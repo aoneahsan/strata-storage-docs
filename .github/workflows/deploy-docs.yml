@@ -1,0 +1,53 @@
+name: Deploy docs to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request: # build-only validation; makes "build" a required-check context
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; don't cancel in-progress production deploys.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build # exact name referenced by the main-branch ruleset
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Enable Corepack (Yarn 4)
+        run: corepack enable
+      - name: Install dependencies
+        run: yarn install --immutable
+      - name: Build Docusaurus site (regenerates llms-full.txt, then builds)
+        # onBrokenLinks / onBrokenMarkdownLinks are 'throw' — this is the
+        # link-integrity gate as well as the build.
+        run: yarn build
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: build
+
+  deploy:
+    name: deploy
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
