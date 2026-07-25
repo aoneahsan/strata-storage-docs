@@ -15,11 +15,20 @@ const SITE_URL = 'https://stratastorage-docs.aoneahsan.com';
 const DOCS_DIR = path.join(__dirname, '..', 'docs');
 const OUT_FILE = path.join(__dirname, '..', 'static', 'llms-full.txt');
 
+/**
+ * Internal files that must never reach the published site. This walker does NOT
+ * see the docs plugin's `exclude` in docusaurus.config.js, so the skip list is
+ * duplicated here on purpose — keep the two in sync. Without this, an internal
+ * ops file is excluded from build/ yet still published inside /llms-full.txt.
+ */
+const SKIP_FILES = new Set(['MANUAL-TASKS.md']);
+
 /** Recursively collect .md/.mdx files, sorted for deterministic output. */
 function collect(dir) {
   const out = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     const full = path.join(dir, entry.name);
+    if (entry.name.startsWith('_') || SKIP_FILES.has(entry.name)) continue;
     if (entry.isDirectory()) out.push(...collect(full));
     else if (/\.mdx?$/.test(entry.name)) out.push(full);
   }

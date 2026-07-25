@@ -55,6 +55,15 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/aoneahsan/strata-storage-docs/edit/main/docs/',
           showLastUpdateTime: true,
+          // `exclude` REPLACES the plugin defaults, so the defaults are restated here.
+          // MANUAL-TASKS.md is an internal ops file that must never ship as a public page.
+          exclude: [
+            '**/_*.{js,jsx,ts,tsx,md,mdx}',
+            '**/_*/**',
+            '**/*.test.{js,jsx,ts,tsx}',
+            '**/__tests__/**',
+            'MANUAL-TASKS.md',
+          ],
         },
         blog: false,
         theme: {
