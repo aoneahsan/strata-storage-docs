@@ -21,6 +21,14 @@ The SessionStorage adapter provides temporary storage that persists for the dura
 | Batch Support | ✅ Yes |
 | Transaction Support | ❌ No |
 
+:::info Shared storage area — key ownership
+This area is shared with every other script on the origin, and the key prefix is empty by default. Since
+**2.9.0** the adapter treats a key as its own only when the stored value is a `StorageValue` envelope, so
+`keys()`, the TTL sweep and `clear()` never touch data this library did not write. A key written here by
+anything else is invisible to `keys()` by design; `setLogLevel('debug')` shows what is being skipped.
+Full explanation: [Configuration ▸ key ownership](../../../configuration.md#key-ownership).
+:::
+
 ## Usage
 
 ```typescript

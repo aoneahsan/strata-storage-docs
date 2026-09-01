@@ -51,7 +51,11 @@ const storage = new Strata({
 ### Configuration Options
 
 - `group` (string): iOS App Group identifier for sharing between apps
-- `prefix` (string): Prefix for all keys (default: 'strata_')
+:::caution Corrected in 2.9.0
+This page previously documented a `prefix` option here. **`PreferencesAdapter` has no `prefix` option** —
+it accepts no configuration at all. Use `namespace` on the instance
+(`defineStorage({ namespace: 'myapp' })`) to scope keys on native.
+:::
 
 ## Platform Implementation
 

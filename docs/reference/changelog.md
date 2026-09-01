@@ -5,6 +5,61 @@ All notable changes to Strata Storage will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.0] - 2026-09-01
+
+**Closes the entire consumer-reported issue queue.** No API changes and no data migration — every key
+stays exactly where it is.
+
+### Fixed
+
+- **Web adapters no longer treat other applications' keys as their own.** `localStorage`,
+  `sessionStorage` and cookies are shared with every script on the origin, and the default key prefix is
+  empty — so a name test matched every key there. An adapter now identifies its own data by **shape**: a
+  key is its own only when the stored value is a `StorageValue` envelope. This ends the
+  `Failed to get key … is not valid JSON` error stream (Microsoft Clarity's `_cltk` was the usual
+  trigger), keeps `keys()` to keys this library wrote, and closes two data-loss paths — the TTL sweep
+  deleting a foreign key whose JSON carried an expired `expires`, and an unfiltered `clear()` wiping the
+  origin. See [Troubleshooting](./troubleshooting.md) and
+  [Configuration ▸ key ownership](../configuration.md#key-ownership).
+- **An unscoped `subscribe()` no longer throws.** It fanned out across every registered adapter and
+  `indexedDB` threw `NotSupportedError`, commonly killing application boot. Non-observable backends are
+  skipped. See [`subscribe()`](../api/core/strata.md#subscribe).
+- **Per-adapter configuration reaches the adapter.**
+  `defineStorage({ adapters: { localStorage: { prefix: 'app:' } } })` was a silent no-op on the
+  synchronous path, which is usable before `initialize()` resolves. Configuration is now applied
+  synchronously at registration.
+- **`defaultStorages` protects the synchronous path too** — with `localStorage` unavailable, `setSync`
+  now falls through to the next listed backend instead of throwing.
+- **`clear({ expiredOnly: true })` was a guaranteed no-op** on `localStorage`, `sessionStorage` and
+  cookies, and **`cleanupExpired()` reported `0`** while doing the work. Both corrected.
+- **`setLogLevel` / `getLogLevel` are now exported.** They were documented but unreachable — and they
+  matter now, because skipped foreign keys are reported at `debug`.
+- **Documentation corrections.** The `localStorage` adapter page said `prefix` defaults to `'strata_'`;
+  it defaults to `''`. The Capacitor `preferences` page documented a `prefix` option that does not exist.
+
+### Changed
+
+- `adapters: { <name>: false }` now skips **registration**, not just initialization. Note that
+  `defaultStorages` is *not* a registration list — it picks the default adapter, while multi-adapter
+  operations span everything registered.
+
+### Coming in 3.0.0
+
+A real default key prefix for the web adapters, built on this release's shape check, with migrate-on-read
+and an opt-out for consumers whose physical key names are frozen.
+
+## [2.8.5] - 2026-07-25
+
+README, packaging and metadata pass. The at-a-glance version row no longer ships stale, `CHANGELOG.md`
+is included in the tarball, `funding` and a canonical `repository.url` were added, and `homepage` points
+at this documentation site. `dist/package.json` was reduced to a two-field module marker so a publish
+from `dist/` cannot ship the wrong tree. No runtime code changes across 2.8.2–2.8.5.
+
+:::caution 2.8.2 was a bad release
+`2.8.2` was published from a stale tree: its bundled docs omitted the required `npx cap sync` native
+setup step. It is deprecated on npm. Use 2.8.3 or later.
+:::
+
 ## [2.8.1] - 2026-06-30
 
 Documentation and metadata release — **no runtime code changes, no API changes**. Bug reports now

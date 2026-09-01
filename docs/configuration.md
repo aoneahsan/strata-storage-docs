@@ -255,6 +255,44 @@ const storage = new Strata({
 });
 ```
 
+:::danger `defaultStorages` is not a registration list
+It is the preference order for choosing the **default** adapter, and the fallback order when one is
+unusable. Operations with no explicit `storage` — `keys()`, `clear()`, `size()`, `subscribe()` —
+deliberately span **every registered adapter**, so listing one storage here does not stop the others from
+being registered or swept.
+
+To leave an adapter out entirely, say so:
+
+```typescript
+const storage = defineStorage({
+  defaultStorages: ['localStorage'],
+  adapters: { sessionStorage: false, indexedDB: false, cookies: false, cache: false },
+});
+```
+
+Since 2.9.0, `adapters: { <name>: false }` skips **registration**, not just initialization. (Before 2.9.0
+it only skipped initialization, so the adapter was still registered and still swept — which is what made
+`defaultStorages` look like a registration list that was being ignored.)
+:::
+
+## Shared storage areas and key ownership {#key-ownership}
+
+`localStorage`, `sessionStorage` and cookies are shared with every other script on the origin, and the
+web adapters' key prefix is empty by default. **Since 2.9.0 an adapter identifies its own data by shape**
+— a key is its own only when the stored value is a `StorageValue` envelope — so `keys()`, the TTL sweep
+and `clear()` never touch data this library did not write.
+
+Consequences worth knowing:
+
+- A key written to the same area by anything else is invisible to `keys()` **by design**.
+- A value we cannot read is skipped and reported at `debug`, not as an error: it is evidence the key
+  belongs to somebody else, which is the ordinary case in a shared area.
+- `setLogLevel('debug')` (exported) names every skipped key and why.
+
+Setting `namespace` or a per-adapter `prefix` is still worth doing for a clean keyspace. It is no longer
+what keeps this library off other applications' keys.
+
+
 ## Custom Configuration Patterns
 
 ### Multi-Instance Configuration

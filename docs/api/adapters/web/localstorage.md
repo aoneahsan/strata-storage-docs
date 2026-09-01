@@ -21,6 +21,37 @@ The LocalStorage adapter provides simple, synchronous, persistent storage in web
 | Batch Support | ✅ Yes |
 | Transaction Support | ❌ No |
 
+## Shared storage areas {#shared-storage-areas}
+
+`localStorage` is shared with every other script on the origin, and this adapter's key prefix is empty
+by default — so a name test (`key.startsWith(prefix)`) matches **every** key there, including ones
+written by analytics tags, other libraries, and other apps on the same domain.
+
+**Since 2.9.0 the adapter identifies its own data by shape**: a key counts as its own only when the
+stored value deserializes into a `StorageValue` envelope. Everything else is skipped.
+
+What that means in practice:
+
+- `keys()` returns only keys this library wrote. A key put in `localStorage` by anything else is
+  invisible to it **by design**.
+- The TTL sweep and `clear()` never read, delete, or log about another application's data.
+- A value that is not ours is **not an error** — it is evidence the key belongs to somebody else. It is
+  skipped and reported at `debug`. `logger.error` is reserved for a key carrying our own envelope that
+  still fails, and for a genuine storage-access fault such as a blocked origin.
+
+```typescript
+import { setLogLevel } from 'strata-storage';
+setLogLevel('debug');   // names every skipped key and why
+```
+
+:::note Before 2.9.0
+An empty prefix made the adapter claim every key on the origin. It logged
+`Failed to get key <foreign-key> from localStorage: SyntaxError…` on every TTL sweep, returned foreign
+keys from `keys()`, and could delete a foreign key whose JSON happened to carry an expired `expires`.
+Setting a prefix or a namespace is still good practice for a clean keyspace — it is no longer what keeps
+the library off other people's keys.
+:::
+
 ## Usage
 
 ```typescript
@@ -49,7 +80,10 @@ const storage = new Strata({
 
 ### Configuration Options
 
-- `prefix` (string): Prefix for all keys (default: 'strata_')
+- `prefix` (string): Prefix for all keys — **default `''` (empty)**, not `'strata_'`. This page said
+  `'strata_'` until 2.9.0 and that was wrong; the empty default is exactly why the adapter has to
+  identify its own keys by shape (see [Shared storage areas](#shared-storage-areas) below). Applied
+  immediately, so it also holds for `setSync`/`getSync` issued before `initialize()` resolves.
 - `serialize` (function): Custom serialization function
 - `deserialize` (function): Custom deserialization function
 

@@ -81,6 +81,61 @@ await storage.initialize(); // Must call this first
 await storage.set('key', 'value');
 ```
 
+### "Failed to get key … is not valid JSON" in the console
+
+**Symptom.** On every page load, one or more of:
+
+```
+[strata-storage] Failed to get key _cltk from sessionStorage: SyntaxError: Unexpected token 's', "ts3hsf" is not valid JSON
+[strata-storage] Failed to get key logger-level from localStorage: SyntaxError: Unexpected token 'w', "warn" is not valid JSON
+```
+
+**Fixed in 2.9.0 — upgrade.** `yarn up strata-storage` (or `npm i strata-storage@latest`). No code change
+and no migration: your keys stay exactly where they are.
+
+**What was happening.** `localStorage` and `sessionStorage` are shared with every other script on the
+origin, and the web adapters' key prefix is empty by default — so the adapter's name test matched every
+key on the origin, including third-party ones. It then parsed each as JSON and reported the failure at
+`error` level. `_cltk` is Microsoft Clarity's session key; the trigger is usually an analytics tag, not
+your code. Consumers routing their logger into Sentry received one report per foreign key per sweep.
+
+Two further consequences, both closed by the same fix: `keys()` returned keys the library never wrote,
+and the TTL sweep could **delete** a foreign key whose JSON happened to carry an expired `expires`.
+
+**After 2.9.0** an adapter treats a key as its own only when the stored value is a `StorageValue`
+envelope. Foreign keys are skipped silently — a value that is not ours is evidence the key belongs to
+somebody else, not an error. To see what is being skipped:
+
+```typescript
+import { setLogLevel } from 'strata-storage';
+setLogLevel('debug');
+// [strata-storage] sessionStorage: skipping key "_cltk" — value is not readable as
+// sessionStorage data (not written by this adapter).
+```
+
+**If you cannot upgrade yet**, raise the log level's floor so `error` output is suppressed
+(`setLogLevel('silent')` — note this silences real errors too), or construct `Strata` directly and
+register only the adapters you use. Neither is needed on 2.9.0.
+
+### "Operation 'subscribe' is not supported by indexedDB adapter"
+
+**Symptom.** `storage.subscribe(cb)` with no options throws, often taking application boot with it:
+
+```
+NotSupportedError: Operation 'subscribe' is not supported by indexedDB adapter
+```
+
+**Fixed in 2.9.0 — upgrade.** The unscoped form fanned out across every registered adapter, and
+`indexedDB`, `cookies` and `cache` cannot emit change events — so the documented "hear every adapter"
+form failed on any default instance. Non-observable backends are now skipped, and you get an observer
+attached to the ones that can speak.
+
+**Workaround before 2.9.0** (still valid, and tighter when you only care about one backend):
+
+```typescript
+storage.subscribe(cb, { storage: 'localStorage' });
+```
+
 ### QuotaExceededError
 
 **Problem**: Browser storage quota exceeded.

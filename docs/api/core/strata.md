@@ -340,6 +340,30 @@ const unsubscribe = storage.subscribe((change) => {
 unsubscribe();
 ```
 
+#### Which backends actually deliver
+
+Omitting `options` attaches to every registered adapter **that can emit change events** — `memory`,
+`localStorage`, `sessionStorage` and `url`. `indexedDB`, `cookies` and `cache` have no native change
+notification and are skipped, so an unscoped subscription hears fewer backends than are registered. That
+is the intended outcome: an observer that hears everything able to speak.
+
+Naming a non-observable backend explicitly logs a warning, because a subscription that can never fire is
+almost certainly not what you meant:
+
+```typescript
+storage.subscribe(cb, { storage: 'indexedDB' });
+// [strata-storage] subscribe: storage "indexedDB" does not support change events,
+// so this subscription will never fire.
+```
+
+:::note Before 2.9.0
+The unscoped form **threw** `NotSupportedError: Operation 'subscribe' is not supported by indexedDB
+adapter`, because the fan-out did not skip backends that cannot subscribe — and `indexedDB` is registered
+on every default instance. Since the throw propagated out of whatever set up the subscription, it
+commonly took application boot down with it. Scoping to `{ storage: 'localStorage' }` was the workaround;
+it still works and is tighter when only one backend matters.
+:::
+
 ### export()
 
 ```typescript
