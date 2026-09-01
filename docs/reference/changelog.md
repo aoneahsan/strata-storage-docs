@@ -5,6 +5,49 @@ All notable changes to Strata Storage will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-09-01
+
+:::danger Breaking — web adapter keys are now prefixed
+`localStorage` and `sessionStorage` keys are written under **`strata:`**. Existing data migrates itself on
+read, so most consumers do nothing — but **set `keyPrefix: false` if anything outside this library reads a
+physical key directly** (a pre-paint theme script, a logger reading its own level). Migration keeps the
+data reachable through this library; it cannot fix a hard-coded reader.
+:::
+
+### Breaking
+
+- **`localStorage`/`sessionStorage` default to the `strata:` key prefix** (`DEFAULT_WEB_KEY_PREFIX`,
+  exported). 2.9.0 made an unprefixed keyspace *safe* — a key is ours only if its value is a
+  `StorageValue` envelope — and this makes it tidy too, so our keys are identifiable by name.
+  `cookies` (already `strata_`), `indexedDB`, `cache`, `memory` and `url` are unchanged: none of them
+  share a keyspace with other scripts. `namespace` is unaffected and composes as
+  `<keyPrefix><namespace>:<key>`.
+
+### Added
+
+- **`keyPrefix`** — `false` (or `''`) restores pre-3.0 behaviour; a string sets your own prefix. A
+  per-adapter `adapters.localStorage.prefix` still wins.
+- **`migrateLegacyKeys`** (default `true`) — adopt pre-3.0 unprefixed entries on read.
+
+### Migration
+
+A miss at `strata:<key>` falls back to the bare `<key>`; if the value is one of ours it is moved under the
+prefix and returned. Three properties, each verified in a browser:
+
+- **Per key, on read — never a bulk sweep.** A sweep would adopt every unprefixed envelope on the origin,
+  including keys belonging to an instance that opted out or a sibling app still on 2.x.
+- **Never adopts a value that is not ours.** A third-party key such as Microsoft Clarity's `_cltk` is
+  left exactly where it is.
+- **Never overwrites.** A value already at the prefixed key wins; the legacy entry is left alone.
+
+Two applications sharing one origin with one still on 2.x: set `migrateLegacyKeys: false` on the upgraded
+one, or better, give each a `namespace` — they were already colliding before this release.
+
+### Fixed
+
+- **A live timer no longer keeps a Node process alive.** A short-lived script that created an instance and
+  never called `close()` did not exit — measured hanging until killed at 120s, now exits immediately.
+
 ## [2.9.0] - 2026-09-01
 
 **Closes the entire consumer-reported issue queue.** No API changes and no data migration — every key

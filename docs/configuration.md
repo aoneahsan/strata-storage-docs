@@ -275,6 +275,35 @@ it only skipped initialization, so the adapter was still registered and still sw
 `defaultStorages` look like a registration list that was being ignored.)
 :::
 
+## Key prefix and the 3.0.0 migration {#key-prefix}
+
+Since **3.0.0**, `localStorage` and `sessionStorage` keys are written under **`strata:`**
+(`DEFAULT_WEB_KEY_PREFIX`, exported). Existing data migrates itself on read.
+
+```typescript
+const storage = defineStorage();                              // keys at `strata:<key>`
+const legacy  = defineStorage({ keyPrefix: false });          // pre-3.0, bare keys
+const custom  = defineStorage({ keyPrefix: 'myapp:' });       // your own
+const noMove  = defineStorage({ migrateLegacyKeys: false });  // don't adopt 2.x entries
+```
+
+:::danger Take `keyPrefix: false` when something outside this library reads a physical key
+A pre-paint theme script that runs before any module loads, or a logger reading its own level, knows the
+exact key name — and a prefix changes it underneath them. Migration keeps the *data* reachable through
+this library; it cannot fix a hard-coded reader.
+:::
+
+**How migration works.** A miss at `strata:<key>` falls back to the bare `<key>`; if the value is one of
+ours it is moved under the prefix and returned. It is **per key, on read** — never a bulk sweep, which
+would adopt every unprefixed envelope on the origin including keys belonging to an instance that opted out
+or a sibling app still on 2.x. It **never adopts a non-envelope**, and it **never overwrites** a value
+already at the prefixed key. `keys()` lists not-yet-migrated entries so enumeration stays complete, but
+listing never moves anything.
+
+Unchanged: `cookies` (already `strata_`), `indexedDB` and `cache` (named stores), `memory` (its own Map),
+`url` (already prefixes its params). `namespace` is a separate mechanism — the physical key is
+`<keyPrefix><namespace>:<key>`.
+
 ## Shared storage areas and key ownership {#key-ownership}
 
 `localStorage`, `sessionStorage` and cookies are shared with every other script on the origin, and the
