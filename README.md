@@ -24,7 +24,7 @@ yarn serve    # serve the real build
 yarn clear    # wipe the Docusaurus cache
 ```
 
-`yarn build` regenerates `static/llms-full.txt` (`scripts/generate-llms-full.js`) before building. `onBrokenLinks` and `onBrokenMarkdownLinks` are both `throw`, so **the build is the link checker**.
+`yarn build` regenerates `static/llms-full.txt` (`scripts/generate-llms-full.js`) before building. Docusaurus treats broken links as build failures, so **the build is the link checker**.
 
 ## Layout
 

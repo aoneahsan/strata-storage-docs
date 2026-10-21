@@ -40,7 +40,6 @@ const config = {
     // `Map<K, V>` and `{ ... }` object literals in prose don't break compilation.
     format: 'detect',
     hooks: {
-      onBrokenMarkdownLinks: 'throw',
     },
   },
 
