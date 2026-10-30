@@ -5,6 +5,38 @@ All notable changes to Strata Storage will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.1] - 2026-10-21
+
+### Fixed
+
+- **Same-key raw imports preserve the migrated value** (ISSUE-14). When `keyPrefix: false` makes the named raw source and destination the same physical key, `importRawSync` now keeps the newly written Strata envelope instead of deleting it. Distinct-key imports still remove the source only after the destination write succeeds.
+
+## [3.1.0] - 2026-09-24
+
+### Added
+
+- **`importRawSync(rawKey, key, options)`** — adopt ONE foreign `localStorage` / `sessionStorage` entry,
+  named by its exact physical key, into a strata key, deleting the original. The migration path for data
+  written by something other than this library (a pre-strata zustand store, a raw `setItem`), which the
+  implicit paths deliberately never adopt. The raw string is kept as-is; an existing value at `key` wins and
+  nothing is moved. Found while moving ZTools' 22 zustand stores onto strata.
+
+### Fixed
+
+- **`sessionStorage` keys were not prefixed** (ISSUE-13). 3.0.0 documented both web areas as written under
+  `strata:`, but `SessionStorageAdapter`'s constructor defaulted its prefix to `''`, overriding the shared
+  default. It now uses `DEFAULT_WEB_KEY_PREFIX`; existing bare envelope keys migrate themselves on read.
+
+## [3.0.1] - 2026-09-24
+
+### Fixed
+
+- **Android: consuming apps on current AGP failed to configure `:strata-storage`** (ISSUE-12).
+  `android/build.gradle` referenced `getDefaultProguardFile('proguard-android.txt')`, which current Android
+  Gradle Plugin versions reject at configuration time because it includes `-dontoptimize` — so the whole
+  app build failed even though the library sets `minifyEnabled false`. Now uses
+  `proguard-android-optimize.txt`, like every official Capacitor plugin. No JavaScript or API change.
+
 ## [3.0.0] - 2026-09-01
 
 :::danger Breaking — web adapter keys are now prefixed

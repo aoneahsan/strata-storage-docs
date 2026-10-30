@@ -248,6 +248,30 @@ storage.clearSync();
 - `getSync` on a value that was stored encrypted or compressed throws. Read it with `await storage.get(...)`.
 - TTL, tags, and metadata are supported by the synchronous API.
 
+### importRawSync()
+
+Adopt ONE foreign `localStorage` / `sessionStorage` entry, named by its exact physical key, into a Strata key, and
+delete the original. It is the migration path for data written by something other than this library (a raw
+`localStorage.setItem`, a pre-Strata zustand store), which the implicit legacy-key migration deliberately never
+adopts. Added in `3.1.0`.
+
+```typescript
+importRawSync(rawKey: string, key: string, options?: StorageOptions): string | null
+```
+
+```typescript
+// Before: the app wrote localStorage.setItem('app-theme', 'dark') itself.
+storage.importRawSync('app-theme', 'app-theme', { storage: 'localStorage' }); // 'dark'
+storage.getSync<string>('app-theme', { storage: 'localStorage' });            // 'dark'
+```
+
+- The raw string is kept as-is (it is not parsed).
+- It returns the adopted string, or `null` when there was nothing to adopt or `key` already holds a value. An
+  existing value at `key` wins, and nothing is moved.
+- Only `localStorage` and `sessionStorage` can import. Any other adapter throws a `StorageError`.
+- The source is removed only after the destination write succeeds. Since `3.1.1`, when `keyPrefix: false` makes
+  the source and destination the same physical key, the newly written envelope is kept (ISSUE-14).
+
 ### size()
 
 ```typescript

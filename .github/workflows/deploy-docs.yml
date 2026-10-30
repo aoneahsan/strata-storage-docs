@@ -23,6 +23,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # Every page's sitemap lastmod is its git date; a shallow clone dates them all to the last commit.
+          fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version: 24
@@ -30,7 +33,7 @@ jobs:
         run: corepack enable
       - name: Install dependencies
         run: yarn install --immutable
-      - name: Build Docusaurus site (regenerates llms-full.txt, then builds)
+      - name: Build Docusaurus site (writes llms-full.txt into build/)
         # onBrokenLinks is 'throw' — this is the link-integrity gate as well as
         # the build.
         run: yarn build

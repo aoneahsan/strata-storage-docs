@@ -15,6 +15,8 @@
   --ifm-font-family-base:
     system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --docusaurus-highlighted-code-line-bg: rgba(37, 99, 235, 0.1);
+  /* Text on a primary-coloured button: white on the light theme's blue. */
+  --ss-cta-ink: #ffffff;
 }
 
 [data-theme='dark'] {
@@ -26,6 +28,8 @@
   --ifm-color-primary-lighter: #bfdbfe;
   --ifm-color-primary-lightest: #dbeafe;
   --docusaurus-highlighted-code-line-bg: rgba(96, 165, 250, 0.2);
+  /* The dark theme's primary is a light blue, so its button text is near-black. */
+  --ss-cta-ink: #0b1220;
 }
 
 .navbar__title {
