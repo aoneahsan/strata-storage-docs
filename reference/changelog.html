@@ -1,0 +1,476 @@
+<!doctype html><html lang=en-US dir=ltr class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-reference/changelog" data-has-hydrated=false><head><meta charset=UTF-8><meta name=generator content="Docusaurus v3.10.2"><title data-rh=true>Changelog | Strata Storage</title><meta data-rh=true name=viewport content="width=device-width, initial-scale=1.0"/><meta data-rh=true property=og:image content=https://stratastorage-docs.aoneahsan.com/img/social-card.png /><meta data-rh=true name=twitter:image content=https://stratastorage-docs.aoneahsan.com/img/social-card.png /><meta data-rh=true property=og:url content=https://stratastorage-docs.aoneahsan.com/reference/changelog /><meta data-rh=true property=og:locale content=en_US /><meta data-rh=true name=docusaurus_locale content=en /><meta data-rh=true name=docsearch:language content=en /><meta data-rh=true name=keywords content="strata storage, universal storage, capacitor storage, indexeddb, sqlite, keychain, encryption, ttl, cross-platform storage, zero dependency storage"/><meta data-rh=true name=twitter:card content=summary_large_image /><meta data-rh=true property=og:type content=website /><meta data-rh=true name=docusaurus_version content=current /><meta data-rh=true name=docusaurus_tag content=docs-default-current /><meta data-rh=true name=docsearch:version content=current /><meta data-rh=true name=docsearch:docusaurus_tag content=docs-default-current /><meta data-rh=true property=og:title content="Changelog | Strata Storage"/><meta data-rh=true name=description content="All notable changes to Strata Storage will be documented in this file."/><meta data-rh=true property=og:description content="All notable changes to Strata Storage will be documented in this file."/><link data-rh=true rel=icon href=/img/favicon.svg /><link data-rh=true rel=canonical href=https://stratastorage-docs.aoneahsan.com/reference/changelog /><link data-rh=true rel=alternate href=https://stratastorage-docs.aoneahsan.com/reference/changelog hreflang=en-US /><link data-rh=true rel=alternate href=https://stratastorage-docs.aoneahsan.com/reference/changelog hreflang=x-default /><script data-rh=true type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://stratastorage-docs.aoneahsan.com/category/reference","name":"Reference","position":1},{"@type":"ListItem","item":"https://stratastorage-docs.aoneahsan.com/reference/changelog","name":"Changelog","position":2}]}</script><link rel=alternate type=application/rss+xml href=/blog/rss.xml title="Strata Storage release notes RSS Feed"><link rel=alternate type=application/atom+xml href=/blog/atom.xml title="Strata Storage release notes Atom Feed"><script type=application/ld+json>{"@context":"https://schema.org","@graph":[{"@id":"https://stratastorage-docs.aoneahsan.com/#website","@type":"WebSite","description":"Documentation for Strata Storage, a zero-dependency universal storage library with one unified API across web, Android, and iOS.","inLanguage":"en","name":"Strata Storage Documentation","publisher":{"@id":"https://stratastorage-docs.aoneahsan.com/#organization"},"url":"https://stratastorage-docs.aoneahsan.com/"},{"@id":"https://stratastorage-docs.aoneahsan.com/#organization","@type":"Organization","contactPoint":{"@type":"ContactPoint","contactType":"developer support","email":"aoneahsan@gmail.com"},"email":"aoneahsan@gmail.com","name":"Strata Storage Team","sameAs":["https://github.com/aoneahsan/strata-storage","https://www.npmjs.com/package/strata-storage"],"url":"https://stratastorage.aoneahsan.com"},{"@id":"https://stratastorage-docs.aoneahsan.com/#software","@type":"SoftwareSourceCode","author":{"@id":"https://stratastorage-docs.aoneahsan.com/#organization"},"codeRepository":"https://github.com/aoneahsan/strata-storage","description":"Zero-dependency universal storage plugin providing a unified API for all storage operations across web, Android, and iOS — localStorage, IndexedDB, cookies, Cache API, SQLite, Preferences, and Keychain/Keystore, plus encryption, compression, TTL, querying, and cross-tab sync.","keywords":"storage, capacitor, ionic, react, vue, angular, localStorage, indexedDB, sqlite, keychain, preferences, zero-dependencies, cross-platform","license":"https://opensource.org/license/mit","name":"Strata Storage","programmingLanguage":["TypeScript","Swift","Java"],"runtimePlatform":["Web","Android","iOS","Capacitor"],"sameAs":["https://github.com/aoneahsan/strata-storage","https://www.npmjs.com/package/strata-storage"],"url":"https://www.npmjs.com/package/strata-storage"}]}</script><link rel=stylesheet href=/assets/css/styles.1b2398a4.css /><script src=/assets/js/runtime~main.f436dfc2.js defer></script><script src=/assets/js/main.fec0bae2.js defer></script></head><body><svg style="display: none;"><defs>
+<symbol id=theme-svg-external-link viewBox="0 0 24 24"><path fill=currentColor d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme-2be")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")),document.documentElement.setAttribute("data-theme-choice",t||"system")}(),function(){try{for(var[t,e]of new URLSearchParams(window.location.search).entries())if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id=__docusaurus><link rel=preload as=image href=/img/logo.svg /><div role=region aria-label="Skip to main content"><a class=skipToContent_fXgn href=#__docusaurus_skipToContent_fallback>Skip to main content</a></div><nav aria-label=Main class="theme-layout-navbar navbar navbar--fixed-top"><div class=navbar__inner><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded=false class="navbar__toggle clean-btn" type=button><svg width=30 height=30 viewBox="0 0 30 30" aria-hidden=true><path stroke=currentColor stroke-linecap=round stroke-miterlimit=10 stroke-width=2 d="M4 7h22M4 15h22M4 23h22"/></svg></button><a class=navbar__brand href=/><div class=navbar__logo><img src=/img/logo.svg alt="Strata Storage logo" class="themedComponent_mlkZ themedComponent--light_NVdE"/><img src=/img/logo.svg alt="Strata Storage logo" class="themedComponent_mlkZ themedComponent--dark_xIcU"/></div><b class="navbar__title text--truncate">Strata Storage</b></a><a aria-current=page class="navbar__item navbar__link navbar__link--active" href=/>Documentation</a><a class="navbar__item navbar__link" href=/quick-start>Quick Start</a><a class="navbar__item navbar__link" href=/api>API</a><a class="navbar__item navbar__link" href=/blog>Releases</a><a class="navbar__item navbar__link" href=/ai>For AI</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href=https://stratastorage.aoneahsan.com target=_blank rel="noopener noreferrer" class="navbar__item navbar__link">Website<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a><a href=https://www.npmjs.com/package/strata-storage target=_blank rel="noopener noreferrer" class="navbar__item navbar__link">npm<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type=button disabled title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width=24 height=24 aria-hidden=true class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill=currentColor d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"/></svg><svg viewBox="0 0 24 24" width=24 height=24 aria-hidden=true class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill=currentColor d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"/></svg><svg viewBox="0 0 24 24" width=24 height=24 aria-hidden=true class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill=currentColor d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"/></svg></button></div><div class=navbarSearchContainer_Bca1><div class="navbar__search searchBarContainer_NW3z" dir=ltr><svg aria-hidden=true class=searchIcon_T3tP focusable=false viewBox="0 0 16 16"><path fill=currentColor d="M6.02945 10.20327a4.17382 4.17382 0 1 1 4.17382-4.17382 4.15609 4.15609 0 0 1-4.17382 4.17382Zm9.69195 4.2199-4.8225-4.82338A5.88021 5.88021 0 0 0 12.058 6.02856 6.00467 6.00467 0 1 0 9.59979 10.8989l4.82338 4.82338a.89729.89729 0 0 0 1.29912 0 .89749.89749 0 0 0-.00087-1.29909Z"/></svg><input placeholder=Search aria-label=Search class="navbar__search-input searchInput_YFbd" value="" /><div class="loadingRing_RJI3 searchBarLoadingRing_YnHq"><div></div><div></div><div></div><div></div></div></div></div></div></div><div role=presentation class=navbar-sidebar__backdrop></div></nav><div id=__docusaurus_skipToContent_fallback class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class=docsWrapper_hBAB><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type=button></button><div class=docRoot_UBD9><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class=sidebarViewport_aRkj><div class=sidebar_njMd><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/><span class=linkLabel_WmDU>Introduction</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/installation><span class=linkLabel_WmDU>Installation</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/quick-start><span class=linkLabel_WmDU>Quick Start</span></a><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/category/guides><span class=categoryLinkLabel_W154>Guides</span></a><button aria-label="Expand sidebar category 'Guides'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/category/examples><span class=categoryLinkLabel_W154>Examples</span></a><button aria-label="Expand sidebar category 'Examples'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist" href=/category/api-reference><span class=categoryLinkLabel_W154>API Reference</span></a><button aria-label="Expand sidebar category 'API Reference'" aria-expanded=false type=button class="clean-btn menu__caret"></button></div><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class=menu__list-item-collapsible><a class="categoryLink_byQd menu__link menu__link--sublist menu__link--active" href=/category/reference><span class=categoryLinkLabel_W154>Reference</span></a><button aria-label="Collapse sidebar category 'Reference'" aria-expanded=true type=button class="clean-btn menu__caret"></button></div><ul class=menu__list><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current=page tabindex=0 href=/reference/changelog><span class=linkLabel_WmDU>Changelog</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/reference/faq><span class=linkLabel_WmDU>Frequently Asked Questions (FAQ)</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class=menu__link tabindex=0 href=/reference/troubleshooting><span class=linkLabel_WmDU>Troubleshooting</span></a></ul><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/configuration><span class=linkLabel_WmDU>Configuration</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/migration><span class=linkLabel_WmDU>Strata Storage Migration Guide</span></a><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class=menu__link href=/ai><span class=linkLabel_WmDU>For AI Agents</span></a></ul></nav></div></div></aside><main class=docMainContainer_TBSr><div class="container padding-top--md padding-bottom--lg"><div class=row><div class="col docItemCol_VOVn"><div class=docItemContainer_Djhp><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label=Breadcrumbs><ul class=breadcrumbs><li class=breadcrumbs__item><a aria-label="Home page" class=breadcrumbs__link href=/><svg viewBox="0 0 24 24" class=breadcrumbHomeIcon_YNFT><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill=currentColor /></svg></a><li class=breadcrumbs__item><a class=breadcrumbs__link href=/category/reference><span>Reference</span></a><li class="breadcrumbs__item breadcrumbs__item--active"><span class=breadcrumbs__link>Changelog</span></ul></nav><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type=button class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Changelog</h1></header>
+<p>All notable changes to Strata Storage will be documented in this file.</p>
+<p>The format is based on <a href=https://keepachangelog.com/en/1.0.0/ target=_blank rel="noopener noreferrer" class="">Keep a Changelog</a>,
+and this project adheres to <a href=https://semver.org/spec/v2.0.0.html target=_blank rel="noopener noreferrer" class="">Semantic Versioning</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=312---2026-10-30>[3.1.2] - 2026-10-30<a href=#312---2026-10-30 class=hash-link aria-label="Direct link to [3.1.2] - 2026-10-30" title="Direct link to [3.1.2] - 2026-10-30" translate=no>​</a></h2>
+<p>No JavaScript or API change: <code>dist/</code> is equivalent to 3.1.1's.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=removed>Removed<a href=#removed class=hash-link aria-label="Direct link to Removed" title="Direct link to Removed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>The <code>postinstall</code> script.</strong> Installing the package no longer runs anything in your project; the setup
+steps it printed (including <code>npx cap sync</code> for Capacitor apps) are in the README's Quick Start.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed>Changed<a href=#changed class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>The <code>npx strata-storage</code> CLI moved from <code>scripts/</code> to <code>bin/</code>.</strong> The command is unchanged.</li>
+<li class=""><strong>Android:</strong> the fallback <code>compileSdkVersion</code> and <code>targetSdkVersion</code> (used only when your app does not set
+them) are now 36. Your app's own values still win.</li>
+<li class=""><strong>Build and gates:</strong> <code>tsc</code> + <code>tsc-alias</code> replace the custom build script, and <code>yarn gates</code> runs typecheck,
+lint, build and a Vitest suite against the built <code>dist/</code> (the storage-ownership predicate and the README
+version row).</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=311---2026-10-21>[3.1.1] - 2026-10-21<a href=#311---2026-10-21 class=hash-link aria-label="Direct link to [3.1.1] - 2026-10-21" title="Direct link to [3.1.1] - 2026-10-21" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed>Fixed<a href=#fixed class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>Same-key raw imports preserve the migrated value</strong> (ISSUE-14). When <code>keyPrefix: false</code> makes the named raw source and destination the same physical key, <code>importRawSync</code> now keeps the newly written Strata envelope instead of deleting it. Distinct-key imports still remove the source only after the destination write succeeds.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=310---2026-09-24>[3.1.0] - 2026-09-24<a href=#310---2026-09-24 class=hash-link aria-label="Direct link to [3.1.0] - 2026-09-24" title="Direct link to [3.1.0] - 2026-09-24" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added>Added<a href=#added class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class=""><strong><code>importRawSync(rawKey, key, options)</code></strong> — adopt ONE foreign <code>localStorage</code> / <code>sessionStorage</code> entry,
+named by its exact physical key, into a strata key, deleting the original. The migration path for data
+written by something other than this library (a pre-strata zustand store, a raw <code>setItem</code>), which the
+implicit paths deliberately never adopt. The raw string is kept as-is; an existing value at <code>key</code> wins and
+nothing is moved. Found while moving ZTools' 22 zustand stores onto strata.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-1>Fixed<a href=#fixed-1 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong><code>sessionStorage</code> keys were not prefixed</strong> (ISSUE-13). 3.0.0 documented both web areas as written under
+<code>strata:</code>, but <code>SessionStorageAdapter</code>'s constructor defaulted its prefix to <code>''</code>, overriding the shared
+default. It now uses <code>DEFAULT_WEB_KEY_PREFIX</code>; existing bare envelope keys migrate themselves on read.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=301---2026-09-24>[3.0.1] - 2026-09-24<a href=#301---2026-09-24 class=hash-link aria-label="Direct link to [3.0.1] - 2026-09-24" title="Direct link to [3.0.1] - 2026-09-24" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-2>Fixed<a href=#fixed-2 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>Android: consuming apps on current AGP failed to configure <code>:strata-storage</code></strong> (ISSUE-12).
+<code>android/build.gradle</code> referenced <code>getDefaultProguardFile('proguard-android.txt')</code>, which current Android
+Gradle Plugin versions reject at configuration time because it includes <code>-dontoptimize</code> — so the whole
+app build failed even though the library sets <code>minifyEnabled false</code>. Now uses
+<code>proguard-android-optimize.txt</code>, like every official Capacitor plugin. No JavaScript or API change.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=300---2026-09-01>[3.0.0] - 2026-09-01<a href=#300---2026-09-01 class=hash-link aria-label="Direct link to [3.0.0] - 2026-09-01" title="Direct link to [3.0.0] - 2026-09-01" translate=no>​</a></h2>
+<p>:::danger Breaking — web adapter keys are now prefixed
+<code>localStorage</code> and <code>sessionStorage</code> keys are written under <strong><code>strata:</code></strong>. Existing data migrates itself on
+read, so most consumers do nothing — but <strong>set <code>keyPrefix: false</code> if anything outside this library reads a
+physical key directly</strong> (a pre-paint theme script, a logger reading its own level). Migration keeps the
+data reachable through this library; it cannot fix a hard-coded reader.
+:::</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=breaking>Breaking<a href=#breaking class=hash-link aria-label="Direct link to Breaking" title="Direct link to Breaking" translate=no>​</a></h3>
+<ul>
+<li class=""><strong><code>localStorage</code>/<code>sessionStorage</code> default to the <code>strata:</code> key prefix</strong> (<code>DEFAULT_WEB_KEY_PREFIX</code>,
+exported). 2.9.0 made an unprefixed keyspace <em>safe</em> — a key is ours only if its value is a
+<code>StorageValue</code> envelope — and this makes it tidy too, so our keys are identifiable by name.
+<code>cookies</code> (already <code>strata_</code>), <code>indexedDB</code>, <code>cache</code>, <code>memory</code> and <code>url</code> are unchanged: none of them
+share a keyspace with other scripts. <code>namespace</code> is unaffected and composes as
+<code>&lt;keyPrefix>&lt;namespace>:&lt;key></code>.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-1>Added<a href=#added-1 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class=""><strong><code>keyPrefix</code></strong> — <code>false</code> (or <code>''</code>) restores pre-3.0 behaviour; a string sets your own prefix. A
+per-adapter <code>adapters.localStorage.prefix</code> still wins.</li>
+<li class=""><strong><code>migrateLegacyKeys</code></strong> (default <code>true</code>) — adopt pre-3.0 unprefixed entries on read.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=migration>Migration<a href=#migration class=hash-link aria-label="Direct link to Migration" title="Direct link to Migration" translate=no>​</a></h3>
+<p>A miss at <code>strata:&lt;key></code> falls back to the bare <code>&lt;key></code>; if the value is one of ours it is moved under the
+prefix and returned. Three properties, each verified in a browser:</p>
+<ul>
+<li class=""><strong>Per key, on read — never a bulk sweep.</strong> A sweep would adopt every unprefixed envelope on the origin,
+including keys belonging to an instance that opted out or a sibling app still on 2.x.</li>
+<li class=""><strong>Never adopts a value that is not ours.</strong> A third-party key such as Microsoft Clarity's <code>_cltk</code> is
+left exactly where it is.</li>
+<li class=""><strong>Never overwrites.</strong> A value already at the prefixed key wins; the legacy entry is left alone.</li>
+</ul>
+<p>Two applications sharing one origin with one still on 2.x: set <code>migrateLegacyKeys: false</code> on the upgraded
+one, or better, give each a <code>namespace</code> — they were already colliding before this release.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-3>Fixed<a href=#fixed-3 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>A live timer no longer keeps a Node process alive.</strong> A short-lived script that created an instance and
+never called <code>close()</code> did not exit — measured hanging until killed at 120s, now exits immediately.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=290---2026-09-01>[2.9.0] - 2026-09-01<a href=#290---2026-09-01 class=hash-link aria-label="Direct link to [2.9.0] - 2026-09-01" title="Direct link to [2.9.0] - 2026-09-01" translate=no>​</a></h2>
+<p><strong>Closes the entire consumer-reported issue queue.</strong> No API changes and no data migration — every key
+stays exactly where it is.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-4>Fixed<a href=#fixed-4 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>Web adapters no longer treat other applications' keys as their own.</strong> <code>localStorage</code>,
+<code>sessionStorage</code> and cookies are shared with every script on the origin, and the default key prefix is
+empty — so a name test matched every key there. An adapter now identifies its own data by <strong>shape</strong>: a
+key is its own only when the stored value is a <code>StorageValue</code> envelope. This ends the
+<code>Failed to get key … is not valid JSON</code> error stream (Microsoft Clarity's <code>_cltk</code> was the usual
+trigger), keeps <code>keys()</code> to keys this library wrote, and closes two data-loss paths — the TTL sweep
+deleting a foreign key whose JSON carried an expired <code>expires</code>, and an unfiltered <code>clear()</code> wiping the
+origin. See <a class="" href=/reference/troubleshooting>Troubleshooting</a> and
+<a class="" href=/configuration#key-ownership>Configuration ▸ key ownership</a>.</li>
+<li class=""><strong>An unscoped <code>subscribe()</code> no longer throws.</strong> It fanned out across every registered adapter and
+<code>indexedDB</code> threw <code>NotSupportedError</code>, commonly killing application boot. Non-observable backends are
+skipped. See <a class="" href=/api/core/strata#subscribe><code>subscribe()</code></a>.</li>
+<li class=""><strong>Per-adapter configuration reaches the adapter.</strong>
+<code>defineStorage({ adapters: { localStorage: { prefix: 'app:' } } })</code> was a silent no-op on the
+synchronous path, which is usable before <code>initialize()</code> resolves. Configuration is now applied
+synchronously at registration.</li>
+<li class=""><strong><code>defaultStorages</code> protects the synchronous path too</strong> — with <code>localStorage</code> unavailable, <code>setSync</code>
+now falls through to the next listed backend instead of throwing.</li>
+<li class=""><strong><code>clear({ expiredOnly: true })</code> was a guaranteed no-op</strong> on <code>localStorage</code>, <code>sessionStorage</code> and
+cookies, and <strong><code>cleanupExpired()</code> reported <code>0</code></strong> while doing the work. Both corrected.</li>
+<li class=""><strong><code>setLogLevel</code> / <code>getLogLevel</code> are now exported.</strong> They were documented but unreachable — and they
+matter now, because skipped foreign keys are reported at <code>debug</code>.</li>
+<li class=""><strong>Documentation corrections.</strong> The <code>localStorage</code> adapter page said <code>prefix</code> defaults to <code>'strata_'</code>;
+it defaults to <code>''</code>. The Capacitor <code>preferences</code> page documented a <code>prefix</code> option that does not exist.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-1>Changed<a href=#changed-1 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class=""><code>adapters: { &lt;name>: false }</code> now skips <strong>registration</strong>, not just initialization. Note that
+<code>defaultStorages</code> is <em>not</em> a registration list — it picks the default adapter, while multi-adapter
+operations span everything registered.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=coming-in-300>Coming in 3.0.0<a href=#coming-in-300 class=hash-link aria-label="Direct link to Coming in 3.0.0" title="Direct link to Coming in 3.0.0" translate=no>​</a></h3>
+<p>A real default key prefix for the web adapters, built on this release's shape check, with migrate-on-read
+and an opt-out for consumers whose physical key names are frozen.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=285---2026-07-25>[2.8.5] - 2026-07-25<a href=#285---2026-07-25 class=hash-link aria-label="Direct link to [2.8.5] - 2026-07-25" title="Direct link to [2.8.5] - 2026-07-25" translate=no>​</a></h2>
+<p>README, packaging and metadata pass. The at-a-glance version row no longer ships stale, <code>CHANGELOG.md</code>
+is included in the tarball, <code>funding</code> and a canonical <code>repository.url</code> were added, and <code>homepage</code> points
+at this documentation site. <code>dist/package.json</code> was reduced to a two-field module marker so a publish
+from <code>dist/</code> cannot ship the wrong tree. No runtime code changes across 2.8.2–2.8.5.</p>
+<p>:::caution 2.8.2 was a bad release
+<code>2.8.2</code> was published from a stale tree: its bundled docs omitted the required <code>npx cap sync</code> native
+setup step. It is deprecated on npm. Use 2.8.3 or later.
+:::</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=281---2026-06-30>[2.8.1] - 2026-06-30<a href=#281---2026-06-30 class=hash-link aria-label="Direct link to [2.8.1] - 2026-06-30" title="Direct link to [2.8.1] - 2026-06-30" translate=no>​</a></h2>
+<p>Documentation and metadata release — <strong>no runtime code changes, no API changes</strong>. Bug reports now
+route to <a href=https://github.com/aoneahsan/strata-storage/issues target=_blank rel="noopener noreferrer" class="">GitHub Issues</a>; the AI Integration
+Guide documents the <code>npx cap sync</code> native step, the <code>registerCapacitorAdapters()</code> helper, and the
+TypeScript <code>moduleResolution: "bundler" | "nodenext"</code> requirement for subpath types. See the root
+<code>CHANGELOG.md</code> for the full list.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=280---2026-06-27>[2.8.0] - 2026-06-27<a href=#280---2026-06-27 class=hash-link aria-label="Direct link to [2.8.0] - 2026-06-27" title="Direct link to [2.8.0] - 2026-06-27" translate=no>​</a></h2>
+<p><strong>License change: Apache-2.0 → MIT.</strong> A loosening of terms requiring no code changes on your part —
+the only condition is retaining the copyright and license notice. Versions at or before 2.7.1 remain
+available under Apache-2.0; 2.8.0 and later are MIT.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=270---2026-06-24>[2.7.0] - 2026-06-24<a href=#270---2026-06-24 class=hash-link aria-label="Direct link to [2.7.0] - 2026-06-24" title="Direct link to [2.7.0] - 2026-06-24" translate=no>​</a></h2>
+<p>Audit-driven correctness and truthfulness release. No public API surface was
+removed beyond dead config; the focus is making documented behavior match the
+code. See the root <code>CHANGELOG.md</code> for the full itemized list.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-5>Fixed<a href=#fixed-5 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class="">Combined <code>compress</code> + <code>encrypt</code> pipeline now round-trips correctly.</li>
+<li class=""><code>clear({ olderThan })</code>, key/value validation, and <code>close()</code> state reset behave
+as documented.</li>
+<li class=""><code>import()</code>/<code>snapshot()</code> round-trip metadata; auto-backup no longer self-nests.</li>
+<li class=""><code>QueryOptions</code> (<code>limit</code>/<code>skip</code>/<code>sort</code>/<code>select</code>) are honored and <code>query()</code>
+decodes results; multi-adapter TTL cleanup and namespace key isolation work.</li>
+<li class="">Encryption works in Node/SSR environments.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-2>Changed<a href=#changed-2 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class="">Default storage order is now persistent-first.</li>
+<li class=""><strong>Compression is restricted to the <code>lz</code> algorithm</strong> — <code>gzip</code> was never
+implemented and the option type is now <code>algorithm?: 'lz'</code>.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=removed-1>Removed<a href=#removed-1 class=hash-link aria-label="Direct link to Removed" title="Direct link to Removed" translate=no>​</a></h3>
+<ul>
+<li class="">Dead <code>strategy</code> config and the unused <code>StorageStrategy</code> type (type cleanup).</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=261---2026-05-29>[2.6.1] - 2026-05-29<a href=#261---2026-05-29 class=hash-link aria-label="Direct link to [2.6.1] - 2026-05-29" title="Direct link to [2.6.1] - 2026-05-29" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-3>Changed<a href=#changed-3 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class="">Documentation patch release: README and AI integration guide were refreshed to
+cover the 2.6.0 native parity features.</li>
+<li class="">Development dependency patch updates only; no runtime/API behavior changed
+from 2.6.0.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=260---2026-05-27>[2.6.0] - 2026-05-27<a href=#260---2026-05-27 class=hash-link aria-label="Direct link to [2.6.0] - 2026-05-27" title="Direct link to [2.6.0] - 2026-05-27" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-2>Added<a href=#added-2 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>SQLite multi-store</strong> — the <code>database</code> and <code>table</code> options are now honored on
+iOS and Android, so multiple independent SQLite stores (distinct database files
+and/or tables) no longer collapse into a single physical table. Use separate
+<code>defineStorage</code> instances (or distinct <code>database</code>/<code>table</code> config) to keep
+stores isolated.</li>
+<li class=""><strong>Native filesystem backend</strong> — <code>FilesystemAdapter</code> now works on iOS and
+Android (it was previously unavailable on every platform). One file per key
+under the app's documents/files directory (<code>strata_storage/</code>), storing the full
+value wrapper as JSON, with atomic writes; <code>isAvailable()</code> now returns <code>true</code>.</li>
+<li class=""><strong><code>size(true)</code></strong> — native SQLite and filesystem backends now
+return the <code>{ keys, values, metadata }</code> byte breakdown (the flag was previously
+ignored, returning only <code>{ total, count }</code>).</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-6>Fixed<a href=#fixed-6 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>SQLite value round-trip</strong> — native <code>get</code> now returns the full <code>StorageValue</code>
+wrapper (<code>{ value, created, updated, expires, tags, metadata }</code>) instead of a
+raw blob, so TTL, tags, and metadata survive a write→read cycle on iOS and
+Android. Corrupt/legacy rows are treated as a miss instead of throwing.</li>
+<li class=""><strong>Filesystem key/temp-file collision</strong> — in-flight temp files now live in a
+reserved staging subdirectory, so a key whose name resembles a temp file (e.g.
+<code>"backup.tmp"</code>) is never skipped by <code>keys()</code>/<code>size()</code> or wrongly deleted by
+<code>clear()</code>.</li>
+<li class=""><strong><code>size().total</code> consistency</strong> — native backends now include key bytes in
+<code>total</code>, matching the web adapters' convention.</li>
+<li class=""><strong>iOS SQLite bind safety</strong> — text/blob binds use <code>SQLITE_TRANSIENT</code>, removing a
+latent use-after-free for transient Swift buffers.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-4>Changed<a href=#changed-4 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong><code>androidx.security:security-crypto</code></strong> upgraded <code>1.1.0-alpha06</code> → <code>1.1.0</code>
+(stable). The <code>EncryptedSharedPreferences</code> / <code>MasterKey</code> API is unchanged.</li>
+<li class="">The native SQLite database file now resolves from the <code>database</code> option
+(default <code>strata_storage</code> → <code>strata_storage.db</code>); table identifiers are
+sanitized to <code>[A-Za-z0-9_]</code>. Stored values remain bound parameters.</li>
+<li class="">Marketing website tooling migrated to Yarn 4 (Corepack).</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=notes>Notes<a href=#notes class=hash-link aria-label="Direct link to Notes" title="Direct link to Notes" translate=no>​</a></h3>
+<ul>
+<li class="">The native iOS/Android changes in this release are code-complete and reviewed
+but require on-device verification — follow
+<code>docs/guides/platforms/device-verification.md</code>. Web/browser functionality is
+validated by the quality gates (typecheck + build + lint); the project ships no
+automated test runner.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=250---2026-05-26>[2.5.0] - 2026-05-26<a href=#250---2026-05-26 class=hash-link aria-label="Direct link to [2.5.0] - 2026-05-26" title="Direct link to [2.5.0] - 2026-05-26" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-3>Added<a href=#added-3 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>Framework-agnostic, provider-free usage</strong> — <code>defineStorage()</code> returns a
+ready-to-use instance you can create once and use anywhere, with no
+Provider/DI required (Zustand-style). <code>createStrataHooks(instance)</code> (React),
+<code>createStrataComposables(instance)</code> (Vue), and <code>provideStrata(instance)</code>
+(Angular) bind to a created instance; the Provider/Plugin/Service APIs remain
+optional.</li>
+<li class=""><strong>Synchronous API</strong> — <code>getSync</code>/<code>setSync</code>/<code>removeSync</code>/<code>hasSync</code>/<code>keysSync</code>/
+<code>clearSync</code> for sync-capable adapters (memory, localStorage, sessionStorage,
+cookies, url). Async-only backends (indexedDB, cache, native) throw a clear
+error; sync set with encrypt/compress also throws (those are async).</li>
+<li class=""><strong>URL-state adapter</strong> (<code>URLAdapter</code>) — persist state in the query string
+(default) or hash fragment, with <code>popstate</code>/<code>hashchange</code> change events.</li>
+<li class=""><strong>Disaster recovery</strong> (all opt-in) — FNV-1a integrity checksums with
+corruption detection, durable write-verify-readback, mirroring to backup
+adapters with read-repair, and <code>snapshot()</code>/<code>restore()</code> plus scheduled
+<code>autoBackup</code>.</li>
+<li class="">Exported integrity helpers (<code>computeChecksum</code>/<code>verifyChecksum</code>) and error
+classes (e.g. <code>IntegrityError</code>) for <code>instanceof</code> use.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-7>Fixed<a href=#fixed-7 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>The React/Vue/Angular entry points are now actually built and shipped</strong> —
+<code>strata-storage/react|vue|angular</code> previously resolved to files that were
+never compiled into <code>dist/</code>, so every framework import failed.</li>
+<li class="">Multi-adapter operations (<code>keys</code>/<code>clear</code>/<code>size</code>/<code>subscribe</code> with no explicit
+<code>storage</code>) now span all registered adapters instead of only the default.</li>
+<li class="">Cross-tab sync now applies received changes to local memory/IndexedDB/cache
+adapters (previously broadcasts were sent but never applied).</li>
+<li class="">AES-CBC now uses a correct 16-byte IV.</li>
+<li class="">Security: prototype-pollution guards in deep-merge/import/restore, ReDoS-capped
+regex, and <code>SameSite=Lax</code> + automatic <code>Secure</code> cookie defaults.</li>
+<li class="">iOS native plugin now registers with Capacitor (it had no registration and was
+non-functional); added missing native methods on iOS and Android; Keychain
+accessibility hardened.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-5>Changed<a href=#changed-5 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class="">All diagnostic output now routes through a level-gated internal logger
+(default <code>warn</code>); the library no longer writes to the consumer console by
+default. Toggle with <code>new Strata({ debug: { enabled: true } })</code>.</li>
+<li class="">Dependencies updated to latest stable (including TypeScript 6 and ESLint 10).
+The default instance initializes lazily, so importing the package performs no
+I/O. Current quality gates are typecheck, build, lint, and CI; the project no
+longer ships an automated test runner.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=241---2024-12-26>[2.4.1] - 2024-12-26<a href=#241---2024-12-26 class=hash-link aria-label="Direct link to [2.4.1] - 2024-12-26" title="Direct link to [2.4.1] - 2024-12-26" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-4>Added<a href=#added-4 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">Framework integration exports for React, Vue, and Angular</li>
+<li class="">Comprehensive root README.md</li>
+<li class="">Complete reference documentation (changelog, troubleshooting, FAQ)</li>
+<li class="">Missing API feature documentation</li>
+<li class="">SVG assets policy in CLAUDE.md</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-8>Fixed<a href=#fixed-8 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class="">Package.json exports now include framework integrations</li>
+<li class="">Node.js version requirement aligned with documentation (18.0.0+)</li>
+<li class="">Broken links in documentation</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-6>Changed<a href=#changed-6 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class="">Updated documentation structure for better navigation</li>
+<li class="">Improved installation instructions</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=240---2024-12-20>[2.4.0] - 2024-12-20<a href=#240---2024-12-20 class=hash-link aria-label="Direct link to [2.4.0] - 2024-12-20" title="Direct link to [2.4.0] - 2024-12-20" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-5>Added<a href=#added-5 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">Firebase adapter integration</li>
+<li class="">Enhanced TypeScript types</li>
+<li class="">Capacitor plugin structure</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-7>Changed<a href=#changed-7 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class="">Improved error handling across all adapters</li>
+<li class="">Optimized IndexedDB performance</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-9>Fixed<a href=#fixed-9 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class="">Cross-tab sync issues in Safari</li>
+<li class="">TTL expiration edge cases</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=230---2024-12-15>[2.3.0] - 2024-12-15<a href=#230---2024-12-15 class=hash-link aria-label="Direct link to [2.3.0] - 2024-12-15" title="Direct link to [2.3.0] - 2024-12-15" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-6>Added<a href=#added-6 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">Advanced query engine with tag-based filtering</li>
+<li class="">Data migration utilities</li>
+<li class="">Compression threshold configuration</li>
+<li class="">Custom serialization support</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-8>Changed<a href=#changed-8 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class="">Improved encryption performance</li>
+<li class="">Better memory management for large datasets</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-10>Fixed<a href=#fixed-10 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class="">Memory leak in subscription system</li>
+<li class="">Edge cases in TTL cleanup</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=220---2024-12-10>[2.2.0] - 2024-12-10<a href=#220---2024-12-10 class=hash-link aria-label="Direct link to [2.2.0] - 2024-12-10" title="Direct link to [2.2.0] - 2024-12-10" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-7>Added<a href=#added-7 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">Cross-tab synchronization feature</li>
+<li class="">BroadcastChannel support for modern browsers</li>
+<li class="">Storage event fallback for older browsers</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-9>Changed<a href=#changed-9 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class="">Enhanced subscription API</li>
+<li class="">Improved event handling</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-11>Fixed<a href=#fixed-11 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class="">Race conditions in concurrent operations</li>
+<li class="">Storage quota detection in private browsing</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=210---2024-12-05>[2.1.0] - 2024-12-05<a href=#210---2024-12-05 class=hash-link aria-label="Direct link to [2.1.0] - 2024-12-05" title="Direct link to [2.1.0] - 2024-12-05" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-8>Added<a href=#added-8 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">Compression support using LZ-string algorithm</li>
+<li class="">Configurable compression threshold</li>
+<li class="">Automatic compression for large objects</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-10>Changed<a href=#changed-10 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class="">Optimized serialization/deserialization</li>
+<li class="">Improved type safety</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-12>Fixed<a href=#fixed-12 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class="">Issues with null/undefined values</li>
+<li class="">Circular reference handling</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=200---2024-12-01>[2.0.0] - 2024-12-01<a href=#200---2024-12-01 class=hash-link aria-label="Direct link to [2.0.0] - 2024-12-01" title="Direct link to [2.0.0] - 2024-12-01" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-9>Added<a href=#added-9 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">Complete rewrite with zero dependencies</li>
+<li class="">Native mobile support via Capacitor</li>
+<li class="">Encryption using Web Crypto API</li>
+<li class="">TTL (Time-To-Live) support</li>
+<li class="">Multiple storage adapter system</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-11>Changed<a href=#changed-11 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class=""><strong>BREAKING</strong>: New API design for consistency</li>
+<li class=""><strong>BREAKING</strong>: Removed dependency on @capacitor/preferences</li>
+<li class=""><strong>BREAKING</strong>: Changed configuration structure</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=removed-2>Removed<a href=#removed-2 class=hash-link aria-label="Direct link to Removed" title="Direct link to Removed" translate=no>​</a></h3>
+<ul>
+<li class="">All external runtime dependencies</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=migration-guide>Migration Guide<a href=#migration-guide class=hash-link aria-label="Direct link to Migration Guide" title="Direct link to Migration Guide" translate=no>​</a></h3>
+<p>See <a class="" href=/migration>MIGRATION.md</a> for detailed migration instructions from v1.x to v2.x.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=150---2024-11-15>[1.5.0] - 2024-11-15<a href=#150---2024-11-15 class=hash-link aria-label="Direct link to [1.5.0] - 2024-11-15" title="Direct link to [1.5.0] - 2024-11-15" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-10>Added<a href=#added-10 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">Cookie storage adapter</li>
+<li class="">Cache API adapter</li>
+<li class="">FileSystem adapter for Capacitor</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-13>Fixed<a href=#fixed-13 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class="">IndexedDB transaction handling</li>
+<li class="">Safari private browsing detection</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=140---2024-11-01>[1.4.0] - 2024-11-01<a href=#140---2024-11-01 class=hash-link aria-label="Direct link to [1.4.0] - 2024-11-01" title="Direct link to [1.4.0] - 2024-11-01" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-11>Added<a href=#added-11 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">SQLite adapter for mobile platforms</li>
+<li class="">Secure storage using Keychain (iOS) and EncryptedSharedPreferences (Android)</li>
+<li class="">Batch operations support</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-12>Changed<a href=#changed-12 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class="">Improved error messages</li>
+<li class="">Better TypeScript types</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=130---2024-10-15>[1.3.0] - 2024-10-15<a href=#130---2024-10-15 class=hash-link aria-label="Direct link to [1.3.0] - 2024-10-15" title="Direct link to [1.3.0] - 2024-10-15" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-12>Added<a href=#added-12 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">React hooks integration</li>
+<li class="">Vue composables</li>
+<li class="">Angular services</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-14>Fixed<a href=#fixed-14 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class="">Memory adapter data persistence issues</li>
+<li class="">Edge cases in localStorage fallback</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=120---2024-10-01>[1.2.0] - 2024-10-01<a href=#120---2024-10-01 class=hash-link aria-label="Direct link to [1.2.0] - 2024-10-01" title="Direct link to [1.2.0] - 2024-10-01" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-13>Added<a href=#added-13 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">IndexedDB adapter with Promise-based API</li>
+<li class="">Automatic fallback chain</li>
+<li class="">Storage availability detection</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=changed-13>Changed<a href=#changed-13 class=hash-link aria-label="Direct link to Changed" title="Direct link to Changed" translate=no>​</a></h3>
+<ul>
+<li class="">Enhanced platform detection</li>
+<li class="">Improved error handling</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=110---2024-09-15>[1.1.0] - 2024-09-15<a href=#110---2024-09-15 class=hash-link aria-label="Direct link to [1.1.0] - 2024-09-15" title="Direct link to [1.1.0] - 2024-09-15" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-14>Added<a href=#added-14 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">SessionStorage adapter</li>
+<li class="">Memory storage adapter</li>
+<li class="">Configuration validation</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=fixed-15>Fixed<a href=#fixed-15 class=hash-link aria-label="Direct link to Fixed" title="Direct link to Fixed" translate=no>​</a></h3>
+<ul>
+<li class="">localStorage quota exceeded handling</li>
+<li class="">Type serialization edge cases</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=100---2024-09-01>[1.0.0] - 2024-09-01<a href=#100---2024-09-01 class=hash-link aria-label="Direct link to [1.0.0] - 2024-09-01" title="Direct link to [1.0.0] - 2024-09-01" translate=no>​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id=added-15>Added<a href=#added-15 class=hash-link aria-label="Direct link to Added" title="Direct link to Added" translate=no>​</a></h3>
+<ul>
+<li class="">Initial release</li>
+<li class="">Basic localStorage adapter</li>
+<li class="">TypeScript support</li>
+<li class="">Core Strata class</li>
+<li class="">Simple get/set/remove/clear operations</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=version-numbering>Version Numbering<a href=#version-numbering class=hash-link aria-label="Direct link to Version Numbering" title="Direct link to Version Numbering" translate=no>​</a></h2>
+<ul>
+<li class=""><strong>Major version</strong> (X.0.0): Breaking changes, API changes</li>
+<li class=""><strong>Minor version</strong> (0.X.0): New features, backward compatible</li>
+<li class=""><strong>Patch version</strong> (0.0.X): Bug fixes, backward compatible</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=support-policy>Support Policy<a href=#support-policy class=hash-link aria-label="Direct link to Support Policy" title="Direct link to Support Policy" translate=no>​</a></h2>
+<ul>
+<li class=""><strong>Current version</strong> (2.x): Full support, active development</li>
+<li class=""><strong>Previous major version</strong> (1.x): Security fixes only for 6 months after 2.0 release</li>
+<li class=""><strong>Older versions</strong>: No longer supported</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=reporting-issues>Reporting Issues<a href=#reporting-issues class=hash-link aria-label="Direct link to Reporting Issues" title="Direct link to Reporting Issues" translate=no>​</a></h2>
+<p>Found a bug or have a feature request? Please <a href=https://stratastorage.aoneahsan.com/contact target=_blank rel="noopener noreferrer" class="">contact us</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id=links>Links<a href=#links class=hash-link aria-label="Direct link to Links" title="Direct link to Links" translate=no>​</a></h2>
+<ul>
+<li class=""><a href=https://stratastorage.aoneahsan.com target=_blank rel="noopener noreferrer" class="">Website</a></li>
+<li class=""><a href=https://www.npmjs.com/package/strata-storage target=_blank rel="noopener noreferrer" class="">NPM Package</a></li>
+<li class=""><a href=https://stratastorage-docs.aoneahsan.com target=_blank rel="noopener noreferrer" class="">Documentation</a></li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href=https://github.com/aoneahsan/strata-storage-docs/edit/main/docs/reference/changelog.md target=_blank rel="noopener noreferrer" class=theme-edit-this-page><svg fill=currentColor height=20 width=20 viewBox="0 0 40 40" class=iconEdit_Z9Sw aria-hidden=true><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"/></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"><span class=theme-last-updated>Last updated<!-- --> on <b><time datetime=2026-10-30T18:25:23.000Z itemprop=dateModified>Oct 30, 2026</time></b></span></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href=/category/reference><div class=pagination-nav__sublabel>Previous</div><div class=pagination-nav__label>Reference</div></a><a class="pagination-nav__link pagination-nav__link--next" href=/reference/faq><div class=pagination-nav__sublabel>Next</div><div class=pagination-nav__label>Frequently Asked Questions (FAQ)</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href=#312---2026-10-30 class="table-of-contents__link toc-highlight">[3.1.2] - 2026-10-30</a><ul><li><a href=#removed class="table-of-contents__link toc-highlight">Removed</a><li><a href=#changed class="table-of-contents__link toc-highlight">Changed</a></ul><li><a href=#311---2026-10-21 class="table-of-contents__link toc-highlight">[3.1.1] - 2026-10-21</a><ul><li><a href=#fixed class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#310---2026-09-24 class="table-of-contents__link toc-highlight">[3.1.0] - 2026-09-24</a><ul><li><a href=#added class="table-of-contents__link toc-highlight">Added</a><li><a href=#fixed-1 class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#301---2026-09-24 class="table-of-contents__link toc-highlight">[3.0.1] - 2026-09-24</a><ul><li><a href=#fixed-2 class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#300---2026-09-01 class="table-of-contents__link toc-highlight">[3.0.0] - 2026-09-01</a><ul><li><a href=#breaking class="table-of-contents__link toc-highlight">Breaking</a><li><a href=#added-1 class="table-of-contents__link toc-highlight">Added</a><li><a href=#migration class="table-of-contents__link toc-highlight">Migration</a><li><a href=#fixed-3 class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#290---2026-09-01 class="table-of-contents__link toc-highlight">[2.9.0] - 2026-09-01</a><ul><li><a href=#fixed-4 class="table-of-contents__link toc-highlight">Fixed</a><li><a href=#changed-1 class="table-of-contents__link toc-highlight">Changed</a><li><a href=#coming-in-300 class="table-of-contents__link toc-highlight">Coming in 3.0.0</a></ul><li><a href=#285---2026-07-25 class="table-of-contents__link toc-highlight">[2.8.5] - 2026-07-25</a><li><a href=#281---2026-06-30 class="table-of-contents__link toc-highlight">[2.8.1] - 2026-06-30</a><li><a href=#280---2026-06-27 class="table-of-contents__link toc-highlight">[2.8.0] - 2026-06-27</a><li><a href=#270---2026-06-24 class="table-of-contents__link toc-highlight">[2.7.0] - 2026-06-24</a><ul><li><a href=#fixed-5 class="table-of-contents__link toc-highlight">Fixed</a><li><a href=#changed-2 class="table-of-contents__link toc-highlight">Changed</a><li><a href=#removed-1 class="table-of-contents__link toc-highlight">Removed</a></ul><li><a href=#261---2026-05-29 class="table-of-contents__link toc-highlight">[2.6.1] - 2026-05-29</a><ul><li><a href=#changed-3 class="table-of-contents__link toc-highlight">Changed</a></ul><li><a href=#260---2026-05-27 class="table-of-contents__link toc-highlight">[2.6.0] - 2026-05-27</a><ul><li><a href=#added-2 class="table-of-contents__link toc-highlight">Added</a><li><a href=#fixed-6 class="table-of-contents__link toc-highlight">Fixed</a><li><a href=#changed-4 class="table-of-contents__link toc-highlight">Changed</a><li><a href=#notes class="table-of-contents__link toc-highlight">Notes</a></ul><li><a href=#250---2026-05-26 class="table-of-contents__link toc-highlight">[2.5.0] - 2026-05-26</a><ul><li><a href=#added-3 class="table-of-contents__link toc-highlight">Added</a><li><a href=#fixed-7 class="table-of-contents__link toc-highlight">Fixed</a><li><a href=#changed-5 class="table-of-contents__link toc-highlight">Changed</a></ul><li><a href=#241---2024-12-26 class="table-of-contents__link toc-highlight">[2.4.1] - 2024-12-26</a><ul><li><a href=#added-4 class="table-of-contents__link toc-highlight">Added</a><li><a href=#fixed-8 class="table-of-contents__link toc-highlight">Fixed</a><li><a href=#changed-6 class="table-of-contents__link toc-highlight">Changed</a></ul><li><a href=#240---2024-12-20 class="table-of-contents__link toc-highlight">[2.4.0] - 2024-12-20</a><ul><li><a href=#added-5 class="table-of-contents__link toc-highlight">Added</a><li><a href=#changed-7 class="table-of-contents__link toc-highlight">Changed</a><li><a href=#fixed-9 class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#230---2024-12-15 class="table-of-contents__link toc-highlight">[2.3.0] - 2024-12-15</a><ul><li><a href=#added-6 class="table-of-contents__link toc-highlight">Added</a><li><a href=#changed-8 class="table-of-contents__link toc-highlight">Changed</a><li><a href=#fixed-10 class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#220---2024-12-10 class="table-of-contents__link toc-highlight">[2.2.0] - 2024-12-10</a><ul><li><a href=#added-7 class="table-of-contents__link toc-highlight">Added</a><li><a href=#changed-9 class="table-of-contents__link toc-highlight">Changed</a><li><a href=#fixed-11 class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#210---2024-12-05 class="table-of-contents__link toc-highlight">[2.1.0] - 2024-12-05</a><ul><li><a href=#added-8 class="table-of-contents__link toc-highlight">Added</a><li><a href=#changed-10 class="table-of-contents__link toc-highlight">Changed</a><li><a href=#fixed-12 class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#200---2024-12-01 class="table-of-contents__link toc-highlight">[2.0.0] - 2024-12-01</a><ul><li><a href=#added-9 class="table-of-contents__link toc-highlight">Added</a><li><a href=#changed-11 class="table-of-contents__link toc-highlight">Changed</a><li><a href=#removed-2 class="table-of-contents__link toc-highlight">Removed</a><li><a href=#migration-guide class="table-of-contents__link toc-highlight">Migration Guide</a></ul><li><a href=#150---2024-11-15 class="table-of-contents__link toc-highlight">[1.5.0] - 2024-11-15</a><ul><li><a href=#added-10 class="table-of-contents__link toc-highlight">Added</a><li><a href=#fixed-13 class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#140---2024-11-01 class="table-of-contents__link toc-highlight">[1.4.0] - 2024-11-01</a><ul><li><a href=#added-11 class="table-of-contents__link toc-highlight">Added</a><li><a href=#changed-12 class="table-of-contents__link toc-highlight">Changed</a></ul><li><a href=#130---2024-10-15 class="table-of-contents__link toc-highlight">[1.3.0] - 2024-10-15</a><ul><li><a href=#added-12 class="table-of-contents__link toc-highlight">Added</a><li><a href=#fixed-14 class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#120---2024-10-01 class="table-of-contents__link toc-highlight">[1.2.0] - 2024-10-01</a><ul><li><a href=#added-13 class="table-of-contents__link toc-highlight">Added</a><li><a href=#changed-13 class="table-of-contents__link toc-highlight">Changed</a></ul><li><a href=#110---2024-09-15 class="table-of-contents__link toc-highlight">[1.1.0] - 2024-09-15</a><ul><li><a href=#added-14 class="table-of-contents__link toc-highlight">Added</a><li><a href=#fixed-15 class="table-of-contents__link toc-highlight">Fixed</a></ul><li><a href=#100---2024-09-01 class="table-of-contents__link toc-highlight">[1.0.0] - 2024-09-01</a><ul><li><a href=#added-15 class="table-of-contents__link toc-highlight">Added</a></ul><li><a href=#version-numbering class="table-of-contents__link toc-highlight">Version Numbering</a><li><a href=#support-policy class="table-of-contents__link toc-highlight">Support Policy</a><li><a href=#reporting-issues class="table-of-contents__link toc-highlight">Reporting Issues</a><li><a href=#links class="table-of-contents__link toc-highlight">Links</a></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class=footer__title>Docs</div><ul class="footer__items clean-list"><li class=footer__item><a class=footer__link-item href=/>Introduction</a><li class=footer__item><a class=footer__link-item href=/installation>Installation</a><li class=footer__item><a class=footer__link-item href=/quick-start>Quick Start</a><li class=footer__item><a class=footer__link-item href=/api>API Reference</a><li class=footer__item><a class=footer__link-item href=/ai>For AI Agents</a></ul></div><div class="theme-layout-footer-column col footer__col"><div class=footer__title>Support</div><ul class="footer__items clean-list"><li class=footer__item><a href=https://stratastorage.aoneahsan.com target=_blank rel="noopener noreferrer" class=footer__link-item>Website<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a><li class=footer__item><a href=https://stratastorage.aoneahsan.com/contact target=_blank rel="noopener noreferrer" class=footer__link-item>Contact / Support<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a><li class=footer__item><a href=mailto:aoneahsan@gmail.com target=_blank rel="noopener noreferrer" class=footer__link-item>Email<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a><li class=footer__item><a href=https://github.com/aoneahsan/strata-storage/issues target=_blank rel="noopener noreferrer" class=footer__link-item>GitHub issues<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a></ul></div><div class="theme-layout-footer-column col footer__col"><div class=footer__title>Site</div><ul class="footer__items clean-list"><li class=footer__item><a class=footer__link-item href=/blog>Release notes</a><li class=footer__item><a class=footer__link-item href=/feed>Feed</a><li class=footer__item><a class=footer__link-item href=/sitemap>Sitemap</a><li class=footer__item><a href=/feed.xml target=_blank rel="noopener noreferrer" class=footer__link-item>feed.xml<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a><li class=footer__item><a href=/sitemap.xml target=_blank rel="noopener noreferrer" class=footer__link-item>sitemap.xml<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a><li class=footer__item><a href=/llms.txt target=_blank rel="noopener noreferrer" class=footer__link-item>llms.txt<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a></ul></div><div class="theme-layout-footer-column col footer__col"><div class=footer__title>More</div><ul class="footer__items clean-list"><li class=footer__item><a href=https://www.npmjs.com/package/strata-storage target=_blank rel="noopener noreferrer" class=footer__link-item>npm<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a><li class=footer__item><a href=https://github.com/aoneahsan/strata-storage target=_blank rel="noopener noreferrer" class=footer__link-item>GitHub<svg width=13.5 height=13.5 aria-label="(opens in new tab)" class=iconExternalLink_nPIU><use href=#theme-svg-external-link /></svg></a></ul></div></div><div class="footer__bottom text--center"><div class=footer__copyright>Made by the Strata Storage team · © 2026 · Built with Docusaurus</div></div></div></footer></div></body>

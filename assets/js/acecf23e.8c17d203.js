@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkstrata_storage_docs=self.webpackChunkstrata_storage_docs||[]).push([["3220"],{1912(s){s.exports=JSON.parse('{"blogBasePath":"/blog","blogTitle":"Strata Storage release notes","authorsListPath":"/blog/authors"}')}}]);

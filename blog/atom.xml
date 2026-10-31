@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="atom.xsl"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://stratastorage-docs.aoneahsan.com/blog</id>
+    <title>Strata Storage release notes</title>
+    <updated>2026-10-30T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://stratastorage-docs.aoneahsan.com/blog"/>
+    <subtitle>Every Strata Storage release, newest first.</subtitle>
+    <icon>https://stratastorage-docs.aoneahsan.com/img/favicon.svg</icon>
+    <rights>Made by the Strata Storage team.</rights>
+    <entry>
+        <title type="html"><![CDATA[Strata Storage 3.1.2]]></title>
+        <id>https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-2</id>
+        <link href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-2"/>
+        <updated>2026-10-30T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[No API change: the install script is gone, the CLI moved to bin/, and Android SDK fallbacks are 36.]]></summary>
+        <content type="html"><![CDATA[<p>No API change: the install script is gone, the CLI moved to bin/, and Android SDK fallbacks are 36.</p>
+<!-- -->
+<p>No JavaScript or API change: <code>dist/</code> is equivalent to 3.1.1's.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="removed">Removed<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-2#removed" class="hash-link" aria-label="Direct link to Removed" title="Direct link to Removed" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>The <code>postinstall</code> script.</strong> Installing the package no longer runs anything in your project; the setup
+steps it printed (including <code>npx cap sync</code> for Capacitor apps) are in the README's Quick Start.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="changed">Changed<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-2#changed" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>The <code>npx strata-storage</code> CLI moved from <code>scripts/</code> to <code>bin/</code>.</strong> The command is unchanged.</li>
+<li class=""><strong>Android:</strong> the fallback <code>compileSdkVersion</code> and <code>targetSdkVersion</code> (used only when your app does not set
+them) are now 36. Your app's own values still win.</li>
+<li class=""><strong>Build and gates:</strong> <code>tsc</code> + <code>tsc-alias</code> replace the custom build script, and <code>yarn gates</code> runs typecheck,
+lint, build and a Vitest suite against the built <code>dist/</code> (the storage-ownership predicate and the README
+version row).</li>
+</ul>
+<p>Full history: <a class="" href="https://stratastorage-docs.aoneahsan.com/reference/changelog">the changelog</a>. Install: <code>yarn add strata-storage@3.1.2</code>.</p>]]></content>
+        <category label="Release" term="Release"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Strata Storage 3.1.1]]></title>
+        <id>https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-1</id>
+        <link href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-1"/>
+        <updated>2026-10-21T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Same-key raw imports keep the migrated value (ISSUE-14).]]></summary>
+        <content type="html"><![CDATA[<p>Same-key raw imports keep the migrated value (ISSUE-14).</p>
+<!-- -->
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="fixed">Fixed<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-1#fixed" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>Same-key raw imports preserve the migrated value</strong> (ISSUE-14). When <code>keyPrefix: false</code> makes the named raw source and destination the same physical key, <code>importRawSync</code> now keeps the newly written Strata envelope instead of deleting it. Distinct-key imports still remove the source only after the destination write succeeds.</li>
+</ul>
+<p>Full history: <a class="" href="https://stratastorage-docs.aoneahsan.com/reference/changelog">the changelog</a>. Install: <code>yarn add strata-storage@3.1.1</code>.</p>]]></content>
+        <category label="Release" term="Release"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Strata Storage 3.0.1]]></title>
+        <id>https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-0-1</id>
+        <link href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-0-1"/>
+        <updated>2026-09-24T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Android: consuming apps on current AGP configure strata-storage again (ISSUE-12).]]></summary>
+        <content type="html"><![CDATA[<p>Android: consuming apps on current AGP configure strata-storage again (ISSUE-12).</p>
+<!-- -->
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="fixed">Fixed<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-0-1#fixed" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>Android: consuming apps on current AGP failed to configure <code>:strata-storage</code></strong> (ISSUE-12).
+<code>android/build.gradle</code> referenced <code>getDefaultProguardFile('proguard-android.txt')</code>, which current Android
+Gradle Plugin versions reject at configuration time because it includes <code>-dontoptimize</code> — so the whole
+app build failed even though the library sets <code>minifyEnabled false</code>. Now uses
+<code>proguard-android-optimize.txt</code>, like every official Capacitor plugin. No JavaScript or API change.</li>
+</ul>
+<p>Full history: <a class="" href="https://stratastorage-docs.aoneahsan.com/reference/changelog">the changelog</a>. Install: <code>yarn add strata-storage@3.0.1</code>.</p>]]></content>
+        <category label="Release" term="Release"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Strata Storage 3.1.0]]></title>
+        <id>https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-0</id>
+        <link href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-0"/>
+        <updated>2026-09-24T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[importRawSync adopts one foreign localStorage or sessionStorage entry; sessionStorage keys are prefixed again (ISSUE-13).]]></summary>
+        <content type="html"><![CDATA[<p>importRawSync adopts one foreign localStorage or sessionStorage entry; sessionStorage keys are prefixed again (ISSUE-13).</p>
+<!-- -->
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="added">Added<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-0#added" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h2>
+<ul>
+<li class=""><strong><code>importRawSync(rawKey, key, options)</code></strong> — adopt ONE foreign <code>localStorage</code> / <code>sessionStorage</code> entry,
+named by its exact physical key, into a strata key, deleting the original. The migration path for data
+written by something other than this library (a pre-strata zustand store, a raw <code>setItem</code>), which the
+implicit paths deliberately never adopt. The raw string is kept as-is; an existing value at <code>key</code> wins and
+nothing is moved. Found while moving ZTools' 22 zustand stores onto strata.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="fixed">Fixed<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-0#fixed" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h2>
+<ul>
+<li class=""><strong><code>sessionStorage</code> keys were not prefixed</strong> (ISSUE-13). 3.0.0 documented both web areas as written under
+<code>strata:</code>, but <code>SessionStorageAdapter</code>'s constructor defaulted its prefix to <code>''</code>, overriding the shared
+default. It now uses <code>DEFAULT_WEB_KEY_PREFIX</code>; existing bare envelope keys migrate themselves on read.</li>
+</ul>
+<p>Full history: <a class="" href="https://stratastorage-docs.aoneahsan.com/reference/changelog">the changelog</a>. Install: <code>yarn add strata-storage@3.1.0</code>.</p>]]></content>
+        <category label="Release" term="Release"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Strata Storage 3.0.0]]></title>
+        <id>https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-0-0</id>
+        <link href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-0-0"/>
+        <updated>2026-09-01T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[The web adapters now prefix their keys with strata:, with automatic migration of existing data.]]></summary>
+        <content type="html"><![CDATA[<p>The web adapters now prefix their keys with strata:, with automatic migration of existing data.</p>
+<!-- -->
+<p><strong>Breaking: the web adapters now prefix their keys with <code>strata:</code>.</strong> One line restores the old behaviour,
+and existing data migrates itself on read — but read the migration notes before upgrading, because a
+consumer that reads a physical key from outside this library must opt out.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="breaking">Breaking<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-0-0#breaking" class="hash-link" aria-label="Direct link to Breaking" title="Direct link to Breaking" translate="no">​</a></h2>
+<ul>
+<li class=""><strong><code>localStorage</code> and <code>sessionStorage</code> keys are now written under <code>strata:</code>.</strong> <code>DEFAULT_WEB_KEY_PREFIX</code>
+is exported. Before this release the default prefix was the empty string, so this library's keys sat
+unprefixed among every other script's on the origin. 2.9.0 made that <em>safe</em> — a key is ours only if its
+value is a <code>StorageValue</code> envelope — and this makes it <em>tidy</em>, so our keys are identifiable by name too.
+<ul>
+<li class=""><code>cookies</code> are unchanged: they already defaulted to <code>strata_</code>, and moving them would break existing
+cookies for no gain.</li>
+<li class=""><code>indexedDB</code> and <code>cache</code> own a named store, <code>memory</code> owns its own Map, and the URL adapter already
+prefixes its params. None of them can collide with another script's keys, so none of them change.</li>
+<li class=""><code>namespace</code> is a separate mechanism and is unaffected. The physical key is
+<code>&lt;keyPrefix&gt;&lt;namespace&gt;:&lt;key&gt;</code>.</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="added">Added<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-0-0#added" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h2>
+<ul>
+<li class=""><strong><code>keyPrefix</code></strong> — set <code>false</code> (or <code>''</code>) for the pre-3.0 behaviour, or a string for your own prefix. A
+per-adapter <code>adapters.localStorage.prefix</code> still wins over it.</li>
+<li class=""><strong><code>migrateLegacyKeys</code></strong> (default <code>true</code>) — adopt pre-3.0 unprefixed entries on read.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="migration">Migration<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-0-0#migration" class="hash-link" aria-label="Direct link to Migration" title="Direct link to Migration" translate="no">​</a></h2>
+<p><strong>Most consumers need to do nothing.</strong> On a miss at <code>strata:&lt;key&gt;</code>, the adapter looks for the bare <code>&lt;key&gt;</code>
+and, if the value is one of ours, moves it under the prefix and returns it. Your data stays reachable.</p>
+<p>Three properties of that migration, each verified in a browser:</p>
+<ul>
+<li class=""><strong>It is per key, on read — never a bulk sweep.</strong> A sweep would adopt every unprefixed envelope on the
+origin, including keys belonging to an instance that opted out or to a sibling app still on 2.x.</li>
+<li class=""><strong>It never adopts a value that is not ours</strong> — the 2.9.0 envelope check is what makes it safe at all.
+A planted <code>_cltk</code> is left exactly where it is.</li>
+<li class=""><strong>It never overwrites.</strong> A value already at the prefixed key wins and the legacy entry is left alone.</li>
+</ul>
+<p>🔴 <strong>Take <code>keyPrefix: false</code> if anything outside this library reads a physical key directly</strong> — a
+pre-paint theme script that runs before any module loads, or a logger reading its own level. Those
+readers know the exact key name, and a prefix changes it underneath them. Migration keeps the <em>data</em>
+reachable through this library; it cannot fix a hard-coded reader.</p>
+<div class="language-typescript codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-typescript codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token comment" style="color:#999988;font-style:italic">// Frozen physical key names, or an external reader — keep 2.x behaviour:</span><span class="token plain"></span><br></div><div class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token keyword" style="color:#00009f">export</span><span class="token plain"> </span><span class="token keyword" style="color:#00009f">const</span><span class="token plain"> storage </span><span class="token operator" style="color:#393A34">=</span><span class="token plain"> </span><span class="token function" style="color:#d73a49">defineStorage</span><span class="token punctuation" style="color:#393A34">(</span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"> keyPrefix</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token boolean" style="color:#36acaa">false</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">}</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><br></div></code></pre></div></div>
+<p>🔴 <strong>Two applications sharing one origin, one still on 2.x:</strong> set <code>migrateLegacyKeys: false</code> on the
+upgraded one, so it does not move keys the other still reads. Better, give each app a <code>namespace</code> —
+they were already colliding before this release.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="fixed">Fixed<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-0-0#fixed" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>A live timer no longer keeps a Node process alive.</strong> <code>setInterval</code> holds the event loop open, so a
+short-lived script — a build step, a CLI, an SSR warmup — that created an instance never exited unless
+it also called <code>close()</code>. Measured: a script doing one <code>set</code>/<code>get</code> hung until killed at 120s, and now
+exits immediately. All three timers (adapter TTL, cross-adapter cleanup, auto-backup) are <code>unref</code>'d;
+it is a no-op in browsers.</li>
+</ul>
+<p>Full history: <a class="" href="https://stratastorage-docs.aoneahsan.com/reference/changelog">the changelog</a>. Install: <code>yarn add strata-storage@3.0.0</code>.</p>]]></content>
+        <category label="Release" term="Release"/>
+    </entry>
+</feed>

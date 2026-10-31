@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkstrata_storage_docs=self.webpackChunkstrata_storage_docs||[]).push([["6431"],{9328(t){t.exports=JSON.parse('{"metadata":{"permalink":"/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":5,"blogDescription":"Every Strata Storage release, newest first: what changed and what to do about it.","blogTitle":"Strata Storage release notes"}}')}}]);
