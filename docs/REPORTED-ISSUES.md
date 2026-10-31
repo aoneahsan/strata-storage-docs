@@ -14,7 +14,7 @@
 
 **Suggested fix** — Audit every remaining constructor example in context. Use `defineStorage()` for a web-ready instance, or show the required explicit adapter registration where a bare constructor is the lesson. Compile and run representative snippets, and check native examples on devices.
 
-**2026-10-31 work checkpoint** — Entry pages, examples, FAQ/troubleshooting, adapter references and platform guides are corrected in source. A current scan finds only deliberate manually registered constructors, explanatory prose and the historical repro above. The issue remains open until the edited docs are reviewed, approved and published; native examples still need device verification.
+**2026-11-01 publication checkpoint** — The corrected docs were approved, committed as `37f74fa`, manually published as `bdc4552`, and checked byte-for-byte against the live build. The constructor scan found only deliberate registrations, explanatory prose and the historical repro. The issue stays open for native on-device verification.
 
 ### ISSUE-002 — Other documentation claims drifted from the current API
 
@@ -28,18 +28,4 @@
 
 **Suggested fix** — Correct the reference claims and typed examples, run web snippets against the built package, and verify Capacitor paths on devices. Do not imply React Native support without a package-supported adapter path.
 
-**2026-10-31 work checkpoint** — Source corrections now cover unsupported Cache, IndexedDB, memory, cookie, Capacitor, encryption and compression options; service-worker examples use the browser Cache API. The React Native page states the unsupported-runtime boundary. Device verification and publication are still open.
-
-### ISSUE-003 — README names a removed GitHub Actions deployment
-
-**Status:** OPEN · **Reported:** 2026-10-31 from the Strata Storage completion run · **Affects:** `README.md`, deployment instructions
-
-**Symptom** — `README.md:40` describes deployment through GitHub Actions, but the repository has no `.github/workflows` directory and the current guide pair requires a manual fast-forward `gh-pages` release.
-
-**Repro** — Read the README deployment section and compare it with `AGENTS.md` / `CLAUDE.md` and `git branch -a`.
-
-**Root cause** — The README was not updated when automated deployment was removed on 2026-10-31.
-
-**Suggested fix** — Replace the stale steps with the locally verified build, controlled-browser check, ordinary fast-forward `gh-pages` publish and live sitemap/robots check.
-
-**2026-10-31 work checkpoint** — `README.md` now describes the manual build and Pages release. The issue remains open until that source and the resulting live docs are approved and published.
+**2026-11-01 publication checkpoint** — Corrected Cache, IndexedDB, memory, cookie, Capacitor, encryption and compression claims are live at docs commit `37f74fa` and Pages commit `bdc4552`. Package-backed web samples, typecheck, build and 20 browser views passed. Native on-device verification remains open; browser success does not establish native behavior.
