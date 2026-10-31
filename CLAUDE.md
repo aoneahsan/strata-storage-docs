@@ -1,8 +1,17 @@
 # Strata Storage docs guide
 
-**Last Updated:** 2026-10-30
+**Last Updated:** 2026-10-31
 
-**Context verified:** 2026-10-21. **Next routine review:** 2026-11-20.
+| Context | Value |
+|---|---|
+| Last optimized | 2026-10-31 |
+| Next routine optimization eligible | 2026-11-30 |
+| Guide bytes | 2,870 B |
+| Covered subtree | `strata-storage-docs/` (public docs repo) |
+| Method | Guide pair kept mirrored; pointers to records, no copied global law (complete-project run 1) |
+| Fleet record | /home/ahsan/Documents/01-code/docs/tracking/project-context-budget-tracker.json |
+
+**Context verified:** 2026-10-31. **Next routine review:** 2026-11-30.
 
 This public Docusaurus 3 repository, `aoneahsan/strata-storage-docs` on `main`, documents the independent library in `../strata-storage/`. The private marketing site is `../strata-storage-website/`; the private legacy combined checkout is read-only. Content must reflect the library's current public API. Library issues belong in its `docs/REPORTED-ISSUES.md` queue. Never commit secrets to this public repository.
 
