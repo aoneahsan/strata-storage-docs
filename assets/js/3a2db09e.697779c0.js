@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkstrata_storage_docs=self.webpackChunkstrata_storage_docs||[]).push([["3186"],{8070(e){e.exports=JSON.parse('{"tags":[{"label":"Release","permalink":"/blog/tags/release","description":"Strata Storage releases, newest first.","count":5}]}')}}]);

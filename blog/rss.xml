@@ -4,11 +4,28 @@
         <title>Strata Storage release notes</title>
         <link>https://stratastorage-docs.aoneahsan.com/blog</link>
         <description>Every Strata Storage release, newest first.</description>
-        <lastBuildDate>Fri, 30 Oct 2026 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 31 Oct 2026 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en-US</language>
         <copyright>Made by the Strata Storage team.</copyright>
+        <item>
+            <title><![CDATA[Strata Storage 3.1.3]]></title>
+            <link>https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-3</link>
+            <guid>https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-3</guid>
+            <pubDate>Sat, 31 Oct 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[Documentation only: the README drops its CI badge, because releases are built and verified locally.]]></description>
+            <content:encoded><![CDATA[<p>Documentation only: the README drops its CI badge, because releases are built and verified locally.</p>
+<!-- -->
+<p>Documentation only: no code, API or <code>dist/</code> change.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="changed">Changed<a href="https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-3#changed" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>README:</strong> the CI badge is gone (releases are built and verified locally; there is no hosted CI), and the
+Limitations section says the gates run before every release.</li>
+</ul>
+<p>Full history: <a class="" href="https://stratastorage-docs.aoneahsan.com/reference/changelog">the changelog</a>. Install: <code>yarn add strata-storage@3.1.3</code>.</p>]]></content:encoded>
+            <category>Release</category>
+        </item>
         <item>
             <title><![CDATA[Strata Storage 3.1.2]]></title>
             <link>https://stratastorage-docs.aoneahsan.com/blog/strata-storage-3-1-2</link>
