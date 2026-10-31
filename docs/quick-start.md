@@ -1,370 +1,80 @@
 ---
 sidebar_position: 3
-description: Get up and running with Strata Storage in five minutes — install, create a storage instance, and run your first get/set/remove operations.
+title: Quick Start
+description: Install Strata Storage and write, read and remove your first value using the built-in web adapters.
 ---
 
 # Quick Start
 
-Get up and running with Strata Storage in 5 minutes.
+Your first `set()` needs an available adapter. The exported `storage` instance registers the standard web adapters and initialises on first use. You don't construct or initialise it.
 
-## 1. Install
+<a id="install"></a>
+## 📦 Install&nbsp;[#](#install)
 
 ```bash
-npm install strata-storage
+yarn add strata-storage
 ```
 
-## 2. Basic Usage
+The package is ESM-only and requires [Node 24.13 or later](https://github.com/aoneahsan/strata-storage/blob/main/package.json) in your toolchain. It has no runtime dependencies. React, Vue, Angular, Firebase and Capacitor integrations are optional sub-path imports with their own peer requirements.
 
-### Vanilla JavaScript/TypeScript
+<a id="write-and-read-a-value"></a>
+## 🛠️ Write and read a value&nbsp;[#](#write-and-read-a-value)
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { storage } from 'strata-storage';
 
-// Create instance
-const storage = new Strata();
+await storage.set('draft', { title: 'First pass' });
+const draft = await storage.get<{ title: string }>('draft');
 
-// Initialize
-await storage.initialize();
+console.log(draft?.title); // First pass
 
-// Store data
-await storage.set('user', { name: 'John', age: 30 });
-
-// Retrieve data
-const user = await storage.get('user');
-console.log(user); // { name: 'John', age: 30 }
-
-// Remove data
-await storage.remove('user');
-
-// Check existence
-const exists = await storage.has('user');
-console.log(exists); // false
+await storage.remove('draft');
+console.log(await storage.has('draft')); // false
 ```
 
-### React
+The default preference order is `localStorage`, `indexedDB`, `sessionStorage`, then `memory`. The instance also registers `cookies` and `cache`; `keys()`, `clear()` and `size()` without a storage option span all registered adapters. `subscribe()` listens to registered adapters that support change events. The URL adapter is exported but must be registered explicitly. See [storage selection](/configuration#storage-selection) before calling a broad `clear()`.
 
-```jsx
-import { StrataProvider, useStorage } from 'strata-storage/react';
+`get<T>()` returns `T | null` when you supply `T`; without it the result is `unknown | null`. The type parameter describes your data to TypeScript. It does not validate stored data at runtime.
 
-// Wrap your app
-function App() {
-  return (
-    <StrataProvider>
-      <UserProfile />
-    </StrataProvider>
-  );
-}
+<a id="configure-one-instance-for-your-app"></a>
+## ⚙️ Configure one instance for your app&nbsp;[#](#configure-one-instance-for-your-app)
 
-// Use in components
-function UserProfile() {
-  const [user, setUser, loading] = useStorage('user', { name: 'Guest' });
-
-  if (loading) return <div>Loading...</div>;
-
-  return (
-    <div>
-      <h1>Hello, {user.name}!</h1>
-      <button onClick={() => setUser({ name: 'John' })}>
-        Change Name
-      </button>
-    </div>
-  );
-}
-```
-
-### Vue 3
-
-```vue
-<template>
-  <div>
-    <h1>Hello, {{ user?.name || 'Guest' }}!</h1>
-    <button @click="updateName">Change Name</button>
-  </div>
-</template>
-
-<script setup>
-import { useStorage } from 'strata-storage/vue';
-
-const { value: user, update } = useStorage('user', { name: 'Guest' });
-
-const updateName = () => {
-  update({ name: 'John' });
-};
-</script>
-```
-
-### Angular
+Use `defineStorage()` when you need a different adapter preference or feature set. It registers the standard web adapters and initialises lazily, just like `storage`.
 
 ```typescript
-import { Component } from '@angular/core';
-import { StrataService } from 'strata-storage/angular';
+import { defineStorage } from 'strata-storage';
 
-@Component({
-  selector: 'app-user',
-  template: `
-    <h1>Hello, {{ userName }}!</h1>
-    <button (click)="updateName()">Change Name</button>
-  `
-})
-export class UserComponent {
-  userName = 'Guest';
-
-  constructor(private strata: StrataService) {
-    this.loadUser();
-  }
-
-  async loadUser() {
-    const user = await this.strata.get('user').toPromise();
-    this.userName = user?.name || 'Guest';
-  }
-
-  async updateName() {
-    await this.strata.set('user', { name: 'John' }).toPromise();
-    this.userName = 'John';
-  }
-}
-```
-
-## 3. Advanced Features
-
-### Encryption
-
-```typescript
-const storage = new Strata({
-  encryption: {
-    enabled: true,
-    password: 'your-secret-key'
-  }
+export const appStorage = defineStorage({
+  defaultStorages: ['indexedDB', 'localStorage', 'memory'],
 });
 
-// Data is automatically encrypted
-await storage.set('sensitive', { 
-  creditCard: '1234-5678-9012-3456' 
-});
+await appStorage.set('theme', 'dark');
+const theme = await appStorage.get<string>('theme');
 ```
 
-### TTL (Time To Live)
+`defaultStorages` sets preference order; it does **not** limit which adapters are registered. To exclude an adapter, use `adapters: { <name>: false }` in the configuration. [Configuration](/configuration) explains adapter options and the `strata:` key prefix used by `localStorage` and `sessionStorage` since 3.0.
 
-```typescript
-// Expires in 1 hour
-await storage.set('session', userData, {
-  ttl: 3600000 // milliseconds
-});
+<a id="choose-a-framework-or-native-guide"></a>
+## 📱 Choose a framework or native guide&nbsp;[#](#choose-a-framework-or-native-guide)
 
-// Check remaining time
-const ttl = await storage.getTTL('session');
-console.log(`Expires in ${ttl}ms`);
+The core API works without a provider. For a framework, create an instance with `defineStorage()` and bind it:
 
-// Extend expiration
-await storage.extendTTL('session', 1800000); // +30 min
-```
+- [React](/examples/frameworks/react): bind hooks with `createStrataHooks()`.
+- [Vue](/examples/frameworks/vue): bind composables with `createStrataComposables()`.
+- [Angular](/examples/frameworks/angular): provide an instance through `provideStrata()`.
 
-### Querying
+On iOS and Android, register the Capacitor adapters, run `yarn cap sync`, and verify reads and writes on a device. A browser test does not exercise Keychain, EncryptedSharedPreferences, SQLite or the native filesystem. Follow the [device verification guide](/guides/platforms/device-verification).
 
-```typescript
-// Store multiple items
-await storage.set('user:1', { name: 'John', age: 30, role: 'admin' });
-await storage.set('user:2', { name: 'Jane', age: 25, role: 'user' });
-await storage.set('user:3', { name: 'Bob', age: 35, role: 'user' });
+<a id="explore-feature-guides-and-limits"></a>
+## 🎛️ Explore feature guides and limits&nbsp;[#](#explore-feature-guides-and-limits)
 
-// Query with MongoDB-like syntax — matches the stored value by bare field names
-const admins = await storage.query({
-  role: 'admin'
-});
+- [Encryption](/guides/features/encryption) and [compression](/guides/features/compression) are opt-in and use the asynchronous API.
+- [Expiry](/api/features/ttl) supports absolute or sliding TTL.
+- [Queries](/guides/features/queries) filter stored values; Strata Storage remains client-side key-value storage, not a multi-user database.
+- [Key-prefix migration](/configuration#key-prefix) moves qualifying 2.x `localStorage` and `sessionStorage` keys on read, not in a bulk sweep.
+- If one browser app only needs `localStorage`, use it directly.
 
-const youngUsers = await storage.query({
-  age: { $lt: 30 }
-});
+<a id="api-reference"></a>
+## ➡️ API reference&nbsp;[#](#api-reference)
 
-// query() can't filter by key — use keys() for that
-const userKeys = await storage.keys('user:');
-```
-
-### Cross-Tab Sync
-
-```typescript
-// Enable sync
-const storage = new Strata({
-  sync: { enabled: true }
-});
-
-// Subscribe to changes from other tabs
-storage.subscribe((change) => {
-  console.log(`${change.key} changed in another tab`);
-});
-```
-
-### Compression
-
-```typescript
-const storage = new Strata({
-  compression: {
-    enabled: true,
-    threshold: 1024 // Only compress if > 1KB
-  }
-});
-
-// Large data is automatically compressed
-await storage.set('largeData', bigJsonObject);
-```
-
-## 4. Storage Adapters
-
-### Choose Storage Type
-
-```typescript
-// Use specific storage
-await storage.set('key', 'value', { 
-  storage: 'indexedDB' 
-});
-
-// Priority fallback
-const storage = new Strata({
-  defaultStorages: ['indexedDB', 'localStorage', 'memory']
-});
-```
-
-### Platform-Specific
-
-```typescript
-// iOS/Android with Capacitor
-await storage.set('secure-token', token, {
-  storage: 'secure' // Uses Keychain/Keystore
-});
-
-// Preferences (UserDefaults/SharedPreferences)
-await storage.set('settings', preferences, {
-  storage: 'preferences'
-});
-```
-
-## 5. Error Handling
-
-```typescript
-try {
-  await storage.set('key', value);
-} catch (error) {
-  if (error.name === 'QuotaExceededError') {
-    console.error('Storage full');
-  } else if (error.name === 'EncryptionError') {
-    console.error('Encryption failed');
-  }
-}
-```
-
-## 6. Best Practices
-
-### 1. Initialize Once
-
-```typescript
-// App initialization
-const storage = new Strata(config);
-await storage.initialize();
-
-// Export for reuse
-export default storage;
-```
-
-### 2. Use TypeScript
-
-```typescript
-interface User {
-  name: string;
-  email: string;
-}
-
-// Type-safe storage
-const user = await storage.get<User>('user');
-```
-
-### 3. Handle Loading States
-
-```typescript
-const [data, setData, loading] = useStorage('key');
-
-if (loading) {
-  return <LoadingSpinner />;
-}
-```
-
-### 4. Clean Up
-
-```typescript
-// Remove expired items
-await storage.cleanupExpired();
-
-// Clear all data
-await storage.clear();
-
-// Close connections
-await storage.close();
-```
-
-## Complete Example
-
-```typescript
-import { Strata } from 'strata-storage';
-
-async function main() {
-  // Initialize with full configuration
-  const storage = new Strata({
-    defaultStorages: ['indexedDB', 'localStorage'],
-    encryption: { enabled: true, password: 'secret' },
-    compression: { enabled: true },
-    sync: { enabled: true },
-    ttl: { defaultTTL: 3600000 }
-  });
-
-  await storage.initialize();
-
-  // User session with TTL
-  await storage.set('session', {
-    userId: '123',
-    token: 'abc-def-ghi',
-    permissions: ['read', 'write']
-  }, {
-    ttl: 3600000, // 1 hour
-    encrypt: true,
-    tags: ['auth', 'session']
-  });
-
-  // Settings with persistence
-  await storage.set('settings', {
-    theme: 'dark',
-    language: 'en',
-    notifications: true
-  }, {
-    storage: 'preferences' // Native storage on mobile
-  });
-
-  // Subscribe to changes
-  const unsubscribe = storage.subscribe((change) => {
-    if (change.key === 'session' && !change.newValue) {
-      console.log('Session expired, redirecting to login...');
-    }
-  });
-
-  // Tags are filtered via clear(), not query(): e.g. storage.clear({ tags: ['auth'] })
-  // query() matches stored values by bare field names:
-  const sessions = await storage.query({
-    userId: '123'
-  });
-
-  // Cleanup
-  window.addEventListener('beforeunload', () => {
-    unsubscribe();
-    storage.close();
-  });
-}
-
-main().catch(console.error);
-```
-
-## Next Steps
-
-- [Basic Usage Guide](./examples/basic-usage.md) - Detailed examples
-- [Encryption Guide](./guides/features/encryption.md) - Secure your data
-- [Framework Guides](./examples/frameworks/react.md) - React, Vue, Angular
-- [API Reference](./api/core/strata.md) - Complete API documentation
-
-Need help? Check our [FAQ](./reference/faq.md) or [open an issue](https://stratastorage.aoneahsan.com/contact).
+Open the [API reference](/api/core/strata) for method and option contracts, or try the [basic usage examples](/examples/basic-usage) for another round-trip.

@@ -10,9 +10,9 @@ Strata Storage provides extensive configuration options to customize behavior fo
 ## Configuration Overview
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata({
+const storage = defineStorage({
   // Platform detection (auto-detected by default)
   platform: 'web', // 'web' | 'ios' | 'android' | 'node'
   
@@ -73,10 +73,15 @@ const storage = new Strata({
 Strata automatically detects the platform, but you can override it:
 
 ```typescript
-const storage = new Strata({
+import { registerCapacitorAdapters } from 'strata-storage/capacitor';
+
+const storage = defineStorage({
   platform: 'ios' // Force iOS behavior
 });
+await registerCapacitorAdapters(storage);
 ```
+
+`platform` alone does not register native adapters. Run this in a Capacitor app on a device.
 
 **Options:**
 - `'web'` - Browser environment
@@ -89,10 +94,15 @@ const storage = new Strata({
 Specify storage preference order. Strata will use the first available:
 
 ```typescript
-const storage = new Strata({
+import { registerCapacitorAdapters } from 'strata-storage/capacitor';
+
+const storage = defineStorage({
   defaultStorages: ['sqlite', 'preferences', 'memory']
 });
+await registerCapacitorAdapters(storage);
 ```
+
+Register native adapters before reading or writing to `sqlite` or `preferences` on a device.
 
 **Web Options:**
 - `'memory'` - In-memory storage
@@ -249,7 +259,7 @@ want in `defaultStorages`, in order of preference — Strata uses the first one
 available on the current platform:
 
 ```typescript
-const storage = new Strata({
+const storage = defineStorage({
   // Try persistent stores first, fall back to memory as a last resort
   defaultStorages: ['indexedDB', 'localStorage', 'memory']
 });
@@ -257,9 +267,9 @@ const storage = new Strata({
 
 :::danger `defaultStorages` is not a registration list
 It is the preference order for choosing the **default** adapter, and the fallback order when one is
-unusable. Operations with no explicit `storage` — `keys()`, `clear()`, `size()`, `subscribe()` —
-deliberately span **every registered adapter**, so listing one storage here does not stop the others from
-being registered or swept.
+unusable. `keys()`, `clear()` and `size()` with no explicit `storage` span every registered adapter;
+`subscribe()` listens to registered adapters that support change events. Listing one storage here does not
+stop the others from being registered or swept.
 
 To leave an adapter out entirely, say so:
 
@@ -307,7 +317,7 @@ Unchanged: `cookies` (already `strata_`), `indexedDB` and `cache` (named stores)
 ## Shared storage areas and key ownership {#key-ownership}
 
 `localStorage`, `sessionStorage` and cookies are shared with every other script on the origin, and the
-web adapters' key prefix is empty by default. **Since 2.9.0 an adapter identifies its own data by shape**
+`localStorage` and `sessionStorage` use the `strata:` prefix by default since 3.0.0. **Since 2.9.0 an adapter identifies its own data by shape**
 — a key is its own only when the stored value is a `StorageValue` envelope — so `keys()`, the TTL sweep
 and `clear()` never touch data this library did not write.
 
@@ -327,41 +337,49 @@ what keeps this library off other applications' keys.
 ### Multi-Instance Configuration
 
 ```typescript
+import { defineStorage } from 'strata-storage';
+import { registerCapacitorAdapters } from 'strata-storage/capacitor';
+
 // User data storage
-const userStorage = new Strata({
-  defaultStorages: ['secure', 'preferences'],
-  encryption: { enabled: true }
+const userStorage = defineStorage({
+  defaultStorages: ['secure', 'preferences']
 });
 
 // Cache storage
-const cacheStorage = new Strata({
+const cacheStorage = defineStorage({
   defaultStorages: ['cache', 'indexedDB'],
   ttl: { defaultTTL: 300000 } // 5 minutes
 });
 
 // Temporary storage
-const tempStorage = new Strata({
+const tempStorage = defineStorage({
   defaultStorages: ['memory', 'sessionStorage'],
   ttl: { defaultTTL: 60000 } // 1 minute
 });
+
+// In a Capacitor app, before using userStorage on a device:
+await registerCapacitorAdapters(userStorage);
 ```
 
-### Feature Flags
+If you also enable encryption, supply a password from a secure runtime source.
+
+### Optional Features
 
 ```typescript
-const storage = new Strata({
-  // Enable features based on environment
-  encryption: {
-    enabled: process.env.NODE_ENV === 'production'
-  },
+import { defineStorage } from 'strata-storage';
+
+const storage = defineStorage({
   compression: {
-    enabled: !navigator.connection?.saveData
+    enabled: true,
+    threshold: 1024
   },
   sync: {
-    enabled: 'BroadcastChannel' in window
+    enabled: typeof BroadcastChannel !== 'undefined'
   }
 });
 ```
+
+Encryption needs a password from a secure runtime source when you enable it; see the [encryption guide](./guides/features/encryption.md).
 
 ## Validation
 
@@ -369,7 +387,7 @@ Strata validates configuration at initialization:
 
 ```typescript
 try {
-  const storage = new Strata({
+  const storage = defineStorage({
     encryption: {
       enabled: true
       // Missing required 'password'

@@ -9,10 +9,10 @@ Strata Storage includes built-in LZ-string compression to automatically reduce s
 ## Quick Start
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
 // Enable compression globally
-const storage = new Strata({
+const storage = defineStorage({
   compression: {
     enabled: true,
     threshold: 1024 // Compress data > 1KB
@@ -41,7 +41,7 @@ interface CompressionConfig {
 
 ```typescript
 // Automatically compress large data
-const storage = new Strata({
+const storage = defineStorage({
   compression: {
     enabled: true,
     threshold: 5000 // 5KB
@@ -142,12 +142,7 @@ await storage.set('sensitive_data', largeData, {
 
 ### Compression Overhead
 
-| Data Size | Compression Time | Decompression Time |
-|-----------|-----------------|-------------------|
-| 1KB       | <1ms           | <1ms              |
-| 10KB      | 1-2ms          | <1ms              |
-| 100KB     | 5-10ms         | 2-5ms             |
-| 1MB       | 50-100ms       | 20-50ms           |
+Compression time depends on the value and device. Measure your own workload; the codec skips values below the configured threshold and stores the original when compression would not reduce its size.
 
 ### When to Use Compression
 
@@ -168,9 +163,8 @@ await storage.set('sensitive_data', largeData, {
 ### Web Browser Limits
 
 ```typescript
-// localStorage has ~10MB limit
-// Compression helps fit more data
-const storage = new Strata({
+// Browser storage quotas vary; compression can reduce stored text size.
+const storage = defineStorage({
   compression: {
     enabled: true,
     threshold: 500 // Lower threshold for web
@@ -182,13 +176,15 @@ const storage = new Strata({
 
 ```typescript
 // Balance compression with battery usage
-const storage = new Strata({
+const storage = defineStorage({
   compression: {
     enabled: true,
     threshold: 10000 // Higher threshold on mobile
   }
 });
 ```
+
+Register Capacitor adapters before selecting native storage on a device.
 
 ## Monitoring Compression
 
@@ -236,14 +232,9 @@ class CompressionMonitor {
 
 ```typescript
 // Debug compression
-const storage = new Strata({
+const storage = defineStorage({
   compression: { enabled: true },
-  debug: true,
-  onLog: (level, msg, data) => {
-    if (msg.includes('compress')) {
-      console.log('Compression:', data);
-    }
-  }
+  debug: { enabled: true, verbosity: 'verbose', logOperations: true }
 });
 ```
 

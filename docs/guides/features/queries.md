@@ -21,9 +21,9 @@ Strata Storage provides a powerful query engine that supports complex filtering,
 ## Quick Start
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata();
+const storage = defineStorage();
 
 // Simple query — match fields on the stored value by bare name
 const users = await storage.query({
@@ -336,24 +336,12 @@ class Analytics {
 
 ## Performance Optimization
 
-### Indexing Strategy
+### Storage Choice
 
 ```typescript
-// Create indexes for frequently queried fields
-const storage = new Strata({
-  adapters: {
-    indexedDB: {
-      stores: {
-        data: {
-          indexes: [
-            { name: 'status', keyPath: 'value.status' },
-            { name: 'created', keyPath: 'created' },
-            { name: 'tags', keyPath: 'tags', multiEntry: true }
-          ]
-        }
-      }
-    }
-  }
+// Choose IndexedDB for persistence; query() still scans stored values.
+const storage = defineStorage({
+  defaultStorages: ['indexedDB', 'memory']
 });
 ```
 

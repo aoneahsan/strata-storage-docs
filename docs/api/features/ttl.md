@@ -15,9 +15,9 @@ The TTL feature in Strata Storage provides automatic expiration of stored items.
 ## Basic Usage
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata({
+const storage = defineStorage({
   ttl: {
     defaultTTL: 3600000, // 1 hour default TTL
     cleanupInterval: 60000, // Check every minute
@@ -38,7 +38,7 @@ await storage.set('session-data', sessionInfo, {
 
 // Set to expire at specific time
 await storage.set('daily-cache', cache, {
-  expireAt: new Date('2024-12-31T23:59:59')
+  expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
 });
 ```
 
@@ -115,14 +115,14 @@ await storage.set('secure-temp', sensitiveData, {
 ## Platform-Specific Behavior
 
 ### Web
-- Uses `setTimeout` for cleanup scheduling
-- Respects browser background tab throttling
-- Cleanup continues across page reloads
+- Uses a JavaScript interval for periodic cleanup while the instance is active
+- Browser background tab throttling can delay the cleanup sweep
+- Expired values are also removed on read, including after a page reload
 
 ### iOS/Android
-- Native background task scheduling
-- Respects system power management
-- Cleanup continues when app is backgrounded
+- Uses the same JavaScript interval in the Capacitor webview while the app is active
+- Background suspension can delay the cleanup sweep
+- Expired values are removed on the next read after the app resumes
 
 ## Performance Considerations
 
@@ -163,7 +163,7 @@ await storage.set('secure-temp', sensitiveData, {
 
 4. **Monitor cleanup via the `onExpire` callback**:
    ```typescript
-   const storage = new Strata({
+   const storage = defineStorage({
      ttl: {
        autoCleanup: true,
        onExpire: (keys) => {

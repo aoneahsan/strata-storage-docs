@@ -6,7 +6,7 @@ Complete guide for using encryption features in Strata Storage.
 
 Strata Storage provides built-in authenticated encryption using the Web Crypto
 API (`globalThis.crypto.subtle`) — the same code path on web, Capacitor webviews,
-and Node.js / SSR (Node 20+). Two algorithms are available:
+and Node.js / SSR (the package requires Node 24.13 or later). Two algorithms are available:
 
 - **`AES-GCM`** (default) — authenticated encryption (AEAD).
 - **`AES-CBC`** — authenticated via **Encrypt-then-MAC** (HMAC-SHA256 over
@@ -16,10 +16,10 @@ and Node.js / SSR (Node 20+). Two algorithms are available:
 ## Quick Start
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
 // Enable encryption globally
-const storage = new Strata({
+const storage = defineStorage({
   encryption: {
     enabled: true,
     password: 'your-secure-password'
@@ -188,10 +188,9 @@ try {
 
 ## Performance Impact
 
-- Encryption adds ~5-10ms for small data
-- Scales linearly with data size
-- Consider compression before encryption
-- Use selective encryption for optimal performance
+- Encryption adds PBKDF2 key derivation and AES work to each encrypted write and read; measure the cost with your data and device.
+- If you enable both compression and encryption, Strata Storage compresses before encrypting.
+- Encrypt only the values that need it.
 
 ## Advanced Usage
 
@@ -215,7 +214,7 @@ class CustomEncryption {
 ```typescript
 // Query encrypted data (requires decryption)
 const results = await storage.query({
-  'value.type': 'user'
+  type: 'user'
 }, {
   encryptionPassword: password
 });

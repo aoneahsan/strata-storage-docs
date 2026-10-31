@@ -14,7 +14,7 @@ const NPM_URL = 'https://www.npmjs.com/package/strata-storage';
 const BLOG_PATH = '/blog';
 
 /** Internal docs files that must never ship: excluded from the docs plugin and from `/llms-full.txt` alike. */
-const INTERNAL_FILES = ['MANUAL-TASKS.md', 'PACKAGES.md'];
+const INTERNAL_FILES = ['MANUAL-TASKS.md', 'PACKAGES.md', 'REPORTED-ISSUES.md', 'RESOLVED-ISSUES.md'];
 
 /** Each generated category index (an indexed URL, kept) → the docs folder it lists, for its sitemap lastmod. */
 const CATEGORY_ROOTS = {

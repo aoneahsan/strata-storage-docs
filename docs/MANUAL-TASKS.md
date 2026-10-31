@@ -2,7 +2,7 @@
 
 > The ONE place for everything only you (the human) can do. Fixed path: `docs/MANUAL-TASKS.md`.
 > Global spec: `~/.claude/rules/manual-tasks.md`. Excluded from the built site — internal only.
-> Last updated: 2026-07-25
+> Last updated: 2026-10-31
 
 ## ⏳ Pending manual tasks
 
@@ -16,8 +16,8 @@ _None._
 
 ## Reference — this repo's hosting
 
-- **GitHub Pages** from `main` via `.github/workflows/deploy-docs.yml`. No Firebase (a docs site is not a
-  Firebase app — `~/.claude/rules/docs-sites.md` §4).
+- **GitHub Pages** serves the `gh-pages` branch at `/`. After local gates, build from `main` and publish the
+  generated files with an ordinary fast-forward commit to `gh-pages`; no GitHub Actions deploy this site.
 - Custom domain pinned by `static/CNAME`; Docusaurus copies it verbatim into `build/`.
 - Domain derivation: parent site `stratastorage.aoneahsan.com` is a **subdomain**, so the docs domain appends
   `-docs` to the first label → `stratastorage-docs.aoneahsan.com` (`rules/docs-sites.md` §1).

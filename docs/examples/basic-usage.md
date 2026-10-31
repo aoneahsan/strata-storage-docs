@@ -15,9 +15,9 @@ yarn add strata-storage
 ### Store and Retrieve Data
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata();
+const storage = defineStorage();
 
 // Store data
 await storage.set('user_name', 'John Doe');
@@ -87,7 +87,7 @@ await storage.set('temp_token', token, {
 
 // Data expires at specific time
 await storage.set('daily_cache', data, {
-  expireAt: new Date('2024-12-31T23:59:59')
+  expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
 });
 ```
 
@@ -176,8 +176,8 @@ for (const id of userIds) {
 
 ```typescript
 // Create namespaced storage
-const userStorage = new Strata({ namespace: 'users' });
-const appStorage = new Strata({ namespace: 'app' });
+const userStorage = defineStorage({ namespace: 'users' });
+const appStorage = defineStorage({ namespace: 'app' });
 
 // Data is isolated
 await userStorage.set('data', 'user data');
@@ -190,12 +190,12 @@ const appData = await appStorage.get('data'); // 'app data'
 ## Platform Detection
 
 ```typescript
-// Automatic platform-optimized storage
-const storage = new Strata();
+// Browser storage; native adapters need explicit registration
+const storage = defineStorage();
 
-// On web: Uses localStorage/IndexedDB
-// On iOS: Uses UserDefaults/SQLite
-// On Android: Uses SharedPreferences/SQLite
+// On web: prefers localStorage, then IndexedDB, sessionStorage and memory.
+// On iOS/Android: register native adapters before selecting them.
+// See the Capacitor platform guide for device setup.
 
 await storage.set('cross_platform', 'Works everywhere!');
 ```
