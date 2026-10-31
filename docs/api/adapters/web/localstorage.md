@@ -15,7 +15,7 @@ The LocalStorage adapter provides simple, synchronous, persistent storage in web
 | Observable | ✅ Yes (same origin) |
 | Searchable | ✅ Yes |
 | Iterable | ✅ Yes |
-| Capacity | ~10MB |
+| Capacity | Varies by browser and available device storage |
 | Performance | 🚀 Fast |
 | TTL Support | ✅ Yes (manual) |
 | Batch Support | ✅ Yes |
@@ -23,9 +23,9 @@ The LocalStorage adapter provides simple, synchronous, persistent storage in web
 
 ## Shared storage areas {#shared-storage-areas}
 
-`localStorage` is shared with every other script on the origin, and this adapter's key prefix is empty
-by default — so a name test (`key.startsWith(prefix)`) matches **every** key there, including ones
-written by analytics tags, other libraries, and other apps on the same domain.
+`localStorage` is shared with every other script on the origin. Since 3.0.0, this adapter prefixes
+keys with `strata:` by default. Set `keyPrefix: false` only when another script must read the exact
+physical key; older unprefixed keys can migrate on read.
 
 **Since 2.9.0 the adapter identifies its own data by shape**: a key counts as its own only when the
 stored value deserializes into a `StorageValue` envelope. Everything else is skipped.
@@ -55,10 +55,9 @@ the library off other people's keys.
 ## Usage
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata();
-await storage.initialize();
+const storage = defineStorage();
 
 // Explicitly use localStorage
 await storage.set('preference', value, { storage: 'localStorage' });
@@ -67,12 +66,10 @@ await storage.set('preference', value, { storage: 'localStorage' });
 ## Configuration
 
 ```typescript
-const storage = new Strata({
+const storage = defineStorage({
   adapters: {
     localStorage: {
-      prefix: 'myapp_',
-      serialize: JSON.stringify,
-      deserialize: JSON.parse
+      prefix: 'myapp_'
     }
   }
 });
@@ -80,12 +77,9 @@ const storage = new Strata({
 
 ### Configuration Options
 
-- `prefix` (string): Prefix for all keys — **default `''` (empty)**, not `'strata_'`. This page said
-  `'strata_'` until 2.9.0 and that was wrong; the empty default is exactly why the adapter has to
-  identify its own keys by shape (see [Shared storage areas](#shared-storage-areas) below). Applied
-  immediately, so it also holds for `setSync`/`getSync` issued before `initialize()` resolves.
-- `serialize` (function): Custom serialization function
-- `deserialize` (function): Custom deserialization function
+- `prefix` (string): This adapter's physical-key prefix. The instance-level `keyPrefix` defaults to
+  `strata:` and can be set to `false` for a known external reader; an adapter prefix overrides it.
+  The adapter still identifies its own stored values by their envelope shape.
 
 ## Features
 
@@ -242,31 +236,27 @@ class OfflineQueue {
 
 ## Storage Limits
 
-### Size Limits by Browser
-
-| Browser | Limit |
-|---------|-------|
-| Chrome | 10MB |
-| Firefox | 10MB |
-| Safari | 5MB |
-| Edge | 10MB |
+Browser storage limits vary by browser, device, origin, private-browsing mode,
+and current disk space. Treat a quota error as a possible write outcome; do not
+design around a fixed per-browser capacity.
 
 ### Handling Quota Errors
 
 ```typescript
+import { QuotaExceededError } from 'strata-storage';
+
 try {
   await storage.set('data', largeData, { storage: 'localStorage' });
 } catch (error) {
   if (error instanceof QuotaExceededError) {
-    // Clear old data
+    // Only remove data that your application can recreate.
     await storage.clear({
       storage: 'localStorage',
-      filter: (key) => key.startsWith('cache:'),
-      olderThan: Date.now() - 86400000 // 24 hours
+      prefix: 'cache:',
     });
-    
-    // Retry
     await storage.set('data', largeData, { storage: 'localStorage' });
+  } else {
+    throw error;
   }
 }
 ```
@@ -290,7 +280,7 @@ if (window.location.origin === 'https://app.example.com') {
 
 ```typescript
 // Namespace your keys to avoid conflicts
-const storage = new Strata({
+const storage = defineStorage({
   adapters: {
     localStorage: {
       prefix: 'myapp_v1_'
@@ -342,12 +332,16 @@ const unsubscribe = storage.subscribe((change) => {
 ### 4. Compress Large Data
 
 ```typescript
-// Enable compression for large objects
-await storage.set('largeData', data, {
+import { defineStorage } from 'strata-storage';
+
+const compressedStorage = defineStorage({ compression: { enabled: true } });
+await compressedStorage.set('largeData', data, {
   storage: 'localStorage',
-  compress: true // Automatically compress if beneficial
+  compress: true,
 });
 ```
+
+Compression runs only when the instance has `compression.enabled: true`; a per-write flag alone does not create the compressor. It may leave a value uncompressed when that value would not get smaller.
 
 ## Performance Considerations
 
@@ -384,34 +378,15 @@ const bad = {
   regex: /pattern/ // Loses type
 };
 
-// Use custom serialization if needed
-const storage = new Strata({
-  adapters: {
-    localStorage: {
-      serialize: (value) => JSON.stringify(value, replacer),
-      deserialize: (text) => JSON.parse(text, reviver)
-    }
-  }
-});
+// Adapter-level serialize/deserialize callbacks are not part of StrataConfig.
+// Convert a custom value to a supported data shape before calling set().
 ```
 
 ## Security Considerations
 
 ### 1. No Sensitive Data
 
-```typescript
-// Never store sensitive data in localStorage
-// BAD
-await storage.set('password', userPassword, { 
-  storage: 'localStorage' 
-});
-
-// GOOD - Use secure storage for sensitive data
-await storage.set('password', userPassword, { 
-  storage: 'secure',
-  encrypt: true 
-});
-```
+Do not store account passwords in any client-side adapter. Browser `localStorage` is readable by scripts on the origin. A Capacitor app can register the native `secure` adapter for a device-held credential, but that is not a server authentication session or a browser fallback.
 
 ### 2. XSS Vulnerabilities
 
@@ -447,7 +422,7 @@ if (storage.getAvailableStorageTypes().includes('localStorage')) {
 
 ```typescript
 // Debug localStorage contents
-const allKeys = await storage.keys(null, { storage: 'localStorage' });
+const allKeys = await storage.keys(undefined, { storage: 'localStorage' });
 for (const key of allKeys) {
   const value = await storage.get(key, { storage: 'localStorage' });
   console.log(key, value);

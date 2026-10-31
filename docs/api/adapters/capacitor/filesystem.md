@@ -22,8 +22,9 @@ app's sandboxed storage area:
 The file content is the full `StorageValue` wrapper serialised to JSON, so TTL,
 tags, and metadata are preserved across a write-read cycle. Writes go through an
 atomic staging step — the value is written to a temp file in a reserved
-`strata_storage/.strata-staging/` subdirectory, then renamed into place — so a crash
-during write never leaves a partial file.
+`strata_storage/.strata-staging/` subdirectory, then renamed into place. This is
+designed to avoid replacing a stored value with a partial write; the crash path
+still needs the device verification linked above.
 
 On the web (non-Capacitor) platform `isAvailable()` returns `false` and all
 calls are routed to the in-memory fallback.
@@ -37,7 +38,7 @@ calls are routed to the in-memory fallback.
 | Observable | ✅ Yes |
 | Searchable | ✅ Limited (key-prefix scan) |
 | Iterable (`keys()`) | ✅ Yes |
-| Capacity | Device storage (unlimited by API) |
+| Capacity | Limited by available app storage on the device |
 | Performance | File I/O speed (variable; slower than SQLite for many small keys) |
 | TTL Support | ✅ Yes (stored in value wrapper) |
 | Batch Support | ✅ Yes |
@@ -51,10 +52,10 @@ import { defineStorage } from 'strata-storage';
 import { FilesystemAdapter } from 'strata-storage/capacitor';
 
 const storage = defineStorage({
-  adapters: [new FilesystemAdapter()],
   defaultStorages: ['filesystem'],
 });
-await storage.initialize();
+storage.registerAdapter(new FilesystemAdapter());
+await storage.refreshAdapters();
 
 // Write a value
 await storage.set('report_q1', { lines: 42, status: 'final' }, {
@@ -178,7 +179,7 @@ as plain JSON without additional OS-level encryption. For sensitive data, use th
 ### Persisting Large Documents
 
 The Filesystem adapter is most practical for values that are too large for
-Preferences (capped at ~1 MB) or that map naturally to a single file — think
+Preferences (intended for small values) or that map naturally to a single file — think
 cached API responses, user-generated drafts, or exported reports.
 
 ```typescript
@@ -204,7 +205,7 @@ class DocumentStore {
   }
 
   async list(): Promise<string[]> {
-    const keys = await storage.keys({ storage: 'filesystem' });
+    const keys = await storage.keys(undefined, { storage: 'filesystem' });
     return keys.filter(k => k.startsWith('doc_')).map(k => k.slice(4));
   }
 }

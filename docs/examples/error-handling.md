@@ -1,208 +1,76 @@
-# Error Handling Examples
+---
+title: Handle storage errors
+description: Handle failed Strata Storage writes and reads using the public error classes and explicit fallback behavior.
+tags: [examples, errors]
+---
 
-Learn how to properly handle errors in Strata Storage.
+# Handle storage errors
 
-## Basic Error Handling
+`get()` returns `null` when a key is absent. A storage operation can still reject because the adapter is unavailable, the value is invalid, quota is exhausted or an encrypted value cannot be read. Catch the operation where your UI can show a retry or recovery path.
 
-```typescript
-import { Strata } from 'strata-storage';
+- [Handle a failed write](#write)
+- [Try persistent adapters in order](#fallback)
+- [Encryption failures](#encryption)
 
-const storage = new Strata();
-
-try {
-  await storage.set('key', 'value');
-} catch (error) {
-  console.error('Storage error:', error);
-}
-```
-
-## Error Types
+<a id="write"></a>
+## ⚠️ Handle a failed write&nbsp;[#](#write)
 
 ```typescript
 import {
-  StrataError,
+  defineStorage,
   QuotaExceededError,
-  EncryptionError,
-  NotFoundError,
-  ValidationError
+  ValidationError,
 } from 'strata-storage';
 
-try {
-  await storage.set('large-data', hugeObject);
-} catch (error) {
-  if (error instanceof QuotaExceededError) {
-    console.error('Storage quota exceeded');
-    // Clear old data or use different storage
-  } else if (error instanceof ValidationError) {
-    console.error('Invalid data:', error.message);
-  } else {
-    console.error('Unknown error:', error);
+const storage = defineStorage();
+
+async function saveDraft(title: string): Promise<'saved' | 'retry'> {
+  try {
+    await storage.set('draft', { title }, { storage: 'indexedDB' });
+    return 'saved';
+  } catch (error) {
+    if (error instanceof QuotaExceededError) {
+      // Offer a way to free space or export the draft.
+      return 'retry';
+    }
+    if (error instanceof ValidationError) {
+      // Fix the invalid key or value at the call site.
+      throw error;
+    }
+    throw error;
   }
 }
 ```
 
-## Encryption Error Handling
+A `null` read isn't a write error, and a failed write shouldn't be presented as saved. Store a draft in memory only if losing it on reload is acceptable.
+
+<a id="fallback"></a>
+## 🗂️ Try persistent adapters in order&nbsp;[#](#fallback)
+
+The `storage` option can list adapters by availability, but a write failure after selection is not a promise to retry the next backend. To handle write failures, attempt each adapter yourself:
 
 ```typescript
-try {
-  // Try to decrypt with wrong password
-  const data = await storage.get('encrypted-key', {
-    encryptionPassword: 'wrong-password'
-  });
-} catch (error) {
-  if (error instanceof EncryptionError) {
-    console.error('Decryption failed - wrong password?');
-    // Prompt user for correct password
-  }
-}
-```
+import type { StorageType } from 'strata-storage';
 
-## Fallback Strategies
-
-```typescript
-async function saveWithFallback(key: string, value: any) {
-  const storages = ['indexedDB', 'localStorage', 'memory'];
-  
-  for (const storage of storages) {
+async function saveWithFallback(value: string): Promise<StorageType> {
+  const choices: StorageType[] = ['indexedDB', 'localStorage'];
+  for (const adapter of choices) {
     try {
-      await storage.set(key, value, { storage });
-      console.log(`Saved to ${storage}`);
-      return;
-    } catch (error) {
-      console.warn(`Failed to save to ${storage}:`, error);
+      await storage.set('draft', value, { storage: adapter });
+      return adapter;
+    } catch {
+      // Try the next persistent adapter.
     }
   }
-  
-  throw new Error('All storage methods failed');
+  throw new Error('The draft could not be saved in this browser.');
 }
 ```
 
-## Graceful Degradation
+Record the returned adapter if later reads must target the same place. A browser may deny both paths.
 
-```typescript
-class ResilientStorage {
-  private storage: Strata;
-  
-  constructor() {
-    this.storage = new Strata({
-      onError: this.handleError.bind(this)
-    });
-  }
-  
-  private handleError(error: Error, operation: string) {
-    console.error(`Storage ${operation} failed:`, error);
-    
-    // Report to analytics
-    analytics.track('storage_error', {
-      operation,
-      error: error.message,
-      type: error.constructor.name
-    });
-  }
-  
-  async get<T>(key: string, defaultValue: T): Promise<T> {
-    try {
-      const value = await this.storage.get<T>(key);
-      return value ?? defaultValue;
-    } catch (error) {
-      console.warn(`Failed to get ${key}, using default`);
-      return defaultValue;
-    }
-  }
-}
-```
+<a id="encryption"></a>
+## 🔐 Encryption failures&nbsp;[#](#encryption)
 
-## Async Error Boundaries
+An encrypted read needs the same user-supplied password used for the write. Configure encryption on the instance before using `encrypt: true`; see the [encryption guide](../guides/features/encryption.md). `EncryptionError` lets you offer a password retry without treating the value as absent.
 
-```typescript
-// React example
-import { Component, ErrorInfo } from 'react';
-
-class StorageErrorBoundary extends Component<Props, State> {
-  state = { hasError: false, error: null };
-  
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-  
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    if (error instanceof StrataError) {
-      console.error('Storage error:', error);
-      // Handle storage-specific errors
-    }
-  }
-  
-  render() {
-    if (this.state.hasError) {
-      return <div>Storage error occurred. Please refresh.</div>;
-    }
-    
-    return this.props.children;
-  }
-}
-```
-
-## Retry Logic
-
-```typescript
-async function retryOperation<T>(
-  operation: () => Promise<T>,
-  maxRetries = 3,
-  delay = 1000
-): Promise<T> {
-  let lastError: Error;
-  
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await operation();
-    } catch (error) {
-      lastError = error;
-      
-      if (error instanceof QuotaExceededError) {
-        // Don't retry quota errors
-        throw error;
-      }
-      
-      if (i < maxRetries - 1) {
-        await new Promise(resolve => setTimeout(resolve, delay));
-        delay *= 2; // Exponential backoff
-      }
-    }
-  }
-  
-  throw lastError!;
-}
-
-// Usage
-const data = await retryOperation(() => 
-  storage.get('flaky-key')
-);
-```
-
-## Error Reporting
-
-```typescript
-const storage = new Strata({
-  onError: async (error, context) => {
-    // Log locally
-    console.error('Storage error:', error, context);
-    
-    // Report to error tracking service
-    if (window.Sentry) {
-      Sentry.captureException(error, {
-        tags: {
-          storage_operation: context.operation,
-          storage_type: context.storage
-        },
-        extra: context
-      });
-    }
-  }
-});
-```
-
-## See Also
-
-- [Configuration](./configuration.md)
-- [Basic Usage](./basic-usage.md)
-- [TypeScript Types](../api/core/types.md)
+There is no `StrataConfig.onError` callback and no `NotFoundError` for a missing key. Attach error reporting in your own catch block, and avoid logging the value or password.

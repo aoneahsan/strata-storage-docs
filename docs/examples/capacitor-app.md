@@ -1,249 +1,68 @@
 # Capacitor App Examples
 
-Complete examples of using Strata Storage in Capacitor applications.
+A Capacitor app can use the same `set()` and `get()` calls on web, iOS and Android after it registers the native adapters. A browser build exercises the web adapters; native persistence needs device testing.
 
 ## Basic Capacitor Setup
 
 ```typescript
-import { Strata } from 'strata-storage';
 import { Capacitor } from '@capacitor/core';
+import { defineStorage } from 'strata-storage';
+import { registerCapacitorAdapters } from 'strata-storage/capacitor';
 
-const storage = new Strata({
-  namespace: 'capacitor-app',
-  defaultStorages: Capacitor.isNativePlatform() 
-    ? ['secure', 'sqlite', 'preferences']
-    : ['indexedDB', 'localStorage']
+const native = Capacitor.isNativePlatform();
+const storage = defineStorage({
+  namespace: 'my-app',
+  defaultStorages: native
+    ? ['sqlite', 'preferences', 'memory']
+    : ['indexedDB', 'localStorage', 'memory'],
 });
+if (native) await registerCapacitorAdapters(storage);
+
+await storage.set('draft', { title: 'First pass' });
+const draft = await storage.get<{ title: string }>('draft');
 ```
+
+Create this instance once in the app's startup path and share it with screens. Call `registerCapacitorAdapters()` before the first native operation.
 
 ## Platform-Specific Storage
 
 ```typescript
-import { Device } from '@capacitor/device';
-
-async function setupPlatformStorage() {
-  const info = await Device.getInfo();
-  
-  const storage = new Strata({
-    namespace: 'my-app',
-    defaultStorages: info.platform === 'ios'
-      ? ['secure', 'preferences'] // iOS Keychain + UserDefaults
-      : info.platform === 'android'
-      ? ['secure', 'sqlite'] // Android EncryptedSharedPreferences + SQLite
-      : ['indexedDB', 'localStorage'] // Web fallback
-  });
-  
-  return storage;
+if (native) {
+  await storage.set('theme', 'dark', { storage: 'preferences' });
+  await storage.set('offline-draft', draft, { storage: 'sqlite' });
+  await storage.set('device-credential', credential, { storage: 'secure' });
+} else {
+  await storage.set('theme', 'dark', { storage: 'localStorage' });
+  await storage.set('offline-draft', draft, { storage: 'indexedDB' });
 }
 ```
+
+An explicit native storage type is unavailable in a regular browser. Choose a browser fallback for shared code; check native availability and round-trip behavior on both devices.
 
 ## Biometric Authentication
 
-```typescript
-import { BiometricAuth } from '@capacitor-community/biometric-auth';
-
-class SecureStorage {
-  private storage: Strata;
-  
-  async saveWithBiometric(key: string, value: any) {
-    // Check biometric availability
-    const available = await BiometricAuth.isAvailable();
-    
-    if (available.biometryType) {
-      // Verify biometric
-      await BiometricAuth.verify({
-        reason: 'Access secure storage',
-        title: 'Authentication Required'
-      });
-      
-      // Store securely
-      await this.storage.set(key, value, {
-        storage: 'secure',
-        encrypt: true
-      });
-    }
-  }
-}
-```
+Strata's `secure` adapter does not provide a biometric prompt or a `biometricOnly` option. If the host app needs a biometric check, it must choose and verify a separate authentication mechanism. That check is not a guarantee that a value written through Strata remains biometric-gated on later reads.
 
 ## App State Persistence
 
 ```typescript
 import { App } from '@capacitor/app';
 
-class AppStateManager {
-  private storage: Strata;
-  
-  constructor() {
-    this.storage = new Strata();
-    this.setupListeners();
-  }
-  
-  private setupListeners() {
-    // Save state on pause
-    App.addListener('pause', async () => {
-      await this.storage.set('app-state', {
-        timestamp: Date.now(),
-        screen: getCurrentScreen(),
-        data: getAppData()
-      });
-    });
-    
-    // Restore on resume
-    App.addListener('resume', async () => {
-      const state = await this.storage.get('app-state');
-      if (state && Date.now() - state.timestamp < 300000) { // 5 minutes
-        restoreAppState(state);
-      }
+const listener = await App.addListener('appStateChange', async ({ isActive }) => {
+  if (!isActive) {
+    await storage.set('lastPauseAt', Date.now(), {
+      storage: native ? 'preferences' : 'localStorage',
     });
   }
-}
+});
+
+// Remove the listener when the app shell is disposed.
+await listener.remove();
 ```
 
-## Photo Storage
-
-```typescript
-import { Camera, CameraResultType } from '@capacitor/camera';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-
-class PhotoManager {
-  private storage: Strata;
-  
-  async savePhoto() {
-    // Take photo
-    const photo = await Camera.getPhoto({
-      resultType: CameraResultType.Base64,
-      quality: 90
-    });
-    
-    // Save to filesystem
-    const fileName = `photo_${Date.now()}.jpg`;
-    await Filesystem.writeFile({
-      path: fileName,
-      data: photo.base64String!,
-      directory: Directory.Data
-    });
-    
-    // Store metadata in Strata
-    await this.storage.set(`photo:${fileName}`, {
-      path: fileName,
-      timestamp: Date.now(),
-      size: photo.base64String!.length,
-      format: photo.format
-    });
-  }
-  
-  async getPhotos() {
-    // query() matches stored values, not the storage key — list photo keys
-    // and read them.
-    const keys = (await this.storage.keys()).filter((k) => k.startsWith('photo:'));
-    return Promise.all(keys.map((k) => this.storage.get(k)));
-  }
-}
-```
-
-## Network Status Handling
-
-```typescript
-import { Network } from '@capacitor/network';
-
-class NetworkAwareStorage {
-  private storage: Strata;
-  private isOnline = true;
-  
-  constructor() {
-    this.storage = new Strata();
-    this.setupNetworkListener();
-  }
-  
-  private setupNetworkListener() {
-    Network.addListener('networkStatusChange', status => {
-      this.isOnline = status.connected;
-      
-      if (status.connected) {
-        this.syncPendingData();
-      }
-    });
-  }
-  
-  async save(key: string, value: any) {
-    // Always save locally
-    await this.storage.set(key, value);
-    
-    if (this.isOnline) {
-      await this.syncToServer(key, value);
-    } else {
-      await this.queueForSync(key);
-    }
-  }
-}
-```
-
-## Push Notification Data
-
-```typescript
-import { PushNotifications } from '@capacitor/push-notifications';
-
-class NotificationStorage {
-  private storage: Strata;
-  
-  async setup() {
-    // Store registration token
-    PushNotifications.addListener('registration', async (token) => {
-      await this.storage.set('push-token', token.value, {
-        encrypt: true
-      });
-    });
-    
-    // Store notification history
-    PushNotifications.addListener('pushNotificationReceived', async (notification) => {
-      const history = await this.storage.get('notification-history') || [];
-      history.unshift({
-        ...notification,
-        receivedAt: Date.now()
-      });
-      
-      // Keep last 50 notifications
-      await this.storage.set('notification-history', history.slice(0, 50));
-    });
-  }
-}
-```
-
-## Geolocation Tracking
-
-```typescript
-import { Geolocation } from '@capacitor/geolocation';
-
-class LocationTracker {
-  private storage: Strata;
-  
-  async trackLocation() {
-    const position = await Geolocation.getCurrentPosition();
-    
-    // Store with TTL for privacy
-    await this.storage.set('last-location', {
-      lat: position.coords.latitude,
-      lng: position.coords.longitude,
-      accuracy: position.coords.accuracy,
-      timestamp: position.timestamp
-    }, {
-      ttl: 3600000, // 1 hour
-      encrypt: true
-    });
-  }
-  
-  async getLocationHistory() {
-    // Conditions match the stored value by bare field name
-    return await this.storage.query({
-      timestamp: { $gt: Date.now() - 86400000 } // Last 24h
-    });
-  }
-}
-```
+Use the [device verification guide](../guides/platforms/device-verification.md) to test restart persistence and each adapter. An app state event is not a substitute for awaiting a write when data must be durable.
 
 ## See Also
 
-- [Capacitor Platform Guide](../guides/platforms/capacitor.md)
-- [React Native Example](./react-native.md)
-- [Ionic App Example](./ionic-app.md)
+- [Capacitor platform guide](../guides/platforms/capacitor.md)
+- [Native adapter reference](../api/adapters/README.md)

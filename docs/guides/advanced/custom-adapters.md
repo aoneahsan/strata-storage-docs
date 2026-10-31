@@ -1,207 +1,36 @@
+---
+title: Custom adapter registration
+description: Register an adapter manually on a Strata instance and understand the current StorageType typing limit.
+tags: [adapters, advanced]
+---
+
 # Custom Storage Adapters Guide
 
-Learn how to create custom storage adapters for Strata Storage.
+`Strata.registerAdapter()` accepts an object implementing the `StorageAdapter` contract. The class constructor does **not** register any adapters, so manual registration must happen before the first operation.
 
-## Overview
-
-Strata Storage allows you to create custom adapters for any storage backend by extending the `BaseAdapter` class.
-
-## Basic Adapter Structure
+## Manual Registration
 
 ```typescript
-import { BaseAdapter } from 'strata-storage';
-import type { StorageAdapter, StorageValue } from 'strata-storage';
+import { Strata, MemoryAdapter } from 'strata-storage';
 
-export class CustomAdapter extends BaseAdapter implements StorageAdapter {
-  readonly name = 'custom';
-  readonly type = 'custom' as const;
-  
-  async initialize(): Promise<void> {
-    await super.initialize();
-    // Custom initialization
-  }
-  
-  async get<T>(key: string): Promise<StorageValue<T> | null> {
-    // Implementation
-  }
-  
-  async set<T>(key: string, value: T, options?: StorageOptions): Promise<void> {
-    // Implementation
-  }
-  
-  async remove(key: string): Promise<void> {
-    // Implementation
-  }
-  
-  async clear(): Promise<void> {
-    // Implementation
-  }
-  
-  async keys(pattern?: string | RegExp): Promise<string[]> {
-    // Implementation
-  }
-}
-```
+const storage = new Strata({ defaultStorages: ['memory'] });
+storage.registerAdapter(new MemoryAdapter());
+await storage.initialize();
 
-## Example: Redis Adapter
-
-```typescript
-import { BaseAdapter } from 'strata-storage';
-import type { StorageValue, StorageOptions } from 'strata-storage';
-
-export class RedisAdapter extends BaseAdapter {
-  readonly name = 'redis';
-  readonly type = 'redis' as const;
-  private client: any; // Redis client
-  
-  constructor(private config: RedisConfig) {
-    super();
-  }
-  
-  async initialize(): Promise<void> {
-    await super.initialize();
-    this.client = await createRedisClient(this.config);
-  }
-  
-  async get<T>(key: string): Promise<StorageValue<T> | null> {
-    const data = await this.client.get(this.prefixKey(key));
-    if (!data) return null;
-    
-    return JSON.parse(data);
-  }
-  
-  async set<T>(key: string, value: T, options?: StorageOptions): Promise<void> {
-    const prefixedKey = this.prefixKey(key);
-    const wrapped = this.wrapValue(value);
-    
-    if (options?.ttl) {
-      await this.client.setex(
-        prefixedKey,
-        Math.ceil(options.ttl / 1000),
-        JSON.stringify(wrapped)
-      );
-    } else {
-      await this.client.set(prefixedKey, JSON.stringify(wrapped));
-    }
-  }
-  
-  async remove(key: string): Promise<void> {
-    await this.client.del(this.prefixKey(key));
-  }
-  
-  async clear(): Promise<void> {
-    const keys = await this.keys();
-    if (keys.length > 0) {
-      await this.client.del(...keys.map(k => this.prefixKey(k)));
-    }
-  }
-  
-  async keys(pattern?: string | RegExp): Promise<string[]> {
-    const allKeys = await this.client.keys(this.prefixKey('*'));
-    return this.filterKeys(allKeys, pattern);
-  }
-}
-```
-
-## Registering Custom Adapters
-
-```typescript
-import { Strata } from 'strata-storage';
-import { RedisAdapter } from './RedisAdapter';
-
-const storage = new Strata({
-  adapters: {
-    redis: new RedisAdapter({
-      host: 'localhost',
-      port: 6379
-    })
-  },
-  defaultStorages: ['redis', 'localStorage']
+await storage.set('draft', { title: 'First draft' }, { storage: 'memory' });
+const draft = await storage.get<{ title: string }>('draft', {
+  storage: 'memory',
 });
 ```
 
-## Advanced Features
+If you register another adapter after initialization, call `await storage.refreshAdapters()` to attach it and update the default selection.
 
-### Transaction Support
+## Adapter Contract
 
-```typescript
-class TransactionalAdapter extends BaseAdapter {
-  async transaction<T>(fn: (trx: Transaction) => Promise<T>): Promise<T> {
-    const trx = this.createTransaction();
-    try {
-      const result = await fn(trx);
-      await trx.commit();
-      return result;
-    } catch (error) {
-      await trx.rollback();
-      throw error;
-    }
-  }
-  
-  private createTransaction(): Transaction {
-    // Implementation
-  }
-}
-```
+`BaseAdapter` implements common `clear`, `has`, query, observation, TTL and lifecycle behavior. A subclass supplies `name`, `capabilities`, `isAvailable`, `initialize`, `get`, `set`, `remove` and `keys`. `get()` and `set()` exchange a full `StorageValue<T>` wrapper, including timestamps and optional expiry, tags and metadata; a bare value does not satisfy the contract.
 
-### Query Support
+The published `StorageType` is a fixed union of built-in adapter names. A new arbitrary name such as `'redis'` is **not type-safe** with the current public `StorageType` and `StorageOptions.storage` definitions. Do not cast it into the union and present it as supported. If you need a new named adapter, extend the package's type and runtime contract first; this guide documents registration for names the package currently accepts.
 
-```typescript
-class QueryableAdapter extends BaseAdapter {
-  async query(condition: QueryCondition): Promise<StorageValue[]> {
-    const allItems = await this.getAllItems();
-    return allItems.filter(item => 
-      this.queryEngine.matches(item, condition)
-    );
-  }
-}
-```
+## Validation
 
-## Best Practices
-
-1. **Error Handling**: Always wrap operations in try-catch
-2. **Key Prefixing**: Use namespace prefixes to avoid collisions
-3. **Type Safety**: Implement proper TypeScript types
-4. **Performance**: Implement efficient key filtering
-5. **Cleanup**: Properly close connections in destroy()
-
-## Validating Custom Adapters
-
-There is no built-in test harness. Validate your adapter against the
-`BaseAdapter` contract with the real public API: register it on a `Strata`
-instance with `registerAdapter()`, then exercise the core operations
-(`set` / `get` / `remove` / `keys` / `clear`), asserting the round-trip behavior.
-
-```typescript
-import { Strata } from 'strata-storage';
-import { CustomAdapter } from './CustomAdapter';
-
-async function validate() {
-  const storage = new Strata();
-  storage.registerAdapter(new CustomAdapter());
-  await storage.initialize();
-
-  // set + get round-trip
-  await storage.set('greeting', 'hello', { storage: 'custom' });
-  console.assert((await storage.get('greeting', { storage: 'custom' })) === 'hello');
-
-  // keys reflects stored entries
-  console.assert((await storage.keys(undefined, { storage: 'custom' })).includes('greeting'));
-
-  // remove deletes the entry
-  await storage.remove('greeting', { storage: 'custom' });
-  console.assert((await storage.get('greeting', { storage: 'custom' })) === null);
-
-  // clear empties the adapter
-  await storage.set('a', 1, { storage: 'custom' });
-  await storage.clear({ storage: 'custom' });
-  console.assert((await storage.keys(undefined, { storage: 'custom' })).length === 0);
-
-  await storage.close();
-}
-```
-
-## See Also
-
-- [Storage Adapters](../../api/adapters/README.md)
-- [Type Definitions](../../api/core/types.md)
+Register the adapter on a fresh `Strata`, run `set` → `get` → `remove` → `get`, then check `keys`, `clear`, TTL and `close`. Run availability and persistence checks on the target platform. The [adapter reference](../../api/adapters/README.md) lists the built-in names.

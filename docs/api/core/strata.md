@@ -31,11 +31,10 @@ Built from the same factory as `defineStorage()`. Importing the package performs
 ### `new Strata(config?)` — manual
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { Strata, MemoryAdapter } from 'strata-storage';
 
-const storage = new Strata({ defaultStorages: ['indexedDB', 'localStorage'] });
-// You register adapters yourself, then call initialize().
-storage.registerAdapter(/* ... */);
+const storage = new Strata({ defaultStorages: ['memory'] });
+storage.registerAdapter(new MemoryAdapter());
 await storage.initialize();
 ```
 
@@ -53,10 +52,12 @@ Use the constructor directly when you want full control over which adapters are 
 async initialize(): Promise<void>
 ```
 
-Initializes the storage system. Must be called before any other operations.
+Initializes an instance explicitly. `defineStorage()` and the exported singleton initialize lazily on first use; manual instances need registered adapters before use.
 
 ```typescript
-const storage = new Strata();
+import { Strata, registerWebAdapters } from 'strata-storage';
+
+const storage = registerWebAdapters(new Strata());
 await storage.initialize();
 ```
 
@@ -109,18 +110,18 @@ Stores a value in storage.
 
 #### Example
 ```typescript
-// Simple set
+import { defineStorage } from 'strata-storage';
+
+const storage = defineStorage();
 await storage.set('username', 'john_doe');
 
-// With options
-await storage.set('userData', data, {
-  storage: 'secure',
-  encrypt: true,
-  compress: true,
-  ttl: 3600000, // 1 hour
-  tags: ['user', 'profile']
+await storage.set('draft', { status: 'editing' }, {
+  storage: 'indexedDB',
+  ttl: 3_600_000,
 });
 ```
+
+Native `secure` storage needs Capacitor adapter registration. Encryption and compression need an instance configured for those transforms; see the [native setup](../../guides/platforms/capacitor.md), [encryption](../features/encryption.md) and [compression](../features/compression.md) guides.
 
 ### remove()
 
@@ -137,7 +138,7 @@ Removes a value from storage.
 #### Example
 ```typescript
 await storage.remove('tempData');
-await storage.remove('userData', { storage: 'secure' });
+await storage.remove('draft', { storage: 'indexedDB' });
 ```
 
 ### has()

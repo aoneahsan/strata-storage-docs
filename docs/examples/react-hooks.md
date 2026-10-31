@@ -197,56 +197,25 @@ function ShoppingCart() {
 
 ### Auth State Management
 
+The server owns authentication. The hook can display its session state, but a value in Strata Storage is not proof of sign-in. This example assumes the host app exposes a cookie-backed `/api/session` endpoint:
+
 ```typescript
 function useAuth() {
-  const storage = useStrata();
-  const [auth, setAuth] = useState(null);
+  const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
-  
-  useEffect(() => {
-    // Check auth on mount
-    storage.get('auth_token').then(token => {
-      setAuth(token ? { token } : null);
-      setLoading(false);
-    });
-    
-    // Listen for auth changes
-    const unsubscribe = storage.subscribe((change) => {
-      if (change.key === 'auth_token') {
-        setAuth(change.newValue ? { token: change.newValue } : null);
-      }
-    });
-    
-    return unsubscribe;
-  }, []);
-  
-  const login = async (credentials) => {
-    const response = await api.login(credentials);
-    await storage.set('auth_token', response.token, {
-      encrypt: true,
-      ttl: 7200000 // 2 hours
-    });
-    setAuth({ token: response.token });
-  };
-  
-  const logout = async () => {
-    await storage.remove('auth_token');
-    setAuth(null);
-  };
-  
-  return { auth, loading, login, logout };
-}
 
-// Auth Provider
-function AuthProvider({ children }) {
-  const auth = useAuth();
-  return (
-    <AuthContext.Provider value={auth}>
-      {children}
-    </AuthContext.Provider>
-  );
+  useEffect(() => {
+    fetch('/api/session', { credentials: 'include' })
+      .then(response => response.ok ? response.json() : null)
+      .then(setAccount)
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { account, loading };
 }
 ```
+
+Keep the browser session credential in a server-issued `HttpOnly` cookie. Strata's JavaScript cookie adapter cannot create one.
 
 ### Offline Queue
 
@@ -370,22 +339,24 @@ function usePersistentState(key, initialValue, options = {}) {
 
 ### useEncryptedStorage
 
+Create the instance with encryption enabled before wrapping it in a hook. Passing `encrypt: true` to an unconfigured `useStrata()` instance does not initialise the encryption manager.
+
 ```typescript
-function useEncryptedStorage(password) {
-  const baseStorage = useStrata();
-  
-  const storage = useMemo(() => ({
-    set: (key, value) => baseStorage.set(key, value, { 
-      encrypt: true, 
-      encryptionPassword: password 
+import { defineStorage } from 'strata-storage';
+
+const encryptedStorage = defineStorage({ encryption: { enabled: true } });
+
+function useEncryptedStorage(password: string) {
+  return useMemo(() => ({
+    set: (key: string, value: unknown) => encryptedStorage.set(key, value, {
+      encrypt: true,
+      encryptionPassword: password,
     }),
-    get: (key) => baseStorage.get(key, { 
-      encryptionPassword: password 
+    get: (key: string) => encryptedStorage.get(key, {
+      encryptionPassword: password,
     }),
-    remove: (key) => baseStorage.remove(key)
+    remove: (key: string) => encryptedStorage.remove(key),
   }), [password]);
-  
-  return storage;
 }
 ```
 

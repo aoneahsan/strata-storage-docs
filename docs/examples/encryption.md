@@ -1,194 +1,125 @@
 # Encryption Examples
 
-Examples of using encryption features in Strata Storage.
+Strata uses Web Crypto for encrypted values. Create an instance with encryption enabled, then provide a password at the operation or instance level. A plain `defineStorage()` instance does not initialize the encryption manager, even if a later `set()` passes `encrypt: true`.
 
 ## Basic Encryption
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata();
+const storage = defineStorage({ encryption: { enabled: true } });
+const password = await askUserForPassword();
 
-// Encrypt a single value
-await storage.set('api-key', 'secret-key-123', {
-  encrypt: true,
-  encryptionPassword: 'strong-password'
+await storage.set('private-draft', { text: 'A draft' }, {
+  encryptionPassword: password,
 });
-
-// Retrieve and decrypt
-const apiKey = await storage.get('api-key', {
-  encryptionPassword: 'strong-password'
+const draft = await storage.get<{ text: string }>('private-draft', {
+  encryptionPassword: password,
 });
 ```
+
+The password must be available again to decrypt the value. Do not hard-code it or save it beside the encrypted data.
 
 ## Global Encryption
 
 ```typescript
-const storage = new Strata({
-  encryption: {
-    enabled: true,
-    password: 'global-encryption-key'
-  }
+const storage = defineStorage({
+  encryption: { enabled: true, password },
 });
 
-// All operations are encrypted
-await storage.set('user-data', { name: 'John', ssn: '123-45-6789' });
-await storage.set('payment-info', { card: '****1234' });
+await storage.set('private-draft', { text: 'A draft' });
+const draft = await storage.get('private-draft');
 ```
+
+The configured password applies to encrypted operations on that instance. Protect it in the calling application.
 
 ## Selective Encryption
 
 ```typescript
-const storage = new Strata();
+const storage = defineStorage({ encryption: { enabled: true } });
 
-// Encrypt sensitive data only
-await storage.set('username', 'john_doe'); // Not encrypted
-await storage.set('password', 'secret123', { encrypt: true });
-await storage.set('session', 'abc123', { encrypt: true });
+await storage.set('theme', 'dark', { encrypt: false });
+await storage.set('private-draft', draft, {
+  encrypt: true,
+  encryptionPassword: password,
+});
+
+const savedTheme = await storage.get('theme');
+const savedDraft = await storage.get('private-draft', {
+  encryptionPassword: password,
+});
 ```
+
+When encryption is enabled globally, mark each intentionally plain write with `encrypt: false`.
 
 ## Password Management
 
+Use an application-owned unlock step. Do not treat a missing verification value as a successful unlock. For example, create a marker after the user first sets a password, then require that marker on later unlocks:
+
 ```typescript
-class SecureStorage {
-  private storage: Strata;
-  private password: string;
-  
-  constructor() {
-    this.storage = new Strata();
-  }
-  
-  async unlock(masterPassword: string) {
-    // Verify master password
-    try {
-      await this.storage.get('_verification', {
-        encryptionPassword: masterPassword
-      });
-      this.password = masterPassword;
-      return true;
-    } catch {
-      return false;
-    }
-  }
-  
-  async setSecure(key: string, value: any) {
-    if (!this.password) throw new Error('Storage locked');
-    
-    await this.storage.set(key, value, {
-      encrypt: true,
-      encryptionPassword: this.password
-    });
-  }
-  
-  async getSecure(key: string) {
-    if (!this.password) throw new Error('Storage locked');
-    
-    return await this.storage.get(key, {
-      encryptionPassword: this.password
-    });
+const storage = defineStorage({ encryption: { enabled: true } });
+
+async function createPassword(password: string): Promise<void> {
+  await storage.set('_verification', 'ready', { encryptionPassword: password });
+}
+
+async function unlock(password: string): Promise<boolean> {
+  try {
+    return await storage.get<string>('_verification', {
+      encryptionPassword: password,
+    }) === 'ready';
+  } catch {
+    return false;
   }
 }
 ```
 
+This checks whether the supplied password decrypts the marker. It is a local example, not an account authentication system.
+
 ## Key Derivation
 
-```typescript
-import { Strata } from 'strata-storage';
+Strata derives an encryption key from the supplied password with PBKDF2. The `encryption` config accepts `iterations`, `saltLength`, `keyLength`, and `algorithm`. It generates a fresh salt for each encrypted write, so the application does not need to hash the password itself.
 
-class DerivedKeyStorage {
-  private storage: Strata;
-  
-  async deriveKey(password: string, salt: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password + salt);
-    const hash = await crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode(...new Uint8Array(hash)));
-  }
-  
-  async saveWithDerivedKey(key: string, value: any, userPassword: string) {
-    const salt = await this.storage.get('user-salt') || 'default-salt';
-    const derivedKey = await this.deriveKey(userPassword, salt);
-    
-    await this.storage.set(key, value, {
-      encrypt: true,
-      encryptionPassword: derivedKey
-    });
-  }
-}
+```typescript
+const storage = defineStorage({
+  encryption: {
+    enabled: true,
+    iterations: 600_000,
+    saltLength: 16,
+    keyLength: 256,
+    algorithm: 'AES-GCM',
+  },
+});
 ```
 
 ## Encrypted File Storage
 
-```typescript
-async function saveEncryptedFile(file: File, password: string) {
-  // Read file as base64
-  const reader = new FileReader();
-  const base64 = await new Promise<string>((resolve) => {
-    reader.onload = () => resolve(reader.result as string);
-    reader.readAsDataURL(file);
-  });
-  
-  // Store encrypted
-  await storage.set(`file:${file.name}`, {
-    name: file.name,
-    type: file.type,
-    size: file.size,
-    data: base64,
-    uploadedAt: new Date()
-  }, {
-    encrypt: true,
-    encryptionPassword: password
-  });
-}
+A `File` is not stored as a live browser object. Convert its bytes to a serializable value before writing, and size it for the chosen adapter's quota:
 
-async function getEncryptedFile(filename: string, password: string): Promise<Blob> {
-  const fileData = await storage.get(`file:${filename}`, {
-    encryptionPassword: password
-  });
-  
-  if (!fileData) throw new Error('File not found');
-  
-  // Convert base64 back to blob
-  const response = await fetch(fileData.data);
-  return await response.blob();
-}
+```typescript
+const bytes = new Uint8Array(await file.arrayBuffer());
+await storage.set(`file:${file.name}`, Array.from(bytes), {
+  storage: 'indexedDB',
+  encrypt: true,
+  encryptionPassword: password,
+});
 ```
 
 ## Secure Form Data
 
 ```typescript
-class SecureForm {
-  private storage: Strata;
-  
-  constructor() {
-    this.storage = new Strata({
-      encryption: {
-        enabled: true,
-        password: this.generateFormKey()
-      }
-    });
-  }
-  
-  private generateFormKey(): string {
-    // Generate unique key per session
-    return `form-${Date.now()}-${Math.random()}`;
-  }
-  
-  async saveField(fieldName: string, value: string, sensitive = false) {
-    if (sensitive) {
-      await this.storage.set(`form:${fieldName}`, value, {
-        encrypt: true,
-        ttl: 3600000 // Auto-expire after 1 hour
-      });
-    } else {
-      await this.storage.set(`form:${fieldName}`, value);
-    }
-  }
+async function saveDraft(formId: string, value: unknown, password: string) {
+  await storage.set(`form:${formId}`, value, {
+    encrypt: true,
+    encryptionPassword: password,
+    ttl: 3_600_000,
+  });
 }
 ```
+
+Keep the password available for a later read, and remove the draft when the user discards it.
 
 ## See Also
 
 - [Encryption Guide](../guides/features/encryption.md)
 - [Encryption API](../api/features/encryption.md)
-- [User Authentication](./user-auth.md)

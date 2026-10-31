@@ -4,7 +4,7 @@
 
 **Status:** OPEN · **Reported:** 2026-10-31 from the Strata Storage completion run · **Affects:** docs for `strata-storage@3.1.3`, example pages
 
-**Symptom** — `No available storage adapters. Configured preference: localStorage, indexedDB, sessionStorage, memory. Registered: (none).` when an example constructs `new Strata()` and calls `set()` without registering an adapter. The current source has 245 `new Strata()` occurrences across 58 docs files; this is a candidate count, not a count of confirmed failures.
+**Symptom** — `No available storage adapters. Configured preference: localStorage, indexedDB, sessionStorage, memory. Registered: (none).` when an example constructs `new Strata()` and calls `set()` without registering an adapter. At report time, the source had 245 `new Strata()` occurrences across 58 docs files; this was a candidate count, not a count of confirmed failures.
 
 **Repro** — Follow the opening example in `docs/examples/data-sync.md`: construct `new Strata()` and call `set()` in a browser without a preceding `registerAdapter()` call. The built package rejects the operation with the error above.
 
@@ -13,6 +13,8 @@
 **Root cause** — The `Strata` constructor does not register adapters. `defineStorage()` and the exported `storage` instance register the standard web adapters. The seven linked pages corrected in the 2026-10-31 Quick Start pass are excluded from this open scope.
 
 **Suggested fix** — Audit every remaining constructor example in context. Use `defineStorage()` for a web-ready instance, or show the required explicit adapter registration where a bare constructor is the lesson. Compile and run representative snippets, and check native examples on devices.
+
+**2026-10-31 work checkpoint** — Entry pages, examples, FAQ/troubleshooting, adapter references and platform guides are corrected in source. A current scan finds only deliberate manually registered constructors, explanatory prose and the historical repro above. The issue remains open until the edited docs are reviewed, approved and published; native examples still need device verification.
 
 ### ISSUE-002 — Other documentation claims drifted from the current API
 
@@ -26,6 +28,8 @@
 
 **Suggested fix** — Correct the reference claims and typed examples, run web snippets against the built package, and verify Capacitor paths on devices. Do not imply React Native support without a package-supported adapter path.
 
+**2026-10-31 work checkpoint** — Source corrections now cover unsupported Cache, IndexedDB, memory, cookie, Capacitor, encryption and compression options; service-worker examples use the browser Cache API. The React Native page states the unsupported-runtime boundary. Device verification and publication are still open.
+
 ### ISSUE-003 — README names a removed GitHub Actions deployment
 
 **Status:** OPEN · **Reported:** 2026-10-31 from the Strata Storage completion run · **Affects:** `README.md`, deployment instructions
@@ -37,3 +41,5 @@
 **Root cause** — The README was not updated when automated deployment was removed on 2026-10-31.
 
 **Suggested fix** — Replace the stale steps with the locally verified build, controlled-browser check, ordinary fast-forward `gh-pages` publish and live sitemap/robots check.
+
+**2026-10-31 work checkpoint** — `README.md` now describes the manual build and Pages release. The issue remains open until that source and the resulting live docs are approved and published.

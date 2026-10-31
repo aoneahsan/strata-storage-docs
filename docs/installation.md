@@ -1,287 +1,69 @@
 ---
 sidebar_position: 2
-description: Install Strata Storage for web, React, Vue, Angular, and Capacitor (iOS/Android) projects. Zero runtime dependencies; framework adapters are optional.
+description: Install Strata Storage and verify a browser or Capacitor adapter with the package's current entry points.
 ---
 
 # Installation
 
-## Prerequisites
+Strata Storage 3.1.4 requires Node 24.13 or later in the toolchain and ships as ESM. The core package has no runtime dependencies. Framework, Firebase and Capacitor integrations are optional sub-path imports with their own peer requirements.
 
-- Node.js 24.13.0 or higher
-- TypeScript 5.0 or higher (optional but recommended)
-- Capacitor 8.0 or higher (for mobile platforms; Android minSdk 23 — secure storage requires API 23+)
+## Add the package
 
-## Package Installation
-
-### Using npm
-```bash
-npm install strata-storage
-```
-
-### Using yarn
 ```bash
 yarn add strata-storage
 ```
 
-## Quick Setup
+For another package manager, use its normal package-add command. The core browser entry point is `strata-storage`.
 
-The easiest way to get started is using our configuration wizard:
-
-```bash
-npx strata-storage configure
-```
-
-This interactive CLI will:
-- Detect your project type (React, Vue, Angular, etc.)
-- Configure storage options
-- Generate configuration files
-- Create example code
-- Install necessary dependencies
-
-## Manual Setup
-
-### 1. Basic Configuration
-
-Create a `strata.config.js` file:
-
-```javascript
-export default {
-  // Default storage types in order of preference
-  defaultStorages: ['indexedDB', 'localStorage', 'memory'],
-  
-  // Enable features as needed
-  encryption: {
-    enabled: true,
-    password: process.env.STRATA_ENCRYPTION_KEY
-  },
-  
-  compression: {
-    enabled: true,
-    threshold: 1024 // Only compress if > 1KB
-  },
-  
-  sync: {
-    enabled: true
-  },
-  
-  ttl: {
-    defaultTTL: 3600000, // 1 hour
-    autoCleanup: true
-  }
-};
-```
-
-### 2. TypeScript Configuration
-
-Add to your `tsconfig.json`:
-
-```json
-{
-  "compilerOptions": {
-    "types": ["strata-storage"],
-    "paths": {
-      "strata-storage": ["node_modules/strata-storage/dist"],
-      "strata-storage/*": ["node_modules/strata-storage/dist/*"]
-    }
-  }
-}
-```
-
-### 3. Framework-Specific Setup
-
-#### React
-
-```jsx
-import { StrataProvider } from 'strata-storage/react';
-import config from './strata.config';
-
-function App() {
-  return (
-    <StrataProvider config={config}>
-      <YourApp />
-    </StrataProvider>
-  );
-}
-```
-
-#### Vue 3
-
-```javascript
-import { createApp } from 'vue';
-import { StrataPlugin } from 'strata-storage/vue';
-import config from './strata.config';
-
-const app = createApp(App);
-app.use(StrataPlugin, config);
-```
-
-#### Angular
+## Verify a browser write
 
 ```typescript
-import { StrataModule } from 'strata-storage/angular';
-import config from './strata.config';
+import { defineStorage } from 'strata-storage';
 
-@NgModule({
-  imports: [
-    StrataModule.forRoot(config)
-  ]
-})
-export class AppModule {}
+const storage = defineStorage();
+await storage.set('installation-check', 'ready', { storage: 'memory' });
+const result = await storage.get<string>('installation-check', {
+  storage: 'memory',
+});
+console.log(result); // ready
 ```
 
-## Platform-Specific Setup
+`defineStorage()` registers the standard web adapters and initializes lazily. The memory check works in a browser page without asking for persistent storage. Then run the [Quick Start](./quick-start.md) with the adapter your app will use.
 
-### Capacitor (iOS/Android)
+## Add a framework binding only when needed
 
-1. Install Capacitor if not already installed:
-```bash
-npm install @capacitor/core @capacitor/cli
-npx cap init
-```
+The package exports `strata-storage/react`, `strata-storage/vue` and `strata-storage/angular`. Install the corresponding framework peer in your app and follow its [integration example](./examples/README.md). A basic `defineStorage()` call needs no framework Provider or plugin.
 
-2. Add platforms:
-```bash
-npx cap add ios
-npx cap add android
-```
+## Add Capacitor adapters only in a Capacitor app
 
-3. Sync the plugin:
-```bash
-npx cap sync
-```
-
-### iOS Additional Setup
-
-For Keychain access, add to `Info.plist`:
-
-```xml
-<key>NSFaceIDUsageDescription</key>
-<string>Store secure data with biometric protection</string>
-```
-
-### Android Additional Setup
-
-For encrypted storage, ensure minimum SDK version in `android/variables.gradle`:
-
-```gradle
-ext {
-    minSdkVersion = 23
-}
-```
-
-### Firebase (optional cross-device sync)
-
-Firebase is an **optional peer dependency** — install it only if you use the
-[Firebase sync feature](./guides/platforms/firebase.md):
-
-```bash
-npm install firebase
-```
+Install the optional `@capacitor/core` peer through your app's package manager and sync the native project after installing the package. Register the adapters before selecting a native backend:
 
 ```typescript
-import { enableFirebaseSync } from 'strata-storage/firebase';
+import { defineStorage } from 'strata-storage';
+import { registerCapacitorAdapters } from 'strata-storage/capacitor';
+
+const storage = defineStorage();
+await registerCapacitorAdapters(storage);
+await storage.set('device-setting', 'ready', { storage: 'preferences' });
+const result = await storage.get<string>('device-setting', {
+  storage: 'preferences',
+});
 ```
 
-## Environment Variables
+This snippet requires a running Capacitor iOS or Android app. The registration helper returns without adding native adapters in a browser tab. Run the [device verification sequence](./guides/platforms/device-verification.md), including a read after app restart. The Secure adapter uses platform storage but does not expose a biometric prompt option; do not add Face ID usage text solely for this package.
 
-For sensitive configuration, use environment variables:
+## Optional Firebase integration
 
-```bash
-# .env
-STRATA_ENCRYPTION_KEY=your-secret-key
-STRATA_DEFAULT_STORAGE=indexedDB
-STRATA_SYNC_ENABLED=true
-```
+Install the `firebase` peer only if your app uses the [Firebase integration](./guides/platforms/firebase.md). Its setup and authentication remain your app's responsibility. The core package does not provide a hosted account or automatic cross-device synchronization.
 
-Then in your config:
+## Encryption passwords
 
-```javascript
-export default {
-  encryption: {
-    enabled: true,
-    password: process.env.STRATA_ENCRYPTION_KEY
-  },
-  defaultStorages: [process.env.STRATA_DEFAULT_STORAGE || 'memory']
-};
-```
-
-## Build Configuration
-
-### Webpack
-
-No special configuration needed - Strata Storage is zero-dependency.
-
-### Vite
-
-Add to `vite.config.js` if using SSR:
-
-```javascript
-export default {
-  ssr: {
-    noExternal: ['strata-storage']
-  }
-};
-```
-
-### Next.js
-
-For server-side rendering, initialize only on client:
-
-```jsx
-import dynamic from 'next/dynamic';
-
-const StrataProvider = dynamic(
-  () => import('strata-storage/react').then(mod => mod.StrataProvider),
-  { ssr: false }
-);
-```
-
-## Verify Installation
-
-Create a test file to verify everything is working:
-
-```javascript
-import { Strata } from 'strata-storage';
-
-async function test() {
-  const storage = new Strata();
-  await storage.initialize();
-  
-  await storage.set('test', { message: 'Hello Strata!' });
-  const value = await storage.get('test');
-  
-  console.log('Success:', value);
-}
-
-test().catch(console.error);
-```
-
-## Next Steps
-
-- [Quick Start Guide](./quick-start.md)
-- [Basic Usage](./examples/basic-usage.md)
-- [Framework Integration](./examples/frameworks/react.md)
-- [API Reference](./api/core/strata.md)
+Do not put an encryption password in a browser `.env` file or compiled config: build tools can embed it in public JavaScript. An encrypted write needs an instance with encryption enabled **and** a password supplied by a user or other appropriate runtime flow. Follow the [encryption guide](./guides/features/encryption.md) for the exact options and recovery implications. A server secret belongs only on the server.
 
 ## Troubleshooting
 
-### Module Resolution Issues
+- “No available storage adapters” usually means a manually constructed `new Strata()` instance has no registered adapters. Use `defineStorage()` for the standard browser set, or register the adapter explicitly.
+- A native adapter cannot be selected from an ordinary browser page. Check Capacitor registration and the device runtime.
+- If an encrypted write throws for a missing password, supply a password through the application flow; do not disable the failure or bundle a fixed one.
 
-If you encounter module resolution issues:
-
-1. Clear node_modules and reinstall:
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
-
-2. Check TypeScript paths configuration
-3. Ensure you're importing from the correct path
-
-### Platform-Specific Issues
-
-- **iOS**: Run `npx cap sync ios` after installation
-- **Android**: Run `npx cap sync android` after installation
-- **Web**: Ensure your bundler supports ES modules
-
-For more help, see our [troubleshooting guide](./reference/troubleshooting.md) or [open an issue](https://stratastorage.aoneahsan.com/contact).
+See [troubleshooting](./reference/troubleshooting.md) for further error paths.

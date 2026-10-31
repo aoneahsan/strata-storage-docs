@@ -1,133 +1,47 @@
 ---
 slug: /
 sidebar_position: 1
-description: Strata Storage is a zero-dependency universal storage library with one unified async/sync API across web, Android, and iOS — localStorage, IndexedDB, cookies, Cache API, SQLite, Preferences, and Keychain/Keystore, plus encryption, compression, TTL, querying, and cross-tab sync.
-keywords: [strata storage, universal storage, capacitor storage, indexeddb, sqlite, keychain, encryption, ttl, cross-platform storage]
+description: Strata Storage provides one key/value API for browser and Capacitor storage adapters, with explicit setup for native paths and optional features.
+keywords: [strata storage, capacitor storage, indexeddb, sqlite, encryption, cross-platform storage]
 ---
 
 # Introduction
 
-Welcome to **Strata Storage** - a zero-dependency universal storage plugin providing a unified API for all storage operations across web, Android, and iOS platforms.
+Strata Storage gives browser and Capacitor apps one `set()` and `get()` shape across several storage adapters. The adapter still matters: browser, iOS and Android values live in different places, and a browser read cannot prove a native read.
 
-## Why Strata Storage?
-
-Managing storage across different platforms is challenging:
-- Different APIs for web (localStorage, IndexedDB) vs native (UserDefaults, SharedPreferences)
-- No built-in encryption or compression
-- Complex synchronization between tabs/windows
-- Manual TTL (time-to-live) management
-- Limited querying capabilities
-
-Strata Storage solves these problems with:
-- **Unified API** - Same interface across all platforms
-- **Zero Dependencies** - No external packages, pure implementation
-- **Built-in Features** - Encryption, compression, sync, TTL, queries
-- **Type Safety** - Full TypeScript support
-- **Framework Integration** - React, Vue, Angular support
-
-## Key Features
-
-### 🔌 Multiple Storage Adapters
-- **Web**: LocalStorage, SessionStorage, IndexedDB, Cookies, Cache API
-- **iOS**: UserDefaults, Keychain, SQLite, FileManager
-- **Android**: SharedPreferences, EncryptedSharedPreferences, SQLite
-- **Universal**: Memory storage, Filesystem
-
-### 🔐 Security & Performance
-- **Encryption**: AES-GCM (default) or authenticated AES-CBC (Encrypt-then-MAC), PBKDF2 (600k iterations)
-- **Compression**: LZ-string algorithm
-- **Secure Storage**: Native secure storage on mobile platforms
-- **Automatic Cleanup**: TTL support with expiration callbacks
-
-### 🔄 Synchronization
-- **Cross-tab Sync**: Real-time synchronization across browser tabs
-- **Change Events**: Subscribe to storage changes
-- **Cross-device Sync**: Optional [Firebase](./guides/platforms/firebase.md) (Firestore / Realtime Database) backend
-- **Debounced Updates**: Optimized performance
-
-### 🔍 Advanced Querying
-- **MongoDB-like Operators**: `$eq`, `$gt`, `$in`, `$regex`, etc.
-- **Nested Queries**: Support for complex object queries
-- **Sorting & Projection**: Transform and filter results
-
-### 🎯 Developer Experience
-- **TypeScript First**: Complete type definitions
-- **Framework Support**: React hooks, Vue composables, Angular services
-- **Easy Setup**: `npx strata-storage configure`
-- **Comprehensive Docs**: Detailed guides and examples
-
-## Quick Example
+## First browser round-trip
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-// Initialize with configuration
-const storage = new Strata({
-  encryption: { enabled: true },
-  compression: { enabled: true },
-  sync: { enabled: true },
-  ttl: { defaultTTL: 3600000 } // 1 hour
-});
-
-await storage.initialize();
-
-// Store encrypted & compressed data with TTL
-await storage.set('user', { 
-  name: 'John', 
-  email: 'john@example.com' 
-}, {
-  ttl: 3600000, // 1 hour
-  tags: ['profile', 'important']
-});
-
-// Retrieve data (automatically decrypted & decompressed)
-const user = await storage.get('user');
-
-// Query stored values with MongoDB-like syntax. Conditions match the value's
-// own fields by bare name (wrapper metadata like the key or tags is not queryable).
-const matches = await storage.query({
-  email: { $regex: '@example.com$' }
-});
-
-// Subscribe to changes
-storage.subscribe((change) => {
-  console.log(`${change.key} changed from`, change.oldValue, 'to', change.newValue);
+const storage = defineStorage();
+await storage.set('draft', { title: 'First pass' }, { storage: 'indexedDB' });
+const draft = await storage.get<{ title: string }>('draft', {
+  storage: 'indexedDB',
 });
 ```
 
-## Platform Support
+`defineStorage()` registers the standard browser adapters and initializes on first use. Memory, localStorage, sessionStorage, IndexedDB, cookies and a JSON-value Cache adapter are included. The URL adapter is registered separately for shareable UI state.
 
-| Platform | Storage Types | Encryption | Sync | TTL | Queries |
-|----------|--------------|------------|------|-----|---------|
-| Web | ✅ All | ✅ Web Crypto | ✅ BroadcastChannel | ✅ | ✅ |
-| iOS | ✅ Native | ✅ Keychain | ✅ Via Plugin | ✅ | ✅ |
-| Android | ✅ Native | ✅ EncryptedSharedPrefs | ✅ Via Plugin | ✅ | ✅ |
-| Node.js | ✅ Filesystem | ✅ Crypto | ✅ Events | ✅ | ✅ |
+## What changes by platform
 
-## Architecture
+| Runtime | Available path | Verification boundary |
+|---|---|---|
+| Browser page | Standard web adapters through `defineStorage()` | Test the selected browser, quota and reload behaviour |
+| Capacitor iOS/Android | Register Preferences, Secure, SQLite or Filesystem adapters | Run write → read → restart → read on a device |
+| Node or server process | Memory and explicitly supported adapters | Do not assume a browser or native backend exists |
 
-Strata Storage follows a modular architecture:
+The native Secure adapter uses iOS Keychain or Android EncryptedSharedPreferences. Strata does not expose a biometric requirement or guarantee hardware-backed keys through its public options. Native adapter read paths still require [device verification](./guides/platforms/device-verification.md).
 
-```
-┌─────────────────────────────────────────┐
-│            Strata Core API              │
-├─────────────────────────────────────────┤
-│   Features Layer                        │
-│   ├── Encryption    ├── Compression    │
-│   ├── Sync          ├── TTL            │
-│   └── Query Engine  └── Migration      │
-├─────────────────────────────────────────┤
-│   Storage Adapters                      │
-│   ├── Web Adapters  ├── iOS Adapters   │
-│   └── Android       └── Universal      │
-└─────────────────────────────────────────┘
-```
+## Optional features
 
-## Next Steps
+- Encryption and compression need an instance configured for those transforms. An encrypted write also needs an encryption password. Follow the [encryption](./guides/features/encryption.md) and [compression](./guides/features/compression.md) guides before enabling them.
+- TTL can expire stored values. Query conditions match fields of the decoded value; wrapper metadata is not queryable. See [TTL](./guides/features/ttl.md) and the [query reference](./api/features/query.md).
+- Cross-tab notifications can help refresh browser views. They do not make multi-tab writes atomic. Optional Firebase integration requires its own project and setup; it is not automatic cross-device sync.
 
-1. [Install Strata Storage](./installation.md)
-2. [Follow the Quick Start guide](./quick-start.md)
-3. [Explore the examples](./examples/README.md)
-4. [Read the API documentation](./api/core/strata.md)
+## Next steps
 
-Join us in making cross-platform storage simple and powerful! 🚀
+1. [Install the package](./installation.md).
+2. [Run the Quick Start](./quick-start.md).
+3. [Choose an adapter](./api/adapters/README.md).
+4. [Read the API reference](./api/core/strata.md).

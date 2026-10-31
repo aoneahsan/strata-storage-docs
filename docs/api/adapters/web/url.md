@@ -45,16 +45,15 @@ await storage.set('q', 'invoices', { storage: 'url' });
 
 ## Configuration
 
-Pass `URLAdapterConfig` when constructing the adapter, or configure it through `StrataConfig.adapters.url`.
+Configure the adapter directly before registering it. `StrataConfig.adapters` has no `url` field.
 
 ```typescript
 import { URLAdapter } from 'strata-storage';
 
-new URLAdapter(); // all defaults
-
-// Configured via Strata
-const storage = defineStorage({ adapters: { url: { mode: 'hash', history: 'push' } } });
-storage.registerAdapter(new URLAdapter());
+const storage = defineStorage();
+const url = new URLAdapter();
+url.configure({ mode: 'hash', history: 'push' });
+storage.registerAdapter(url);
 ```
 
 ### Configuration Options
@@ -83,11 +82,17 @@ storage.subscribe((change) => {
 Query mode (`?strata.tab=...`) is shared with the server on every navigation and works well for SSR-readable state. Hash mode (`#strata.tab=...`) keeps state entirely client-side — the fragment is never sent to the server.
 
 ```typescript
-// Server-readable state
-storage.registerAdapter(new URLAdapter()); // mode: 'query' (default)
+import { defineStorage, URLAdapter } from 'strata-storage';
 
-// Client-only state
-storage.registerAdapter(new URLAdapter()); // construct with { mode: 'hash' }
+// Choose one mode for an instance. Query is the default.
+const queryStorage = defineStorage();
+queryStorage.registerAdapter(new URLAdapter());
+
+// For fragment state, configure a separate adapter before registration.
+const hashStorage = defineStorage();
+const hashAdapter = new URLAdapter();
+hashAdapter.configure({ mode: 'hash' });
+hashStorage.registerAdapter(hashAdapter);
 ```
 
 ## Use Cases

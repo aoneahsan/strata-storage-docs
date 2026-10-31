@@ -4,16 +4,15 @@ Copy-pasteable examples for syncing Strata Storage through **Firebase** (Cloud
 Firestore or the Realtime Database). See the [Firebase guide](../guides/platforms/firebase.md)
 for the full configuration reference.
 
-> Install the optional peer dependency first: `npm install firebase`.
+Install the optional peer dependency with `yarn add firebase`.
 
 ## Firestore: cross-device profile
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { Strata, defineStorage } from 'strata-storage';
 import { enableFirebaseSync } from 'strata-storage/firebase';
 
-const storage = new Strata();
-await storage.initialize();
+const storage = defineStorage();
 
 await enableFirebaseSync(storage, {
   apiKey: 'YOUR_API_KEY',
@@ -43,11 +42,10 @@ const unsubscribe = storage.subscribe(
 ## Realtime Database: shared counter
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { Strata, defineStorage } from 'strata-storage';
 import { enableFirebaseSync } from 'strata-storage/firebase';
 
-const storage = new Strata();
-await storage.initialize();
+const storage = defineStorage();
 
 await enableFirebaseSync(storage, {
   apiKey: 'YOUR_API_KEY',
@@ -67,15 +65,21 @@ storage.subscribe(
 
 ## Encrypt before it leaves the device
 
-The Firebase adapters store values as-is (no client-side encryption). To keep
-data confidential in Firebase, encrypt with the [encryption feature](../guides/features/encryption.md)
-and write the result to the Firebase store:
+The Firebase adapters store values as-is unless encryption is enabled on the Strata instance. Configure encryption before the first write, then pass a password for each encrypted operation:
 
 ```typescript
-await storage.set('secret', sensitiveValue, {
+const encryptedStorage = defineStorage({ encryption: { enabled: true } });
+await enableFirebaseSync(encryptedStorage, {
+  apiKey: 'YOUR_API_KEY',
+  authDomain: 'your-app.firebaseapp.com',
+  projectId: 'your-app',
+  appId: 'YOUR_APP_ID',
+  firestore: true,
+});
+await encryptedStorage.set('secret', sensitiveValue, {
   storage: 'firestore',
   encrypt: true,
-  encryptionPassword: 'user-derived-password',
+  encryptionPassword: userProvidedPassword,
 });
 ```
 

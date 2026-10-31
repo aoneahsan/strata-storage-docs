@@ -230,23 +230,25 @@ function TodoList() {
 
 ### Encrypted Storage
 
-There is no dedicated encryption hook — pass the encryption options (`encrypt`, `encryptionPassword`) per call on the instance.
+There is no dedicated encryption hook. Create an instance with encryption enabled, then pass the password per call.
 
 ```tsx
 import { useState } from 'react';
-import { storage } from './storage';
+import { defineStorage } from 'strata-storage';
+
+const secureStorage = defineStorage({ encryption: { enabled: true } });
 
 function SecureData() {
   const [data, setData] = useState(null);
   const [pwd, setPwd] = useState('');
 
   const unlock = async () => {
-    const secureData = await storage.get('secure-data', { encryptionPassword: pwd });
+    const secureData = await secureStorage.get('secure-data', { encryptionPassword: pwd });
     setData(secureData);
   };
 
   const saveSecure = async (value) => {
-    await storage.set('secure-data', value, { encrypt: true, encryptionPassword: pwd });
+    await secureStorage.set('secure-data', value, { encrypt: true, encryptionPassword: pwd });
     setData(value);
   };
 

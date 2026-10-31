@@ -69,15 +69,14 @@ npx cap sync
 
 ### "Storage not initialized"
 
-**Problem**: Calling methods before initialization.
+**Problem**: A manually constructed `Strata` instance has no registered adapters, or the requested adapter is unavailable.
 
-**Solution**: Always call `initialize()` before using storage:
+**Solution**: Use `defineStorage()` for the standard web adapters. It initializes lazily:
 
 ```typescript
-const storage = new Strata();
-await storage.initialize(); // Must call this first
+import { defineStorage } from 'strata-storage';
+const storage = defineStorage();
 
-// Now you can use storage
 await storage.set('key', 'value');
 ```
 
@@ -94,7 +93,7 @@ await storage.set('key', 'value');
 and no migration: your keys stay exactly where they are.
 
 **What was happening.** `localStorage` and `sessionStorage` are shared with every other script on the
-origin, and the web adapters' key prefix is empty by default — so the adapter's name test matched every
+origin, and the web adapters' key prefix was empty before 3.0.0 — so the adapter's name test matched every
 key on the origin, including third-party ones. It then parsed each as JSON and reported the failure at
 `error` level. `_cltk` is Microsoft Clarity's session key; the trigger is usually an analytics tag, not
 your code. Consumers routing their logger into Sentry received one report per foreign key per sweep.
@@ -169,7 +168,7 @@ try {
 
 ```typescript
 // Ensure encryption is properly configured
-const storage = new Strata({
+const storage = defineStorage({
   encryption: {
     enabled: true,
     password: 'your-password' // Use consistent password
@@ -188,8 +187,7 @@ const storage = new Strata({
 
 ```typescript
 // Check available storage types first
-const storage = new Strata();
-await storage.initialize();
+const storage = defineStorage();
 
 const available = storage.getAvailableStorageTypes();
 console.log('Available:', available);
@@ -214,7 +212,7 @@ if (available.includes('indexedDB')) {
 **Solution**: Use memory adapter as fallback:
 
 ```typescript
-const storage = new Strata({
+const storage = defineStorage({
   defaultStorage: 'memory' // Works in all modes
 });
 ```
@@ -226,7 +224,7 @@ const storage = new Strata({
 **Solution**: Automatic fallback is built-in, or configure manually:
 
 ```typescript
-const storage = new Strata({
+const storage = defineStorage({
   defaultStorages: ['indexedDB', 'memory'] // Skip localStorage
 });
 ```
@@ -313,8 +311,7 @@ if (Capacitor.getPlatform() === 'android') {
 
 ```typescript
 // Don't open multiple connections
-const storage = new Strata(); // Reuse instance
-await storage.initialize(); // Only once
+const storage = defineStorage(); // Reuse instance
 
 // Use throughout app
 await storage.set('key', 'value');
@@ -329,11 +326,11 @@ await storage.set('key', 'value');
 **Solution**:
 
 ```typescript
-// Use batch operations
-await storage.setBatch([
-  { key: 'key1', value: 'value1' },
-  { key: 'key2', value: 'value2' },
-  { key: 'key3', value: 'value3' }
+// Start independent writes together
+await Promise.all([
+  storage.set('key1', 'value1'),
+  storage.set('key2', 'value2'),
+  storage.set('key3', 'value3')
 ]);
 
 // Disable compression for small data
@@ -351,7 +348,7 @@ await storage.set('key', 'value', { storage: 'memory' });
 
 ```typescript
 // Use memory caching
-const storage = new Strata({
+const storage = defineStorage({
   cache: {
     enabled: true,
     maxSize: 100 // Cache 100 items
@@ -359,7 +356,9 @@ const storage = new Strata({
 });
 
 // Read multiple keys at once
-const values = await storage.getBatch(['key1', 'key2', 'key3']);
+const values = await Promise.all(
+  ['key1', 'key2', 'key3'].map((key) => storage.get(key))
+);
 ```
 
 ### High Memory Usage
@@ -370,7 +369,7 @@ const values = await storage.getBatch(['key1', 'key2', 'key3']);
 
 ```typescript
 // Limit cache size
-const storage = new Strata({
+const storage = defineStorage({
   cache: {
     enabled: true,
     maxSize: 50 // Smaller cache
@@ -382,7 +381,7 @@ const storage = new Strata({
 await storage.set('large', bigData, { storage: 'indexedDB' });
 
 // Clear memory periodically
-storage.clearCache();
+await storage.clear({ storage: 'memory' });
 ```
 
 ## Data Persistence Issues
@@ -416,8 +415,11 @@ await storage.set('important', value, { storage: 'indexedDB' });
 
 // Implement backup
 async function backupData() {
-  const data = await storage.getAll();
-  // Send to server or store in multiple locations
+  const keys = await storage.keys(undefined, { storage: 'indexedDB' });
+  const data = Object.fromEntries(await Promise.all(
+    keys.map(async (key) => [key, await storage.get(key, { storage: 'indexedDB' })])
+  ));
+  return data; // Encrypt and transfer through your own authenticated backup API.
 }
 ```
 
@@ -428,9 +430,9 @@ async function backupData() {
 **Solution**: Ensure TTL cleanup is enabled:
 
 ```typescript
-const storage = new Strata({
+const storage = defineStorage({
   ttl: {
-    enabled: true,
+    autoCleanup: true,
     cleanupInterval: 60000 // Check every minute
   }
 });
@@ -462,8 +464,7 @@ interface User {
   name: string;
 }
 
-const storage = new Strata();
-await storage.initialize();
+const storage = defineStorage();
 
 // Type-safe operations
 await storage.set<User>('user', { id: 1, name: 'John' });
@@ -483,11 +484,11 @@ if (user) {
 
 ```typescript
 // Ensure types are imported correctly
-import { Strata, type StrataConfig } from 'strata-storage';
+import { defineStorage, type StrataConfig } from 'strata-storage';
 
 // Or use namespace imports
 import * as StrataStorage from 'strata-storage';
-const storage = new StrataStorage.Strata();
+const storage = StrataStorage.defineStorage();
 ```
 
 ### Framework Integration Types
@@ -524,8 +525,8 @@ If you're still experiencing problems:
 2. **Browse the docs**: [Documentation](https://stratastorage-docs.aoneahsan.com)
 3. **Enable Debug Mode**:
    ```typescript
-   const storage = new Strata({
-     debug: true // Logs all operations
+   const storage = defineStorage({
+     debug: { enabled: true, logOperations: true }
    });
    ```
 4. **Contact us**: [Report an issue](https://stratastorage.aoneahsan.com/contact)

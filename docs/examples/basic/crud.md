@@ -10,18 +10,17 @@ Learn how to perform Create, Read, Update, and Delete operations with Strata Sto
 - [Update](#update)
 - [Delete (Remove)](#delete-remove)
 - [List Operations](#list-operations)
-- [Batch Operations](#batch-operations)
+- [Multiple Items](#multiple-items)
 - [Error Handling](#error-handling)
 
 ## Setup
 
-First, initialize Strata Storage:
+First, create a web-ready instance. It initializes on the first operation:
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata();
-await storage.initialize();
+const storage = defineStorage();
 ```
 
 ## Create (Set)
@@ -77,15 +76,15 @@ await storage.set('sessionData', data, {
   ttl: 60 * 60 * 1000
 });
 
-// With encryption
-await storage.set('sensitiveData', secret, {
-  encrypt: true
+// Enable encryption on a separate instance before asking it to encrypt.
+const encryptedStorage = defineStorage({ encryption: { enabled: true } });
+await encryptedStorage.set('sensitiveData', secret, {
+  encryptionPassword: password
 });
 
-// With compression
-await storage.set('hugeData', massiveObject, {
-  compress: true
-});
+// Compression also needs instance configuration.
+const compressedStorage = defineStorage({ compression: { enabled: true } });
+await compressedStorage.set('hugeData', massiveObject);
 
 // With tags for querying
 await storage.set('document', content, {
@@ -262,8 +261,8 @@ await storage.remove('username');
 await storage.remove('age');
 await storage.remove('isActive');
 
-// Or use removeBatch
-await storage.removeBatch(['username', 'age', 'isActive']);
+// For a list of keys, wait for every removal
+await Promise.all(['username', 'age', 'isActive'].map((key) => storage.remove(key)));
 ```
 
 ### Clear All Data
@@ -312,7 +311,10 @@ console.log(keys); // ['username', 'user', 'settings', ...]
 ### Get All Data
 
 ```typescript
-const allData = await storage.getAll();
+const keys = await storage.keys();
+const allData = Object.fromEntries(await Promise.all(
+  keys.map(async (key) => [key, await storage.get(key)])
+));
 console.log(allData);
 // {
 //   username: 'john_doe',
@@ -334,31 +336,32 @@ console.log(hasUnknown); // false
 ### Get Storage Size
 
 ```typescript
-// Get number of items
-const count = await storage.size();
-console.log(`Storage contains ${count} items`);
-
-// Get approximate size in bytes (if supported)
-const bytes = await storage.sizeInBytes();
-console.log(`Storage uses ~${bytes} bytes`);
+const size = await storage.size();
+console.log(`Storage contains ${size.count} items`);
+console.log(`Storage uses approximately ${size.total} bytes`);
 ```
 
-## Batch Operations
+## Multiple Items
+
+These calls run independently. If one fails, earlier writes may already have succeeded.
 
 ### Set Multiple Items
 
 ```typescript
-await storage.setBatch([
-  { key: 'username', value: 'john_doe' },
-  { key: 'email', value: 'john@example.com' },
-  { key: 'age', value: 25 }
+await Promise.all([
+  storage.set('username', 'john_doe'),
+  storage.set('email', 'john@example.com'),
+  storage.set('age', 25)
 ]);
 ```
 
 ### Get Multiple Items
 
 ```typescript
-const values = await storage.getBatch(['username', 'email', 'age']);
+const keys = ['username', 'email', 'age'];
+const values = Object.fromEntries(await Promise.all(
+  keys.map(async (key) => [key, await storage.get(key)])
+));
 console.log(values);
 // {
 //   username: 'john_doe',
@@ -370,17 +373,15 @@ console.log(values);
 ### Remove Multiple Items
 
 ```typescript
-await storage.removeBatch(['username', 'email', 'age']);
+await Promise.all(['username', 'email', 'age'].map((key) => storage.remove(key)));
 ```
 
-### Batch with Options
+### Per-Item Options
 
 ```typescript
-await storage.setBatch([
-  { key: 'user1', value: data1, options: { storage: 'indexedDB' } },
-  { key: 'user2', value: data2, options: { encrypt: true } },
-  { key: 'user3', value: data3, options: { ttl: 3600000 } }
-]);
+await storage.set('user1', data1, { storage: 'indexedDB' });
+await storage.set('user2', data2, { encrypt: true, encryptionPassword: password });
+await storage.set('user3', data3, { ttl: 3600000 });
 ```
 
 ## Error Handling
@@ -456,12 +457,11 @@ const success = await safeSet('theme', 'dark');
 Here's a complete example demonstrating all CRUD operations:
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
 async function crudExample() {
   // Setup
-  const storage = new Strata();
-  await storage.initialize();
+  const storage = defineStorage();
 
   // CREATE
   await storage.set('user', {
@@ -500,7 +500,9 @@ async function crudExample() {
   const allKeys = await storage.keys();
   console.log('All keys:', allKeys);
 
-  const allData = await storage.getAll();
+  const allData = Object.fromEntries(await Promise.all(
+    allKeys.map(async (key) => [key, await storage.get(key)])
+  ));
   console.log('All data:', allData);
 
   // DELETE

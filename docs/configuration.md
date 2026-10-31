@@ -383,19 +383,17 @@ Encryption needs a password from a secure runtime source when you enable it; see
 
 ## Validation
 
-Strata validates configuration at initialization:
+Initialisation selects the first available registered adapter from `defaultStorages`. Encryption can be enabled without an instance password when each encrypted operation supplies `encryptionPassword`:
 
 ```typescript
 try {
-  const storage = defineStorage({
-    encryption: {
-      enabled: true
-      // Missing required 'password'
-    }
-  });
+  const storage = defineStorage({ encryption: { enabled: true } });
   await storage.initialize();
+  await storage.set('private-draft', draft, {
+    encryptionPassword: password,
+  });
 } catch (error) {
-  console.error('Invalid configuration:', error);
+  // Show a setup or write failure in the application UI.
 }
 ```
 

@@ -1,358 +1,78 @@
-# Offline Support Examples
+# Offline support examples
 
-Examples of building offline-first applications with Strata Storage.
+Strata can keep a local draft while the network is unavailable. Sending that draft to a server is an application protocol: the server must accept an idempotency key and return a successful HTTP status before the client removes its queued write.
 
-## Basic Offline Detection
+## A bounded write outbox
+
+This browser example keeps each queued write under its own IndexedDB key. Adding a new write during a replay does not overwrite the current queue. Replace `/api/notes` with your own endpoint, and make the server treat repeated `Idempotency-Key` values as the same operation.
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-class OfflineManager {
-  private storage: Strata;
-  private isOnline = navigator.onLine;
-  
-  constructor() {
-    this.storage = new Strata();
-    this.setupListeners();
-  }
-  
-  private setupListeners() {
-    window.addEventListener('online', () => {
-      this.isOnline = true;
-      this.onOnline();
-    });
-    
-    window.addEventListener('offline', () => {
-      this.isOnline = false;
-      this.onOffline();
-    });
-  }
-  
-  private async onOnline() {
-    console.log('Back online - syncing data...');
-    await this.syncPendingChanges();
-  }
-  
-  private async onOffline() {
-    console.log('Gone offline - using local storage');
-    await this.storage.set('offline-since', Date.now());
-  }
+const storage = defineStorage();
+
+type PendingNote = {
+  id: string;
+  title: string;
+};
+
+async function queueNote(title: string): Promise<string> {
+  const id = crypto.randomUUID();
+  await storage.set(`outbox:${id}`, { id, title } satisfies PendingNote, {
+    storage: 'indexedDB',
+  });
+  return id;
 }
-```
 
-## Offline Queue
+async function replayNotes(): Promise<void> {
+  const keys = await storage.keys(/^outbox:/, { storage: 'indexedDB' });
 
-```typescript
-class OfflineQueue {
-  private storage: Strata;
-  private queueKey = 'offline-queue';
-  
-  async add(action: QueueAction) {
-    const queue = await this.getQueue();
-    queue.push({
-      ...action,
-      id: generateId(),
-      timestamp: Date.now()
-    });
-    
-    await this.storage.set(this.queueKey, queue);
-  }
-  
-  async process() {
-    const queue = await this.getQueue();
-    const pending = [...queue];
-    const failed: QueueAction[] = [];
-    
-    for (const action of pending) {
-      try {
-        await this.executeAction(action);
-      } catch (error) {
-        console.error('Failed to process:', action, error);
-        failed.push(action);
-      }
-    }
-    
-    // Keep only failed actions in queue
-    await this.storage.set(this.queueKey, failed);
-    
-    return {
-      processed: pending.length - failed.length,
-      failed: failed.length
-    };
-  }
-  
-  private async executeAction(action: QueueAction) {
-    switch (action.type) {
-      case 'api-call':
-        return fetch(action.url, action.options);
-      case 'sync-data':
-        return this.syncData(action.data);
-      default:
-        throw new Error(`Unknown action type: ${action.type}`);
-    }
-  }
-}
-```
+  for (const key of keys) {
+    const note = await storage.get<PendingNote>(key, { storage: 'indexedDB' });
+    if (!note) continue;
 
-## Service Worker Integration
-
-```typescript
-// service-worker.js
-const storage = new Strata({
-  namespace: 'sw-cache',
-  defaultStorages: ['cache', 'indexedDB']
-});
-
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then(async (response) => {
-      if (response) {
-        return response;
-      }
-      
-      try {
-        const networkResponse = await fetch(event.request);
-        
-        // Cache successful responses
-        if (networkResponse.ok) {
-          const cache = await caches.open('v1');
-          cache.put(event.request, networkResponse.clone());
-          
-          // Store metadata
-          await storage.set(`cache:${event.request.url}`, {
-            cached: Date.now(),
-            size: networkResponse.headers.get('content-length')
-          });
-        }
-        
-        return networkResponse;
-      } catch (error) {
-        // Offline - try to serve from cache
-        const cached = await storage.get(`fallback:${event.request.url}`);
-        if (cached) {
-          return new Response(cached.data, cached.options);
-        }
-        
-        throw error;
-      }
-    })
-  );
-});
-```
-
-## Conflict Resolution
-
-```typescript
-class ConflictResolver {
-  private storage: Strata;
-  
-  async sync(localData: any, remoteData: any) {
-    const conflicts: Conflict[] = [];
-    
-    // Compare timestamps
-    if (localData.updatedAt > remoteData.updatedAt) {
-      // Local is newer
-      return this.resolveLocalWins(localData, remoteData);
-    } else if (remoteData.updatedAt > localData.updatedAt) {
-      // Remote is newer
-      return this.resolveRemoteWins(localData, remoteData);
-    } else {
-      // Same timestamp - need manual resolution
-      conflicts.push({
-        key: localData.id,
-        local: localData,
-        remote: remoteData
-      });
-    }
-    
-    if (conflicts.length > 0) {
-      await this.storage.set('conflicts', conflicts);
-      return this.mergeData(localData, remoteData);
-    }
-    
-    return localData;
-  }
-  
-  private mergeData(local: any, remote: any) {
-    // Custom merge strategy
-    return {
-      ...remote,
-      ...local,
-      merged: true,
-      mergedAt: Date.now()
-    };
-  }
-}
-```
-
-## Progressive Data Loading
-
-```typescript
-class ProgressiveLoader {
-  private storage: Strata;
-  
-  async loadData(key: string) {
-    // 1. Check memory cache
-    const cached = await this.storage.get(key, { storage: 'memory' });
-    if (cached) return { data: cached, source: 'memory' };
-    
-    // 2. Check local storage
-    const local = await this.storage.get(key, { storage: 'indexedDB' });
-    if (local) {
-      // Background refresh if stale
-      if (this.isStale(local)) {
-        this.refreshInBackground(key);
-      }
-      return { data: local, source: 'local' };
-    }
-    
-    // 3. Fetch from network
     try {
-      const fresh = await this.fetchFromNetwork(key);
-      await this.storage.set(key, fresh);
-      return { data: fresh, source: 'network' };
-    } catch (error) {
-      // 4. Use stale data if available
-      const stale = await this.storage.get(`stale:${key}`);
-      if (stale) {
-        return { data: stale, source: 'stale', warning: 'Using stale data' };
-      }
-      
-      throw error;
-    }
-  }
-}
-```
-
-## Background Sync
-
-```typescript
-class BackgroundSync {
-  private storage: Strata;
-  
-  async register(tag: string, data: any) {
-    if ('serviceWorker' in navigator && 'SyncManager' in window) {
-      const reg = await navigator.serviceWorker.ready;
-      
-      // Store data for sync
-      await this.storage.set(`sync:${tag}`, data);
-      
-      // Register background sync
-      await reg.sync.register(tag);
-    } else {
-      // Fallback to periodic sync
-      this.fallbackSync(tag, data);
-    }
-  }
-  
-  private fallbackSync(tag: string, data: any) {
-    const attemptSync = async () => {
-      if (navigator.onLine) {
-        try {
-          await this.performSync(tag, data);
-          await this.storage.remove(`sync:${tag}`);
-        } catch (error) {
-          // Retry later
-          setTimeout(attemptSync, 30000);
-        }
-      } else {
-        // Check again in 10 seconds
-        setTimeout(attemptSync, 10000);
-      }
-    };
-    
-    attemptSync();
-  }
-}
-```
-
-## Offline Analytics
-
-```typescript
-class OfflineAnalytics {
-  private storage: Strata;
-  private batchSize = 50;
-  
-  async track(event: AnalyticsEvent) {
-    const events = await this.storage.get('analytics-queue') || [];
-    events.push({
-      ...event,
-      timestamp: Date.now(),
-      offline: !navigator.onLine
-    });
-    
-    await this.storage.set('analytics-queue', events);
-    
-    // Try to flush if online
-    if (navigator.onLine && events.length >= this.batchSize) {
-      this.flush();
-    }
-  }
-  
-  async flush() {
-    const events = await this.storage.get('analytics-queue') || [];
-    if (events.length === 0) return;
-    
-    try {
-      await fetch('/api/analytics', {
+      const response = await fetch('/api/notes', {
         method: 'POST',
-        body: JSON.stringify(events)
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': note.id,
+        },
+        body: JSON.stringify({ title: note.title }),
       });
-      
-      // Clear queue on success
-      await this.storage.remove('analytics-queue');
-    } catch (error) {
-      console.error('Failed to flush analytics:', error);
+      if (!response.ok) continue;
+      await storage.remove(key, { storage: 'indexedDB' });
+    } catch {
+      // Keep the write for a later retry after a network error.
     }
   }
 }
+
+window.addEventListener('online', () => { void replayNotes(); });
 ```
 
-## Data Prefetching
+Call `replayNotes()` on app startup and on resume too. The `online` event only signals a possible connection; a request can still fail. A server that does not deduplicate `Idempotency-Key` can create duplicate notes after a retry, so do not use this pattern without that server contract. Multi-tab writers also need coordination if the same queued key can replay in two tabs at once.
 
-```typescript
-class DataPrefetcher {
-  private storage: Strata;
-  private prefetchQueue = new Set<string>();
-  
-  async prefetch(urls: string[]) {
-    for (const url of urls) {
-      if (!this.prefetchQueue.has(url)) {
-        this.prefetchQueue.add(url);
-        this.prefetchUrl(url);
-      }
-    }
-  }
-  
-  private async prefetchUrl(url: string) {
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      await this.storage.set(`prefetch:${url}`, data, {
-        ttl: 3600000 // 1 hour
-      });
-    } catch (error) {
-      console.error(`Failed to prefetch ${url}:`, error);
-    } finally {
-      this.prefetchQueue.delete(url);
-    }
-  }
-  
-  async get(url: string) {
-    // Check prefetched data first
-    const prefetched = await this.storage.get(`prefetch:${url}`);
-    if (prefetched) return prefetched;
-    
-    // Fetch normally
-    const response = await fetch(url);
-    return response.json();
-  }
-}
+## Service worker response cache
+
+A service worker can cache HTTP responses through the browser Cache API. Strata's Cache adapter requires `window` and does not run in a service worker.
+
+```javascript
+// In a service worker, for same-origin GET requests you choose to cache.
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET' ||
+      new URL(event.request.url).origin !== self.location.origin) return;
+
+  event.respondWith((async () => {
+    const cache = await caches.open('app-responses-v1');
+    const cached = await cache.match(event.request);
+    if (cached) return cached;
+
+    const response = await fetch(event.request);
+    if (response.ok) await cache.put(event.request, response.clone());
+    return response;
+  })());
+});
 ```
 
-## See Also
-
-- [Custom Adapters Guide](../guides/advanced/custom-adapters.md)
-- [Sync Examples](./cross-tab-sync.md)
-- [Data Synchronization](./data-sync.md)
+Choose cacheable routes deliberately. A cached response can be stale, and this example has no eviction policy. For Strata data, use an adapter appropriate to the browser page and test the read path after reload.

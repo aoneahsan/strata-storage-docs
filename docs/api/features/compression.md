@@ -13,16 +13,14 @@ Strata Storage includes built-in compression using a pure JavaScript implementat
 Enable compression for all data:
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata({
+const storage = defineStorage({
   compression: {
     enabled: true,
     threshold: 1024 // Only compress data larger than 1KB
   }
 });
-
-await storage.initialize();
 
 // All large objects are now automatically compressed
 await storage.set('largeData', bigObject);
@@ -33,17 +31,20 @@ await storage.set('largeData', bigObject);
 Compress specific values:
 
 ```typescript
-const storage = new Strata(); // No global compression
-await storage.initialize();
+import { defineStorage } from 'strata-storage';
 
-// Normal storage
-await storage.set('small', 'value'); // Not compressed
+const storage = defineStorage({ compression: { enabled: true } });
 
-// Compressed storage
+// Skip compression for a specific value.
+await storage.set('small', 'value', { compress: false });
+
+// Allow compression for a specific value when it reduces size.
 await storage.set('large', bigObject, {
   compress: true
 });
 ```
+
+The per-operation flag controls a configured compressor. `compress: true` on an instance without `compression.enabled: true` does not initialize one.
 
 ## API Reference
 
@@ -132,14 +133,12 @@ if (manager.isCompressedData(result)) {
 ### Basic Compression
 
 ```typescript
-const storage = new Strata({
+const storage = defineStorage({
   compression: {
     enabled: true,
     threshold: 1024 // Compress data > 1KB
   }
 });
-
-await storage.initialize();
 
 // Small data - not compressed
 await storage.set('small', 'Hello'); // 5 bytes, not compressed
@@ -153,134 +152,66 @@ await storage.set('large', 'x'.repeat(2000), {
 ### Selective Compression
 
 ```typescript
-const storage = new Strata();
-await storage.initialize();
+const storage = defineStorage({ compression: { enabled: true } });
 
-// Don't compress structured data (poor compression ratio)
-await storage.set('config', { theme: 'dark', lang: 'en' });
+// Skip a small value deliberately.
+await storage.set('config', { theme: 'dark', lang: 'en' }, { compress: false });
 
-// Compress text data (good compression ratio)
+// Ask the configured compressor to examine larger values.
 await storage.set('article', longArticleText, { compress: true });
-
-// Compress JSON arrays (moderate compression ratio)
 await storage.set('logs', largeLogArray, { compress: true });
 ```
 
+The compressor may keep an input uncompressed when compression would not reduce its size.
+
 ### Compression with Encryption
 
-Compress before encrypting for best results:
+Compression runs before encryption when both are configured. Supply the
+password at runtime from your application's authentication or a user-entered
+secret; do not embed it in a browser bundle or store it beside the encrypted
+value.
 
 ```typescript
-const storage = new Strata({
-  compression: {
-    enabled: true,
-    threshold: 512
-  },
-  encryption: {
-    enabled: true,
-    password: 'secure-key'
-  }
-});
-
-await storage.initialize();
-
-// Data is compressed first, then encrypted
-await storage.set('sensitiveData', largeSecretData);
+function createPrivateStorage(encryptionPassword: string) {
+  return defineStorage({
+    compression: { enabled: true, threshold: 512 },
+    encryption: { enabled: true, password: encryptionPassword },
+  });
+}
 ```
 
-### Dynamic Threshold
+### Choosing a Threshold
 
-Adjust compression threshold based on storage availability:
+The threshold is chosen when the storage instance is created. Test
+representative values on your target devices and set a threshold that avoids
+compressing small writes. `navigator.storage.estimate()` reports an origin's
+estimated storage budget; it does not establish a reliable `localStorage`
+capacity or an ideal compression threshold.
 
-```typescript
-async function getCompressionThreshold(): Promise<number> {
-  const quota = await navigator.storage.estimate();
-  const available = quota.quota! - quota.usage!;
+### Compression Measurement
 
-  if (available < 10 * 1024 * 1024) { // Less than 10MB available
-    return 512; // Compress aggressively
-  } else if (available < 100 * 1024 * 1024) { // Less than 100MB
-    return 1024; // Normal compression
-  } else {
-    return 10240; // Only compress very large data
-  }
-}
-
-const storage = new Strata({
-  compression: {
-    enabled: true,
-    threshold: await getCompressionThreshold()
-  }
-});
-```
-
-### Compression Analytics
-
-Track compression effectiveness:
+Measure a representative value with the exported manager. This reports the
+codec's result for that sample; it is not a measurement of the complete
+adapter write or of every value stored by an instance.
 
 ```typescript
-import { Strata, CompressionManager } from 'strata-storage';
+import { CompressionManager } from 'strata-storage';
 
-class CompressionTracker {
-  private storage: Strata;
-  private compression = new CompressionManager({ threshold: 1024 });
-  private stats = {
-    totalOriginalSize: 0,
-    totalCompressedSize: 0,
-    compressionCount: 0
-  };
+const sample = { entries: Array.from({ length: 100 }, () => 'repeated text') };
+const compressor = new CompressionManager({ threshold: 1024 });
+const start = performance.now();
+const result = await compressor.compress(sample);
+const elapsedMs = performance.now() - start;
 
-  constructor() {
-    this.storage = new Strata({
-      compression: { enabled: true, threshold: 1024 }
-    });
-  }
-
-  async initialize() {
-    await this.storage.initialize();
-  }
-
-  async set(key: string, value: any) {
-    await this.storage.set(key, value, { compress: true });
-
-    // Measure how well the value compressed
-    const result = await this.compression.compress(value);
-
-    if (this.compression.isCompressedData(result)) {
-      this.stats.totalOriginalSize += result.originalSize;
-      this.stats.totalCompressedSize += result.compressedSize;
-      this.stats.compressionCount++;
-    }
-  }
-
-  getStats() {
-    const avgRatio = this.stats.totalCompressedSize / this.stats.totalOriginalSize;
-    const savedBytes = this.stats.totalOriginalSize - this.stats.totalCompressedSize;
-
-    return {
-      ...this.stats,
-      averageCompressionRatio: avgRatio,
-      totalBytesSaved: savedBytes,
-      percentSaved: ((1 - avgRatio) * 100).toFixed(2) + '%'
-    };
-  }
+if (compressor.isCompressedData(result)) {
+  console.log({
+    originalBytes: result.originalSize,
+    compressedBytes: result.compressedSize,
+    elapsedMs,
+  });
+} else {
+  console.log({ compressed: false, elapsedMs });
 }
-
-// Usage
-const tracker = new CompressionTracker();
-await tracker.initialize();
-await tracker.set('data1', largeData1);
-await tracker.set('data2', largeData2);
-
-console.log(tracker.getStats());
-// {
-//   totalOriginalSize: 50000,
-//   totalCompressedSize: 15000,
-//   compressionCount: 2,
-//   averageCompressionRatio: 0.3,
-//   totalBytesSaved: 35000,
-//   percentSaved: '70.00%'
-// }
 ```
 
 ## Performance Considerations
@@ -301,48 +232,21 @@ console.log(tracker.getStats());
 
 ### Compression Impact
 
-```typescript
-// Example compression ratios:
-
-// Text (excellent compression)
-const text = 'Lorem ipsum...'.repeat(100);
-// Original: 100KB → Compressed: 15KB (85% reduction)
-
-// JSON array (good compression)
-const logs = Array(1000).fill({ timestamp: Date.now(), level: 'info' });
-// Original: 50KB → Compressed: 20KB (60% reduction)
-
-// Mixed object (moderate compression)
-const data = { users: [...], settings: {...}, cache: {...} };
-// Original: 30KB → Compressed: 18KB (40% reduction)
-
-// Random data (poor compression)
-const random = crypto.getRandomValues(new Uint8Array(10000));
-// Original: 10KB → Compressed: 10.5KB (no reduction, overhead)
-```
-
-### Performance Benchmarks
-
-Average compression/decompression times:
-
-| Data Size | Compress | Decompress |
-|-----------|----------|------------|
-| 10 KB     | ~2 ms    | ~0.5 ms    |
-| 100 KB    | ~20 ms   | ~5 ms      |
-| 1 MB      | ~200 ms  | ~50 ms     |
+Compression ratio and time depend on the input and device. Measure with your
+actual values on the platforms you support. Repetitive text often compresses
+well; already-compressed images and random bytes often do not. The bundled
+compressor does not promise a fixed reduction or latency.
 
 ## Best Practices
 
 ### 1. Set Appropriate Threshold
 
-```typescript
-// ❌ BAD - Too low, compresses everything
-const storage = new Strata({
-  compression: { enabled: true, threshold: 10 }
-});
+Set a threshold for the value sizes you actually write. A very low threshold
+spends time checking small values even when the compressor decides to leave
+them unchanged.
 
-// ✅ GOOD - Only compress larger data
-const storage = new Strata({
+```typescript
+const storage = defineStorage({
   compression: { enabled: true, threshold: 1024 }
 });
 ```
@@ -350,13 +254,13 @@ const storage = new Strata({
 ### 2. Combine with Right Storage Adapter
 
 ```typescript
-// IndexedDB can handle large data without compression
+// Skip compression when the value is already small enough for your use case.
 await storage.set('largeData', data, {
   storage: 'indexedDB',
   compress: false
 });
 
-// localStorage has size limits - use compression
+// Compression can reduce repetitive values before a browser storage write.
 await storage.set('largeData', data, {
   storage: 'localStorage',
   compress: true

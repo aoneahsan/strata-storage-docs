@@ -1,208 +1,33 @@
 # Secure Storage Adapter
 
-Hardware-backed secure storage for sensitive data.
+Store sensitive values through Strata Storage's native secure adapter in a Capacitor app.
 
-## Overview
-
-The Secure adapter provides encrypted storage using platform-specific secure mechanisms - Keychain on iOS and EncryptedSharedPreferences on Android.
-
-### Capabilities
-
-| Feature | Support |
-|---------|----------|
-| Persistence | ✅ Yes |
-| Synchronous | ❌ No (async) |
-| Observable | ❌ No |
-| Searchable | ✅ Yes (limited) |
-| Iterable | ✅ Yes |
-| Capacity | ~5MB |
-| Performance | 🔒 Secure |
-| TTL Support | ✅ Yes (manual) |
-| Batch Support | ✅ Yes |
-| Transaction Support | ❌ No |
-
-## Usage
+## Setup
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
+import { registerCapacitorAdapters } from 'strata-storage/capacitor';
 
-const storage = new Strata();
-await storage.initialize();
+const storage = defineStorage();
+await registerCapacitorAdapters(storage);
 
-// Store sensitive data
-await storage.set('api_key', secretKey, { 
-  storage: 'secure' 
+await storage.set('session_token', token, {
+  storage: 'secure',
+  ttl: 3_600_000,
 });
+const savedToken = await storage.get<string>('session_token', { storage: 'secure' });
+await storage.remove('session_token', { storage: 'secure' });
 ```
 
-## Configuration
+Call `registerCapacitorAdapters` before the first native operation. It registers no native adapter when running in a browser.
 
-```typescript
-const storage = new Strata({
-  adapters: {
-    secure: {
-      accessibility: 'whenUnlockedThisDeviceOnly', // iOS
-      authenticationPrompt: 'Authenticate to access data',
-      biometricOnly: false
-    }
-  }
-});
-```
+## Configuration and limits
 
-## Platform Implementation
+`StrataConfig.adapters.secure` accepts a boolean. Per-operation `StorageOptions` supports `storage`, `ttl`, `encrypt`, and other common Strata options. It does **not** expose Keychain accessibility, a biometric requirement, or an authentication prompt. Do not rely on this adapter for a biometric confirmation flow.
 
-### iOS (Keychain)
+Treat the stored values as credentials: keep keys scoped to the application, use a short TTL where appropriate, and remove them at sign-out. Native behavior and persistence need iOS and Android device verification; see the [device verification guide](../../../guides/platforms/device-verification.md).
 
-```swift
-// Keychain Services implementation
-import Security
+## See also
 
-class KeychainStorage {
-    func save(key: String, value: Data) {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrAccount as String: key,
-            kSecValueData as String: value,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        ]
-        SecItemAdd(query as CFDictionary, nil)
-    }
-}
-```
-
-### Android (EncryptedSharedPreferences)
-
-```java
-// Android encrypted storage
-import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKey;
-
-MasterKey masterKey = new MasterKey.Builder(context)
-    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-    .build();
-
-SharedPreferences prefs = EncryptedSharedPreferences.create(
-    context,
-    "secure_prefs",
-    masterKey,
-    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-);
-```
-
-## Use Cases
-
-### 1. Authentication Tokens
-
-```typescript
-class AuthTokenManager {
-  async saveToken(token: string) {
-    await storage.set('auth_token', token, {
-      storage: 'secure',
-      ttl: 3600000 // 1 hour
-    });
-  }
-  
-  async getToken(): Promise<string | null> {
-    return await storage.get('auth_token', {
-      storage: 'secure'
-    });
-  }
-  
-  async clearToken() {
-    await storage.remove('auth_token', {
-      storage: 'secure'
-    });
-  }
-}
-```
-
-### 2. Biometric Protection
-
-```typescript
-class BiometricStorage {
-  async saveSensitive(key: string, value: string) {
-    await storage.set(key, value, {
-      storage: 'secure',
-      biometricOnly: true,
-      authenticationPrompt: 'Authenticate to access your data'
-    });
-  }
-  
-  async getSensitive(key: string) {
-    try {
-      return await storage.get(key, {
-        storage: 'secure',
-        authenticationPrompt: 'Authenticate to retrieve data'
-      });
-    } catch (error) {
-      if (error.code === 'UserCancel') {
-        console.log('User cancelled authentication');
-      }
-      throw error;
-    }
-  }
-}
-```
-
-### 3. Encryption Keys
-
-```typescript
-class EncryptionKeyManager {
-  async generateAndStore() {
-    const key = await crypto.subtle.generateKey(
-      { name: 'AES-GCM', length: 256 },
-      true,
-      ['encrypt', 'decrypt']
-    );
-    
-    const exported = await crypto.subtle.exportKey('raw', key);
-    const keyString = btoa(String.fromCharCode(...new Uint8Array(exported)));
-    
-    await storage.set('encryption_key', keyString, {
-      storage: 'secure',
-      accessibility: 'whenUnlockedThisDeviceOnly'
-    });
-  }
-}
-```
-
-## Security Features
-
-### Accessibility Options (iOS)
-
-```typescript
-enum Accessibility {
-  WhenUnlocked = 'whenUnlocked',
-  WhenUnlockedThisDeviceOnly = 'whenUnlockedThisDeviceOnly',
-  AfterFirstUnlock = 'afterFirstUnlock',
-  AfterFirstUnlockThisDeviceOnly = 'afterFirstUnlockThisDeviceOnly',
-  WhenPasscodeSetThisDeviceOnly = 'whenPasscodeSetThisDeviceOnly'
-}
-```
-
-### Hardware Security
-
-- **iOS**: Hardware-encrypted Keychain
-- **Android**: Hardware-backed Android Keystore
-- **Biometric**: Touch ID / Face ID / Fingerprint
-
-## Best Practices
-
-1. **Minimal Storage**: Store only essential sensitive data
-2. **Short TTLs**: Use expiration for temporary secrets
-3. **Biometric Protection**: Enable for highly sensitive data
-4. **Error Handling**: Handle authentication failures gracefully
-5. **Backup Exclusion**: Exclude from iCloud/Google backups
-
-## Limitations
-
-1. **Size Limits**: ~5MB total capacity
-2. **Performance**: Slower due to encryption
-3. **No Sync**: Cannot sync across devices
-4. **Platform Specific**: Different behaviors per platform
-
-## See Also
-
-- [Storage Adapters Overview](../README.md)
-- [Encryption Guide](../../../guides/features/encryption.md)
+- [Capacitor platform guide](../../../guides/platforms/capacitor.md)
+- [Encryption guide](../../../guides/features/encryption.md)

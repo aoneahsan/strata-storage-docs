@@ -17,9 +17,9 @@ This feature uses BroadcastChannel API (modern browsers) with a fallback to stor
 ### Enable Synchronization
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { Strata, defineStorage } from 'strata-storage';
 
-const storage = new Strata({
+const storage = defineStorage({
   sync: {
     enabled: true,
     storages: ['localStorage', 'indexedDB'], // Storages to keep in sync (optional)
@@ -27,7 +27,6 @@ const storage = new Strata({
   }
 });
 
-await storage.initialize();
 ```
 
 ### Configuration Options
@@ -49,11 +48,10 @@ interface SyncConfig {
 Subscribe to all storage changes:
 
 ```typescript
-const storage = new Strata({
+const storage = defineStorage({
   sync: { enabled: true }
 });
 
-await storage.initialize();
 
 // Subscribe to changes
 const unsubscribe = storage.subscribe((change) => {
@@ -192,7 +190,7 @@ class ThemeManager {
   private storage: Strata;
 
   constructor() {
-    this.storage = new Strata({
+    this.storage = defineStorage({
       sync: { enabled: true }
     });
   }
@@ -231,67 +229,25 @@ await themeManager.setTheme('dark');
 // All other tabs automatically update
 ```
 
-### User Session Sync
+### Session UI refresh
+
+Authentication belongs to the server or identity provider. Do not copy session tokens into Strata's default browser adapters. If your application already has a server-owned session, a non-secret local event can tell other tabs to recheck it:
 
 ```typescript
-class SessionManager {
-  private storage: Strata;
-  private onLogoutCallback?: () => void;
+const storage = defineStorage({ sync: { enabled: true } });
 
-  constructor() {
-    this.storage = new Strata({
-      sync: { enabled: true }
-    });
+const unsubscribe = storage.subscribe(change => {
+  if (change.key === 'session-check' && change.source === 'remote') {
+    // Ask your server or identity provider for current session state.
+    void refreshSessionFromServer();
   }
-
-  async initialize() {
-    await this.storage.initialize();
-
-    // Subscribe to session changes
-    this.storage.subscribe((change) => {
-      if (change.key === 'session:token') {
-        if (!change.newValue && change.oldValue) {
-          // Session removed in another tab - logout this tab
-          this.handleRemoteLogout();
-        }
-      }
-    });
-  }
-
-  async login(token: string, userData: any) {
-    await this.storage.set('session:token', token);
-    await this.storage.set('session:user', userData);
-  }
-
-  async logout() {
-    await this.storage.remove('session:token');
-    await this.storage.remove('session:user');
-    // All tabs will receive this change
-  }
-
-  onLogout(callback: () => void) {
-    this.onLogoutCallback = callback;
-  }
-
-  private handleRemoteLogout() {
-    // Another tab logged out - clean up this tab
-    this.onLogoutCallback?.();
-    window.location.href = '/login';
-  }
-}
-
-// Usage
-const session = new SessionManager();
-await session.initialize();
-
-session.onLogout(() => {
-  console.log('Logged out from another tab');
 });
 
-// Logout in one tab
-await session.logout();
-// All tabs redirect to login
+await storage.set('session-check', Date.now(), { storage: 'localStorage' });
+// Call unsubscribe() when this view is removed.
 ```
+
+This event is only a hint. It does not create, renew, or revoke a session.
 
 ### Shopping Cart Sync
 
@@ -308,7 +264,7 @@ class ShoppingCart {
   private onUpdateCallback?: (cart: CartItem[]) => void;
 
   constructor() {
-    this.storage = new Strata({
+    this.storage = defineStorage({
       sync: { enabled: true }
     });
   }
@@ -393,7 +349,7 @@ class NotificationManager {
   private onNewNotification?: (notification: Notification) => void;
 
   constructor() {
-    this.storage = new Strata({
+    this.storage = defineStorage({
       sync: { enabled: true }
     });
   }
@@ -488,7 +444,7 @@ class CustomSyncManager {
   private syncQueue: StorageChange[] = [];
 
   constructor() {
-    this.storage = new Strata({
+    this.storage = defineStorage({
       sync: { enabled: true }
     });
   }

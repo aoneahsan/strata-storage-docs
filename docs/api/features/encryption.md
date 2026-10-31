@@ -2,7 +2,7 @@
 
 API documentation for the encryption feature in Strata Storage.
 
-> **Runtime support:** Encryption uses the Web Crypto API (`crypto.subtle`). It works in browsers **and** in modern Node.js / SSR runtimes — Node 20+ exposes `globalThis.crypto.subtle`, so encryption works server-side without any polyfill.
+> **Runtime support:** Encryption uses the Web Crypto API (`crypto.subtle`). The package requires Node 24.13 or later for Node/SSR use. Check `globalThis.crypto.subtle` in the target runtime before depending on encryption.
 
 ## Classes
 
@@ -149,7 +149,9 @@ async hash(data: string): Promise<string>
 ### Global Encryption
 
 ```typescript
-const storage = new Strata({
+import { defineStorage } from 'strata-storage';
+
+const storage = defineStorage({
   encryption: {
     enabled: true,
     password: 'global-password',
@@ -190,7 +192,7 @@ which is about *where* keys live, not this content-encryption feature.)
 |----------|---------|----------------|
 | Web (browser / Web Worker) | ✅ | `crypto.subtle` |
 | Capacitor (iOS/Android webview) | ✅ | `crypto.subtle` |
-| Node.js / SSR (Node 20+) | ✅ | `globalThis.crypto.subtle` |
+| Node.js / SSR (Node 24.13+) | ✅ when `crypto.subtle` is available | `globalThis.crypto.subtle` |
 
 ## Error Handling
 

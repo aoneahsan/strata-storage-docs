@@ -145,10 +145,10 @@ Each section is independent. You can run them in any order and in isolation.
 ```typescript
 async function testPreferences() {
   const storage = defineStorage({
-    adapters: [new PreferencesAdapter()],
     defaultStorages: ['preferences'],
   });
-  await storage.initialize();
+  storage.registerAdapter(new PreferencesAdapter());
+  await storage.refreshAdapters();
 
   // --- set / get round-trip ---
   await storage.set('pref_test_key', 'hello-native', { storage: 'preferences' });
@@ -158,18 +158,18 @@ async function testPreferences() {
   // --- keys ---
   await storage.set('pref_key_a', 1, { storage: 'preferences' });
   await storage.set('pref_key_b', 2, { storage: 'preferences' });
-  const keys = await storage.keys({ storage: 'preferences' });
+  const keys = await storage.keys(undefined, { storage: 'preferences' });
   console.assert(keys.includes('pref_test_key'), 'FAIL preferences: keys missing pref_test_key');
   console.assert(keys.includes('pref_key_a'), 'FAIL preferences: keys missing pref_key_a');
 
   // --- remove ---
   await storage.remove('pref_key_a', { storage: 'preferences' });
-  const afterRemove = await storage.keys({ storage: 'preferences' });
+  const afterRemove = await storage.keys(undefined, { storage: 'preferences' });
   console.assert(!afterRemove.includes('pref_key_a'), 'FAIL preferences: key still present after remove');
 
   // --- clear ---
   await storage.clear({ storage: 'preferences' });
-  const afterClear = await storage.keys({ storage: 'preferences' });
+  const afterClear = await storage.keys(undefined, { storage: 'preferences' });
   console.assert(afterClear.length === 0, 'FAIL preferences: keys not empty after clear');
 
   console.log('PASS preferences');
@@ -198,10 +198,10 @@ async function testPreferences() {
 ```typescript
 async function testSecure() {
   const storage = defineStorage({
-    adapters: [new SecureAdapter()],
     defaultStorages: ['secure'],
   });
-  await storage.initialize();
+  storage.registerAdapter(new SecureAdapter());
+  await storage.refreshAdapters();
 
   const secret = 'super-secret-token-abc123';
   await storage.set('secure_token', secret, { storage: 'secure' });
@@ -211,7 +211,7 @@ async function testSecure() {
   console.assert(got === secret, 'FAIL secure: get after set');
 
   // --- keys and remove ---
-  const keys = await storage.keys({ storage: 'secure' });
+  const keys = await storage.keys(undefined, { storage: 'secure' });
   console.assert(keys.includes('secure_token'), 'FAIL secure: key missing from keys()');
 
   await storage.remove('secure_token', { storage: 'secure' });
@@ -227,10 +227,10 @@ async function testSecure() {
 ```typescript
 // Run this in isolation AFTER relaunching the app — do NOT call clear() before restarting
 const storage = defineStorage({
-  adapters: [new SecureAdapter()],
   defaultStorages: ['secure'],
 });
-await storage.initialize();
+storage.registerAdapter(new SecureAdapter());
+await storage.refreshAdapters();
 const token = await storage.get<string>('secure_token', { storage: 'secure' });
 console.assert(token === 'super-secret-token-abc123', 'FAIL secure: not persisted across restart');
 console.log('PASS secure persistence');
@@ -257,10 +257,10 @@ SQLite receives the most changes in v2.6.0. There are four things to verify: (a)
 async function testSqliteRoundTrip() {
   const sqlite = new SqliteAdapter({ database: 'strata', table: 'storage' });
   const storage = defineStorage({
-    adapters: [sqlite],
     defaultStorages: ['sqlite'],
   });
-  await storage.initialize();
+  storage.registerAdapter(sqlite);
+  await storage.refreshAdapters();
 
   const payload = {
     userId: 'u_001',
@@ -271,7 +271,7 @@ async function testSqliteRoundTrip() {
   await storage.set('rt_test', payload, {
     storage: 'sqlite',
     tags: ['user', 'profile'],
-    expires: Date.now() + 60_000,          // 60 s from now
+    expireAt: Date.now() + 60_000,          // 60 s from now
     metadata: { source: 'verify-run' },
   });
 
@@ -302,15 +302,15 @@ async function testSqliteRoundTrip() {
 async function testSqliteTtl() {
   const sqlite = new SqliteAdapter({ database: 'strata', table: 'storage' });
   const storage = defineStorage({
-    adapters: [sqlite],
     defaultStorages: ['sqlite'],
   });
-  await storage.initialize();
+  storage.registerAdapter(sqlite);
+  await storage.refreshAdapters();
 
   // Write with a 1-second TTL
   await storage.set('ttl_test', 'ephemeral', {
     storage: 'sqlite',
-    expires: Date.now() + 1_000,
+    expireAt: Date.now() + 1_000,
   });
 
   // Immediately readable
@@ -336,18 +336,18 @@ async function testSqliteMultiStore() {
   // Adapter A — database 'alpha', table 'main'
   const adapterA = new SqliteAdapter({ database: 'alpha', table: 'main' });
   const storageA = defineStorage({
-    adapters: [adapterA],
     defaultStorages: ['sqlite'],
   });
-  await storageA.initialize();
+  storageA.registerAdapter(adapterA);
+  await storageA.refreshAdapters();
 
   // Adapter B — database 'beta', table 'main'
   const adapterB = new SqliteAdapter({ database: 'beta', table: 'main' });
   const storageB = defineStorage({
-    adapters: [adapterB],
     defaultStorages: ['sqlite'],
   });
-  await storageB.initialize();
+  storageB.registerAdapter(adapterB);
+  await storageB.refreshAdapters();
 
   // Write the SAME key with different values to each store
   await storageA.set('collision_key', 'value-from-alpha', { storage: 'sqlite' });
@@ -380,10 +380,10 @@ async function testSqliteMultiStore() {
 async function testSqliteDetailedSize() {
   const sqlite = new SqliteAdapter({ database: 'strata', table: 'storage' });
   const storage = defineStorage({
-    adapters: [sqlite],
     defaultStorages: ['sqlite'],
   });
-  await storage.initialize();
+  storage.registerAdapter(sqlite);
+  await storage.refreshAdapters();
 
   // Seed a couple of entries so size is non-zero
   await storage.set('sz_a', { x: 1 }, { storage: 'sqlite', tags: ['t1'] });
@@ -446,10 +446,10 @@ async function testFilesystem() {
   console.assert(available === true, 'FAIL filesystem: isAvailable() returned false — plugin not wired?');
 
   const storage = defineStorage({
-    adapters: [fsAdapter],
     defaultStorages: ['filesystem'],
   });
-  await storage.initialize();
+  storage.registerAdapter(fsAdapter);
+  await storage.refreshAdapters();
 
   // --- set / get ---
   const testValue = { report: 'q1-2026', lines: 42 };
@@ -461,13 +461,13 @@ async function testFilesystem() {
 
   // --- keys ---
   await storage.set('fs_doc_b', 'extra', { storage: 'filesystem' });
-  const keys = await storage.keys({ storage: 'filesystem' });
+  const keys = await storage.keys(undefined, { storage: 'filesystem' });
   console.assert(keys.includes('fs_doc'), 'FAIL filesystem: keys missing fs_doc');
   console.assert(keys.includes('fs_doc_b'), 'FAIL filesystem: keys missing fs_doc_b');
 
   // --- remove ---
   await storage.remove('fs_doc_b', { storage: 'filesystem' });
-  const afterRemove = await storage.keys({ storage: 'filesystem' });
+  const afterRemove = await storage.keys(undefined, { storage: 'filesystem' });
   console.assert(!afterRemove.includes('fs_doc_b'), 'FAIL filesystem: key present after remove');
 
   // --- size ---
@@ -477,7 +477,7 @@ async function testFilesystem() {
 
   // --- clear ---
   await storage.clear({ storage: 'filesystem' });
-  const afterClear = await storage.keys({ storage: 'filesystem' });
+  const afterClear = await storage.keys(undefined, { storage: 'filesystem' });
   console.assert(afterClear.length === 0, 'FAIL filesystem: keys not empty after clear');
 
   console.log('PASS filesystem');

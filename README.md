@@ -39,13 +39,11 @@ scripts/                  generate-llms-full.js (runs as part of build)
 
 ## Deployment
 
-Push to `main` → GitHub Actions (`.github/workflows/deploy-docs.yml`) installs, builds, and publishes `build/` to **GitHub Pages**. The custom domain is pinned by `static/CNAME`, which Docusaurus copies verbatim into `build/`.
-
-Pull requests run the same `build` job without deploying, so it can serve as a required status check.
+Run `yarn install --immutable`, `yarn typecheck` and `yarn build` locally. Serve `build/` and inspect desktop and phone pages before pushing `main`. Publish that exact built tree to the `gh-pages` branch with an ordinary fast-forward commit; never force-push or run `docusaurus deploy`. GitHub Pages serves `gh-pages` at `/`. `static/CNAME` pins the custom domain and `static/.nojekyll` preserves underscore assets. Check the live sitemap, feed and robots file after publication. The repository guide has the release gate.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). `main` is protected: PR + one approving review + green `build`.
+See [CONTRIBUTING.md](./CONTRIBUTING.md). The owner publishes after local verification; this repository has no GitHub Actions workflow.
 
 ## License
 

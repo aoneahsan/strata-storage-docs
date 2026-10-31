@@ -1,178 +1,103 @@
 # Configuration Examples
 
-Examples of various configuration options for Strata Storage.
+Use `defineStorage()` for a web-ready instance. It registers the standard web adapters and initializes on the first operation.
 
 ## Basic Configuration
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata({
+const storage = defineStorage({
   namespace: 'my-app',
   defaultStorages: ['indexedDB', 'localStorage', 'memory'],
-  debug: true
+  debug: { enabled: true, verbosity: 'normal' },
 });
+
+await storage.set('theme', 'dark');
 ```
 
 ## Full Configuration
 
 ```typescript
-const storage = new Strata({
-  // Namespace for all keys
+const storage = defineStorage({
   namespace: 'my-app',
-  
-  // Storage precedence
   defaultStorages: ['indexedDB', 'localStorage', 'memory'],
-  
-  // Encryption settings
-  encryption: {
-    enabled: false,
-    password: process.env.STORAGE_KEY,
-    iterations: 600000
+  adapters: {
+    indexedDB: { dbName: 'MyAppDB', version: 1 },
+    localStorage: { prefix: 'myapp:' },
   },
-  
-  // Compression settings
-  compression: {
-    enabled: true,
-    threshold: 1024, // Compress if > 1KB
-    algorithm: 'lz'
-  },
-  
-  // TTL settings
-  ttl: {
-    cleanupInterval: 60000, // Check every minute
-    defaultTTL: 3600000  // 1 hour default
-  },
-  
-  // Sync settings
-  sync: {
-    enabled: true,
-    storages: ['localStorage', 'indexedDB'],
-    conflictResolution: 'latest'
-  },
-  
-  // Debug settings
-  debug: process.env.NODE_ENV === 'development',
-  onLog: (level, message, data) => {
-    console.log(`[${level}] ${message}`, data);
-  }
+  compression: { enabled: true, threshold: 1024, algorithm: 'lz' },
+  ttl: { cleanupInterval: 60_000, defaultTTL: 3_600_000 },
+  sync: { enabled: true, storages: ['localStorage', 'indexedDB'], conflictResolution: 'latest' },
+  debug: { enabled: true, verbosity: 'normal' },
 });
 ```
+
+`debug` takes an object. `StrataConfig` has no `onLog` callback. Compression currently supports the bundled `'lz'` algorithm.
 
 ## Environment-Based Configuration
 
 ```typescript
-const isDev = process.env.NODE_ENV === 'development';
-const isProd = process.env.NODE_ENV === 'production';
+const isDevelopment = import.meta.env.DEV;
+const storage = defineStorage({
+  namespace: isDevelopment ? 'app-dev' : 'app',
+  defaultStorages: isDevelopment
+    ? ['memory', 'localStorage']
+    : ['indexedDB', 'localStorage', 'memory'],
+  debug: { enabled: isDevelopment },
+});
+```
 
-const storage = new Strata({
-  namespace: isProd ? 'app' : 'app-dev',
-  
-  defaultStorages: isProd 
-    ? ['indexedDB', 'localStorage']
-    : ['memory', 'localStorage'],
-  
-  encryption: {
-    enabled: isProd,
-    password: process.env.ENCRYPTION_KEY
-  },
-  
-  debug: isDev,
-  
-  ttl: {
-    defaultTTL: isProd ? 86400000 : 3600000 // 24h vs 1h
-  }
+Keep encryption passwords outside source code and configuration files. Pass a user-provided password to the operation when encryption is needed:
+
+```typescript
+const encryptedStorage = defineStorage({ encryption: { enabled: true } });
+await encryptedStorage.set('private-draft', draft, {
+  encrypt: true,
+  encryptionPassword: password,
 });
 ```
 
 ## Platform-Specific Configuration
 
 ```typescript
-import { Platform } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
+import { defineStorage } from 'strata-storage';
+import { registerCapacitorAdapters } from 'strata-storage/capacitor';
 
-const storage = new Strata({
+const native = Capacitor.isNativePlatform();
+const storage = defineStorage({
   namespace: 'cross-platform-app',
-  
-  defaultStorages: Platform.isNativePlatform()
-    ? ['sqlite', 'preferences', 'filesystem']
+  defaultStorages: native
+    ? ['sqlite', 'preferences', 'memory']
     : ['indexedDB', 'localStorage', 'memory'],
-  
-  encryption: {
-    enabled: Platform.isNativePlatform(),
-    password: 'native-secure-key'
-  },
-  
-  adapters: Platform.isNativePlatform() ? {
-    sqlite: {
-      databaseName: 'app.db',
-      version: 1
-    },
-    secure: {
-      accessibility: 'afterFirstUnlock'
-    }
-  } : undefined
 });
+if (native) await registerCapacitorAdapters(storage);
 ```
+
+Native adapters are registered separately. `adapters.sqlite` accepts `filename`; its low-level `SqliteAdapter` constructor accepts `database` and `table` for separate stores. `adapters.secure` and `adapters.preferences` accept booleans, not biometric, iCloud, or App Group options.
 
 ## Feature Flags Configuration
 
 ```typescript
-const features = {
-  encryption: true,
-  compression: true,
-  sync: true,
-  ttl: true
-};
-
-const storage = new Strata({
-  namespace: 'feature-app',
-  
-  encryption: features.encryption ? {
-    enabled: true,
-    password: 'secure-password'
-  } : undefined,
-  
-  compression: features.compression ? {
-    enabled: true,
-    threshold: 500
-  } : undefined,
-  
-  sync: features.sync ? {
-    enabled: true
-  } : undefined,
-  
-  ttl: features.ttl ? {
-    cleanupInterval: 300000 // 5 minutes
-  } : undefined
+const storage = defineStorage({
+  compression: enableCompression ? { enabled: true, threshold: 1024 } : undefined,
+  ttl: enableExpiry ? { defaultTTL: 3_600_000 } : undefined,
 });
 ```
 
 ## Multi-Instance Configuration
 
 ```typescript
-// User data storage
-const userStorage = new Strata({
-  namespace: 'user-data',
-  defaultStorages: ['secure', 'sqlite'],
-  encryption: { enabled: true }
-});
-
-// Cache storage
-const cacheStorage = new Strata({
+const userStorage = defineStorage({ namespace: 'user-data' });
+const cacheStorage = defineStorage({
   namespace: 'cache',
   defaultStorages: ['memory', 'localStorage'],
-  ttl: {
-    defaultTTL: 300000 // 5 minutes
-  }
-});
-
-// Settings storage
-const settingsStorage = new Strata({
-  namespace: 'settings',
-  defaultStorages: ['preferences'],
-  sync: { enabled: true }
+  ttl: { defaultTTL: 300_000 },
 });
 ```
+
+Namespaces isolate logical keys. They do not create separate IndexedDB object stores or SQLite tables.
 
 ## See Also
 

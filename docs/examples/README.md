@@ -20,7 +20,7 @@ This directory contains practical examples demonstrating how to use Strata Stora
 ## Platform Examples
 
 - [Web Application](./web-app.md) - Browser-based usage
-- [React Native](./react-native.md) - Mobile app integration
+- [React Native](./react-native.md) - Package support boundary and alternatives
 - [Capacitor App](./capacitor-app.md) - Capacitor plugin usage
 - [Ionic Application](./ionic-app.md) - Ionic framework integration
 
@@ -39,7 +39,7 @@ This directory contains practical examples demonstrating how to use Strata Stora
 
 ## Real-World Examples
 
-- [User Authentication](./user-auth.md) - Managing auth tokens
+- [User Authentication](./user-auth.md) - Server-owned sessions and local UI state
 - [Shopping Cart](./shopping-cart.md) - E-commerce cart management
 - [Form Data Persistence](./form-persistence.md) - Saving form progress
 - [Cache Management](./cache-management.md) - API response caching
@@ -47,15 +47,14 @@ This directory contains practical examples demonstrating how to use Strata Stora
 
 ## Running Examples
 
-Most examples can be run directly in your project:
+Some pages show complete snippets; others show one part of an application flow and need your own data, server or framework setup. Start with the verified browser round-trip:
 
 ```typescript
-// Copy and paste example code
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-// Run example
-const storage = new Strata();
-// ... example code
+const storage = defineStorage();
+await storage.set('draft', 'First pass');
+const draft = await storage.get<string>('draft');
 ```
 
 For complete applications, see the [example apps](https://stratastorage-docs.aoneahsan.com/examples) in the repository.

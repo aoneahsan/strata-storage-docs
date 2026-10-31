@@ -1,159 +1,77 @@
 # Compression Examples
 
-Examples of using compression features in Strata Storage.
+Strata's bundled LZ codec runs when the instance has `compression.enabled: true`. A `compress: true` option on an unconfigured instance does not initialize the compressor.
 
 ## Basic Compression
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata();
-
-// Compress large data
-const largeData = { 
-  // ... large object with repeated data 
-};
-
-await storage.set('large-dataset', largeData, {
-  compress: true
-});
+const storage = defineStorage({ compression: { enabled: true } });
+await storage.set('large-dataset', largeData, { compress: true });
+const restored = await storage.get('large-dataset');
 ```
+
+Compression and decompression use the async API.
 
 ## Automatic Compression
 
 ```typescript
-const storage = new Strata({
+const storage = defineStorage({
   compression: {
     enabled: true,
-    threshold: 1024 // Auto-compress data > 1KB
-  }
+    threshold: 1024,
+    algorithm: 'lz',
+  },
 });
 
-// Automatically compressed if > 1KB
 await storage.set('user-list', largeUserArray);
-
-// Not compressed if < 1KB
 await storage.set('small-config', { theme: 'dark' });
 ```
+
+The configured threshold decides whether the data is large enough to compress. Compression may not reduce every value's size.
 
 ## Selective Compression
 
 ```typescript
-// Compress JSON data
-await storage.set('api-response', jsonData, {
-  compress: true
+const storage = defineStorage({ compression: { enabled: true } });
+
+await storage.set('api-response', jsonData, { compress: true });
+await storage.set('small-config', { theme: 'dark' }, { compress: false });
+```
+
+To combine compression and encryption, enable both features on the instance and supply an encryption password. Strata compresses before encrypting:
+
+```typescript
+const storage = defineStorage({
+  compression: { enabled: true },
+  encryption: { enabled: true },
 });
 
-// Don't compress already compressed data
-await storage.set('image-blob', imageBlob, {
-  compress: false
-});
-
-// Don't compress encrypted data (compress first)
-await storage.set('secure-data', data, {
+await storage.set('private-draft', draft, {
   compress: true,
-  encrypt: true // Compress then encrypt
+  encrypt: true,
+  encryptionPassword: password,
 });
 ```
 
 ## Compression Stats
 
-```typescript
-import { CompressionManager } from 'strata-storage';
-
-async function getCompressionStats() {
-  const compression = new CompressionManager({ threshold: 1024 });
-  const keys = await storage.keys();
-  let totalOriginal = 0;
-  let totalCompressed = 0;
-  
-  for (const key of keys) {
-    const value = await storage.get(key);
-    const result = await compression.compress(value);
-    if (compression.isCompressedData(result)) {
-      totalOriginal += result.originalSize;
-      totalCompressed += result.compressedSize;
-    }
-  }
-  
-  return {
-    totalOriginal,
-    totalCompressed,
-    ratio: (totalCompressed / totalOriginal * 100).toFixed(2) + '%',
-    saved: formatBytes(totalOriginal - totalCompressed)
-  };
-}
-```
+`CompressionManager.compress()` returns compression output for the value you pass it; it does not report a database-wide saved-byte total. Measure a representative input and the actual stored payload if your application needs a size comparison.
 
 ## Conditional Compression
 
 ```typescript
-class SmartCompression {
-  private storage: Strata;
-  
-  async store(key: string, value: any) {
-    const serialized = JSON.stringify(value);
-    const shouldCompress = this.shouldCompress(serialized);
-    
-    await this.storage.set(key, value, {
-      compress: shouldCompress
-    });
-    
-    if (shouldCompress) {
-      console.log(`Compressed ${key}: ${serialized.length} bytes`);
-    }
-  }
-  
-  shouldCompress(data: string): boolean {
-    // Don't compress if too small
-    if (data.length < 500) return false;
-    
-    // Don't compress if already compressed (entropy check)
-    const entropy = this.calculateEntropy(data);
-    if (entropy > 0.95) return false;
-    
-    // Compress text-like data
-    return true;
-  }
-  
-  calculateEntropy(str: string): number {
-    const len = str.length;
-    const frequencies = {};
-    
-    for (const char of str) {
-      frequencies[char] = (frequencies[char] || 0) + 1;
-    }
-    
-    let entropy = 0;
-    for (const count of Object.values(frequencies)) {
-      const p = count / len;
-      entropy -= p * Math.log2(p);
-    }
-    
-    return entropy / 8; // Normalize
-  }
-}
+const storage = defineStorage({ compression: { enabled: true } });
+const shouldCompress = JSON.stringify(value).length >= 1024;
+await storage.set('result', value, { compress: shouldCompress });
 ```
 
 ## Bulk Compression
 
-```typescript
-// Re-store every value with compression enabled
-async function compressAll() {
-  const keys = await storage.keys();
-  
-  for (const key of keys) {
-    const value = await storage.get(key);
-    if (value !== null) {
-      await storage.set(key, value, { compress: true });
-      console.log(`Compressed: ${key}`);
-    }
-  }
-}
-```
+Rewriting all existing keys changes their stored representation and expiry metadata. Migrate a bounded, known key set only after testing a read-write-read round-trip and any TTL requirements.
 
 ## See Also
 
-- [Compression Guide](../guides/features/compression.md)
-- [Performance Optimization](./performance.md)
+- [Compression guide](../guides/features/compression.md)
 - [Configuration](./configuration.md)

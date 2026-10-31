@@ -1,310 +1,72 @@
-# Performance Optimization Examples
+---
+title: Measure storage work
+description: Measure Strata Storage reads, writes and local query costs without invented benchmarks or unsupported indexes.
+tags: [examples, performance]
+---
 
-Examples of optimizing Strata Storage for maximum performance.
+# Measure storage work
 
-## Batch Operations
+Storage speed depends on the adapter, browser or device, value size and the rest of your application. Measure the round-trip you actually use. The Strata API has no `setMany()` method and no `indexedDB.indexes` configuration.
+
+- [Measure a bounded sample](#measure)
+- [Choose the storage path](#path)
+- [Query costs](#query)
+
+<a id="measure"></a>
+## ⏱️ Measure a bounded sample&nbsp;[#](#measure)
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata();
+const storage = defineStorage();
+const samples = Array.from({ length: 20 }, (_, index) => ({
+  id: index,
+  title: `Draft ${index}`,
+}));
 
-// Inefficient: Multiple awaits
-async function slowSave(items: any[]) {
-  for (const item of items) {
-    await storage.set(item.key, item.value);
-  }
+const started = performance.now();
+for (const item of samples) {
+  await storage.set(`draft:${item.id}`, item, { storage: 'indexedDB' });
 }
+const writeMilliseconds = performance.now() - started;
 
-// Efficient: Parallel operations
-async function fastSave(items: any[]) {
-  await Promise.all(
-    items.map(item => storage.set(item.key, item.value))
-  );
-}
-
-// Most efficient: Batch API
-async function batchSave(items: any[]) {
-  await storage.setMany(items);
-}
+const readStarted = performance.now();
+const first = await storage.get<{ id: number; title: string }>(
+  'draft:0', { storage: 'indexedDB' },
+);
+const readMilliseconds = performance.now() - readStarted;
 ```
 
-## Memory Caching
+Run this in each target browser with representative values. `writeMilliseconds` and `readMilliseconds` are measurements from that run, not a package-wide speed claim. Clean up the sample keys when the measurement ends.
+
+<a id="path"></a>
+## 🗂️ Choose the storage path&nbsp;[#](#path)
+
+`memory` loses values on reload. `localStorage` writes synchronously in the browser. `indexedDB` is an async browser backend. Set the adapter explicitly when your data's persistence matters:
 
 ```typescript
-class CachedStorage {
-  private storage: Strata;
-  private cache = new Map<string, any>();
-  private cacheSize = 0;
-  private maxCacheSize = 10 * 1024 * 1024; // 10MB
-  
-  async get(key: string) {
-    // Check memory cache first
-    if (this.cache.has(key)) {
-      return this.cache.get(key);
-    }
-    
-    // Load from storage
-    const value = await this.storage.get(key);
-    
-    if (value !== null) {
-      this.addToCache(key, value);
-    }
-    
-    return value;
-  }
-  
-  private addToCache(key: string, value: any) {
-    const size = JSON.stringify(value).length;
-    
-    // Evict if needed
-    while (this.cacheSize + size > this.maxCacheSize && this.cache.size > 0) {
-      const firstKey = this.cache.keys().next().value;
-      this.evictFromCache(firstKey);
-    }
-    
-    this.cache.set(key, value);
-    this.cacheSize += size;
-  }
-  
-  private evictFromCache(key: string) {
-    const value = this.cache.get(key);
-    if (value) {
-      this.cacheSize -= JSON.stringify(value).length;
-      this.cache.delete(key);
-    }
-  }
-}
-```
-
-## Lazy Loading
-
-```typescript
-class LazyStorage {
-  private storage: Strata;
-  private loaded = new Set<string>();
-  private loading = new Map<string, Promise<any>>();
-  
-  async get(key: string) {
-    // Return loading promise if already in progress
-    if (this.loading.has(key)) {
-      return this.loading.get(key);
-    }
-    
-    // Return cached if already loaded
-    if (this.loaded.has(key)) {
-      return this.storage.get(key);
-    }
-    
-    // Start loading
-    const loadPromise = this.loadValue(key);
-    this.loading.set(key, loadPromise);
-    
-    try {
-      const value = await loadPromise;
-      this.loaded.add(key);
-      return value;
-    } finally {
-      this.loading.delete(key);
-    }
-  }
-  
-  private async loadValue(key: string) {
-    // Simulate expensive load operation
-    const value = await this.storage.get(key);
-    
-    // Post-process if needed
-    if (value && value.compressed) {
-      return this.decompress(value.data);
-    }
-    
-    return value;
-  }
-}
-```
-
-## Indexed Queries
-
-```typescript
-// Configure with indexes for better query performance
-const storage = new Strata({
-  adapters: {
-    indexedDB: {
-      indexes: [
-        { name: 'byType', keyPath: 'value.type' },
-        { name: 'byStatus', keyPath: 'value.status' },
-        { name: 'byCreated', keyPath: 'value.created' },
-        { name: 'byUserId', keyPath: 'value.userId' }
-      ]
-    }
-  }
-});
-
-// Fast queries using indexes (conditions match the stored value by bare field name)
-const activeUsers = await storage.query({
-  status: 'active'
-});
-
-// Compound queries
-const recentActiveUsers = await storage.query({
-  status: 'active',
-  created: { $gt: Date.now() - 86400000 }
+await storage.set('preview', { open: true }, { storage: 'memory' });
+await storage.set('draft', { title: 'Working copy' }, {
+  storage: 'indexedDB',
 });
 ```
 
-## Compression Strategy
+Compression is optional. It only runs when the instance is configured for it, and it may keep a value uncompressed if the output would not be smaller:
 
 ```typescript
-class SmartCompression {
-  private storage: Strata;
-  
-  async set(key: string, value: any, options?: any) {
-    const size = JSON.stringify(value).length;
-    
-    // Only compress large data
-    const shouldCompress = size > 1024; // 1KB threshold
-    
-    return this.storage.set(key, value, {
-      ...options,
-      compress: shouldCompress
-    });
-  }
-  
-  async bulkCompress(pattern: string) {
-    // query() matches stored values, not the storage key — list keys and
-    // filter them by pattern, then re-store the large ones compressed.
-    const re = new RegExp(pattern);
-    const keys = (await this.storage.keys()).filter((k) => re.test(k));
-    
-    await Promise.all(
-      keys.map(async (key) => {
-        const value = await this.storage.get(key);
-        if (value && JSON.stringify(value).length > 1024) {
-          await this.storage.set(key, value, { compress: true });
-        }
-      })
-    );
-  }
-}
+const compressedStorage = defineStorage({
+  compression: { enabled: true, threshold: 1024 },
+});
+const articleText = 'A representative paragraph. '.repeat(100);
+await compressedStorage.set('article', articleText, {
+  storage: 'indexedDB',
+  compress: true,
+});
 ```
 
-## Read-Through Cache
+Replace the sample `articleText` with your application's value. Compare a representative write and read with compression on and off before enabling it for a workload.
 
-```typescript
-class ReadThroughCache {
-  private storage: Strata;
-  private fetchers = new Map<string, () => Promise<any>>();
-  
-  register(pattern: RegExp, fetcher: () => Promise<any>) {
-    this.fetchers.set(pattern.source, fetcher);
-  }
-  
-  async get(key: string) {
-    // Check cache first
-    const cached = await this.storage.get(key);
-    if (cached !== null) {
-      return cached;
-    }
-    
-    // Find matching fetcher
-    for (const [pattern, fetcher] of this.fetchers) {
-      if (new RegExp(pattern).test(key)) {
-        const value = await fetcher();
-        
-        // Cache the result
-        await this.storage.set(key, value, {
-          ttl: 300000 // 5 minutes
-        });
-        
-        return value;
-      }
-    }
-    
-    return null;
-  }
-}
-```
+<a id="query"></a>
+## 🔎 Query costs&nbsp;[#](#query)
 
-## Debounced Writes
-
-```typescript
-class DebouncedStorage {
-  private storage: Strata;
-  private pendingWrites = new Map<string, any>();
-  private writeTimer: NodeJS.Timeout | null = null;
-  
-  async set(key: string, value: any, options?: any) {
-    this.pendingWrites.set(key, { value, options });
-    
-    if (this.writeTimer) {
-      clearTimeout(this.writeTimer);
-    }
-    
-    this.writeTimer = setTimeout(() => {
-      this.flushWrites();
-    }, 100); // 100ms debounce
-  }
-  
-  private async flushWrites() {
-    const writes = Array.from(this.pendingWrites.entries());
-    this.pendingWrites.clear();
-    
-    await Promise.all(
-      writes.map(([key, { value, options }]) =>
-        this.storage.set(key, value, options)
-      )
-    );
-  }
-}
-```
-
-## Storage Metrics
-
-```typescript
-class MetricStorage {
-  private storage: Strata;
-  private metrics = {
-    reads: 0,
-    writes: 0,
-    hits: 0,
-    misses: 0,
-    errors: 0
-  };
-  
-  async get(key: string) {
-    this.metrics.reads++;
-    
-    try {
-      const value = await this.storage.get(key);
-      
-      if (value !== null) {
-        this.metrics.hits++;
-      } else {
-        this.metrics.misses++;
-      }
-      
-      return value;
-    } catch (error) {
-      this.metrics.errors++;
-      throw error;
-    }
-  }
-  
-  getMetrics() {
-    const hitRate = this.metrics.reads > 0
-      ? (this.metrics.hits / this.metrics.reads) * 100
-      : 0;
-    
-    return {
-      ...this.metrics,
-      hitRate: `${hitRate.toFixed(2)}%`
-    };
-  }
-}
-```
-
-## See Also
-
-- [Cache Management](./cache-management.md)
-- [Multi-Storage](./multi-storage.md)
-- [Configuration](./configuration.md)
+`storage.query()` scans selected adapter keys and decodes each value before matching. Strata doesn't expose IndexedDB indexes or SQL indexes through its key/value API. Use a server-side query for large or shared datasets; keep local queries bounded and measure them on the target device.

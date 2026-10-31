@@ -12,18 +12,18 @@ The SessionStorage adapter provides temporary storage that persists for the dura
 |---------|----------|
 | Persistence | 🔄 Session only |
 | Synchronous | ✅ Yes |
-| Observable | ❌ No (tab-specific) |
+| Observable | ✅ Yes (same-tab changes; no cross-tab sync) |
 | Searchable | ✅ Yes |
 | Iterable | ✅ Yes |
-| Capacity | ~10MB |
+| Capacity | Varies by browser and available device storage |
 | Performance | 🚀 Fast |
 | TTL Support | ✅ Yes (manual) |
 | Batch Support | ✅ Yes |
 | Transaction Support | ❌ No |
 
 :::info Shared storage area — key ownership
-This area is shared with every other script on the origin, and the key prefix is empty by default. Since
-**2.9.0** the adapter treats a key as its own only when the stored value is a `StorageValue` envelope, so
+This area is shared with every other script on the origin. Since 3.0.0, the adapter prefixes keys with
+`strata:` by default. The adapter has also checked the stored `StorageValue` envelope since 2.9.0, so
 `keys()`, the TTL sweep and `clear()` never touch data this library did not write. A key written here by
 anything else is invisible to `keys()` by design; `setLogLevel('debug')` shows what is being skipped.
 Full explanation: [Configuration ▸ key ownership](../../../configuration.md#key-ownership).
@@ -32,10 +32,9 @@ Full explanation: [Configuration ▸ key ownership](../../../configuration.md#ke
 ## Usage
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata();
-await storage.initialize();
+const storage = defineStorage();
 
 // Explicitly use sessionStorage
 await storage.set('sessionData', data, { storage: 'sessionStorage' });
@@ -44,12 +43,10 @@ await storage.set('sessionData', data, { storage: 'sessionStorage' });
 ## Configuration
 
 ```typescript
-const storage = new Strata({
+const storage = defineStorage({
   adapters: {
     sessionStorage: {
-      prefix: 'session_',
-      serialize: JSON.stringify,
-      deserialize: JSON.parse
+      prefix: 'session_'
     }
   }
 });
@@ -57,9 +54,7 @@ const storage = new Strata({
 
 ### Configuration Options
 
-- `prefix` (string): Prefix for all keys (default: 'strata_session_')
-- `serialize` (function): Custom serialization function
-- `deserialize` (function): Custom deserialization function
+- `prefix` (string): Physical key prefix. The instance-level default is `strata:`; this adapter option overrides it. Serialization callbacks are not part of `StrataConfig`.
 
 ## Features
 
@@ -180,44 +175,12 @@ class SessionCart {
 }
 ```
 
-### 3. Temporary Authentication
+### 3. Temporary signed-in page state
 
-```typescript
-class SessionAuth {
-  async setSessionToken(token: string, expiresIn: number) {
-    await storage.set('session_token', {
-      token,
-      expiresAt: Date.now() + expiresIn
-    }, {
-      storage: 'sessionStorage',
-      ttl: expiresIn
-    });
-  }
-  
-  async getSessionToken() {
-    const data = await storage.get('session_token', {
-      storage: 'sessionStorage'
-    });
-    
-    if (!data) return null;
-    
-    if (Date.now() > data.expiresAt) {
-      await storage.remove('session_token', {
-        storage: 'sessionStorage'
-      });
-      return null;
-    }
-    
-    return data.token;
-  }
-  
-  async clearSession() {
-    await storage.remove('session_token', {
-      storage: 'sessionStorage'
-    });
-  }
-}
-```
+Keep only recreatable interface state here, such as the selected tab or an
+unfinished search. Let your authentication system manage credentials; a value
+in `sessionStorage` is readable by scripts on the page and cannot prove that a
+user is signed in.
 
 ### 4. Page State Management
 
@@ -341,19 +304,10 @@ const sessionId = await sessionManager.getOrCreate(
 ### 3. Clean Up Sensitive Data
 
 ```typescript
-// Clear sensitive data explicitly
+// Clear recreatable session data explicitly on sign-out.
 class SecureSession {
   async logout() {
-    // Clear all session data
-    const keys = await storage.keys('session_', {
-      storage: 'sessionStorage'
-    });
-    
-    for (const key of keys) {
-      await storage.remove(key, {
-        storage: 'sessionStorage'
-      });
-    }
+    await storage.clear({ storage: 'sessionStorage', prefix: 'session_' });
   }
 }
 ```
@@ -422,27 +376,11 @@ for (const { key, value } of updates) {
 
 ## Security Considerations
 
-### 1. Session Hijacking
+### 1. Session tokens
 
-```typescript
-// Don't store session tokens that could be reused
-// Add additional validation
-
-async function validateSession() {
-  const session = await storage.get('session', {
-    storage: 'sessionStorage'
-  });
-  
-  if (!session) return false;
-  
-  // Validate session properties
-  return (
-    session.userAgent === navigator.userAgent &&
-    session.origin === window.location.origin &&
-    session.expiresAt > Date.now()
-  );
-}
-```
+Do not treat a browser-stored user agent, origin, or expiry field as proof of a
+valid login. The server must validate its own session or access token on every
+protected request. Avoid putting reusable credentials in browser storage.
 
 ### 2. Data Sensitivity
 
@@ -450,7 +388,7 @@ async function validateSession() {
 // Be cautious with sensitive data
 // SessionStorage is accessible via JavaScript
 
-// Consider encryption for sensitive session data
+// Encryption requires a password supplied separately from browser storage.
 await storage.set('sensitiveData', data, {
   storage: 'sessionStorage',
   encrypt: true,
@@ -464,7 +402,7 @@ await storage.set('sensitiveData', data, {
 |---------|---------------|---------------|
 | Persistence | Tab session | Permanent |
 | Sharing | Tab-specific | Domain-wide |
-| Capacity | ~10MB | ~10MB |
+| Capacity | Browser-dependent | Browser-dependent |
 | Use Case | Temporary state | User preferences |
 | Auto-cleanup | Yes (tab close) | No |
 

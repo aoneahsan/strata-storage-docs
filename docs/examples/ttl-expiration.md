@@ -1,192 +1,80 @@
-# TTL & Expiration Examples
+---
+title: Expire local values
+description: Use Strata Storage TTL, absolute expiry and expiry inspection without treating client expiry as server authentication.
+tags: [examples, ttl]
+---
 
-Examples of using Time-To-Live (TTL) features in Strata Storage.
+# Expire local values
 
-## Basic TTL
+A TTL gives a stored value an expiry time. Strata returns `null` after that time and can clean expired records from adapters. Expiry is a local cache rule, not a server session or authorization boundary.
+
+- [Relative and absolute expiry](#expiry)
+- [Sliding expiry](#sliding)
+- [Inspect and change expiry](#inspect)
+
+<a id="expiry"></a>
+## ⏱️ Relative and absolute expiry&nbsp;[#](#expiry)
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata();
+const storage = defineStorage();
+const options = { storage: 'memory' as const };
 
-// Expire after 5 minutes
-await storage.set('temp-data', data, {
-  ttl: 300000 // 5 minutes in milliseconds
+await storage.set('preview', { title: 'Working copy' }, {
+  ...options,
+  ttl: 5 * 60 * 1000,
 });
 
-// Expire after 1 hour
-await storage.set('session-token', token, {
-  ttl: 3600000 // 1 hour
+await storage.set('event-data', { count: 3 }, {
+  ...options,
+  expireAt: Date.now() + 60 * 60 * 1000,
+});
+
+const preview = await storage.get<{ title: string }>('preview', options);
+// After its expiry, preview is null.
+```
+
+`ttl` is a duration in milliseconds from the write. `expireAt` is a future `Date` or epoch-millisecond timestamp. A past `expireAt` doesn't create a future expiry; use a relative expression when the example should keep working next year.
+
+<a id="sliding"></a>
+## 🔄 Sliding expiry&nbsp;[#](#sliding)
+
+```typescript
+const slidingStorage = defineStorage({
+  defaultStorages: ['memory'],
+  ttl: {
+    defaultTTL: 30 * 60 * 1000,
+    slidingTTL: true,
+  },
+});
+
+await slidingStorage.set('draft', 'In progress', {
+  storage: 'memory',
+});
+const draft = await slidingStorage.get<string>('draft', {
+  storage: 'memory',
 });
 ```
 
-## Sliding TTL (Session Management)
+With `slidingTTL` and a configured `defaultTTL`, each successful read of an unexpired value refreshes its expiry. A per-write `sliding: true` flag alone does not supply the duration needed for a later read to extend it.
+
+<a id="inspect"></a>
+## 🔎 Inspect and change expiry&nbsp;[#](#inspect)
 
 ```typescript
-// Create session with sliding expiration
-await storage.set('user-session', sessionData, {
-  ttl: 1800000,    // 30 minutes
-  sliding: true    // Reset TTL on each access
-});
-
-// Each get() resets the TTL
-const session = await storage.get('user-session');
-// Session now expires 30 minutes from now
-```
-
-## Absolute Expiration
-
-```typescript
-// Expire at midnight
-const midnight = new Date();
-midnight.setHours(24, 0, 0, 0);
-
-await storage.set('daily-cache', data, {
-  expireAt: midnight
-});
-
-// Expire at specific timestamp
-await storage.set('event-data', data, {
-  expireAt: 1735689599000 // Dec 31, 2024
-});
-```
-
-## Cache Implementation
-
-```typescript
-class CacheManager {
-  private storage: Strata;
-  
-  constructor() {
-    this.storage = new Strata({
-      ttl: {
-        defaultTTL: 300000, // 5 minutes default
-        cleanupInterval: 60000 // Clean every minute
-      }
-    });
-  }
-  
-  async cache(key: string, factory: () => Promise<any>, ttl?: number) {
-    // Try to get from cache
-    const cached = await this.storage.get(key);
-    if (cached !== null) {
-      console.log('Cache hit:', key);
-      return cached;
-    }
-    
-    // Generate new value
-    console.log('Cache miss:', key);
-    const value = await factory();
-    
-    // Cache with TTL
-    await this.storage.set(key, value, { ttl });
-    
-    return value;
-  }
-  
-  async warmCache(keys: string[], factory: (key: string) => Promise<any>) {
-    await Promise.all(
-      keys.map(key => this.cache(key, () => factory(key)))
-    );
-  }
-}
-```
-
-## API Response Caching
-
-```typescript
-class APICache {
-  private storage: Strata;
-  
-  async fetchWithCache(url: string, options?: RequestInit) {
-    const cacheKey = `api:${url}`;
-    const cached = await this.storage.get(cacheKey);
-    
-    if (cached) {
-      return cached;
-    }
-    
-    const response = await fetch(url, options);
-    const data = await response.json();
-    
-    // Cache based on endpoint
-    const ttl = this.getTTLForEndpoint(url);
-    await this.storage.set(cacheKey, data, { ttl });
-    
-    return data;
-  }
-  
-  getTTLForEndpoint(url: string): number {
-    if (url.includes('/user/')) return 3600000; // 1 hour
-    if (url.includes('/feed/')) return 60000;   // 1 minute
-    if (url.includes('/static/')) return 86400000; // 24 hours
-    return 300000; // Default 5 minutes
-  }
-}
-```
-
-## TTL Management
-
-```typescript
-// Check remaining TTL
-const ttl = await storage.getTTL('session');
-if (ttl && ttl < 300000) { // Less than 5 minutes
-  console.log('Session expiring soon');
-  showWarning('Your session will expire soon');
+const remainingMs = await storage.getTTL('preview', options);
+const soon = await storage.getExpiring(10 * 60 * 1000, options);
+for (const item of soon) {
+  const key = item.key;
+  const expiresInMs = item.expiresIn;
+  // Use key and expiresInMs in your UI.
 }
 
-// Extend TTL
-await storage.extendTTL('session', 1800000); // Add 30 minutes
-
-// Make persistent (remove TTL)
-await storage.persist('important-data');
+await storage.extendTTL('preview', 5 * 60 * 1000, options);
+await storage.persist('preview', options);
 ```
 
-## Cleanup Strategies
+`getTTL()` returns `null` for a key without expiry or one that is absent. `getExpiring()` returns `{ key, expiresIn }`, not `{ key, ttl }`. `extendTTL()` adds time to the current expiry; `persist()` removes expiry, but a memory value still disappears on reload. Run `cleanupExpired(options)` when you need to remove expired records immediately instead of waiting for a read or scheduled cleanup.
 
-```typescript
-// Manual cleanup
-async function cleanupExpired() {
-  const removed = await storage.cleanupExpired();
-  console.log(`Removed ${removed} expired items`);
-}
-
-// Scheduled cleanup
-setInterval(cleanupExpired, 300000); // Every 5 minutes
-
-// Get items expiring soon
-const expiringSoon = await storage.getExpiring(600000); // Within 10 minutes
-for (const item of expiringSoon) {
-  console.log(`${item.key} expires in ${item.ttl}ms`);
-}
-```
-
-## Common TTL Patterns
-
-```typescript
-const TTL = {
-  MINUTE: 60 * 1000,
-  HOUR: 60 * 60 * 1000,
-  DAY: 24 * 60 * 60 * 1000,
-  WEEK: 7 * 24 * 60 * 60 * 1000
-};
-
-// Different TTLs for different data types
-await storage.set('user-preferences', prefs, {
-  ttl: TTL.WEEK // Rarely changes
-});
-
-await storage.set('api-token', token, {
-  ttl: TTL.HOUR // Security
-});
-
-await storage.set('live-feed', feed, {
-  ttl: TTL.MINUTE // Fresh data
-});
-```
-
-## See Also
-
-- [TTL Guide](../guides/features/ttl.md)
-- [Cache Management](./cache-management.md)
-- [Offline Support](./offline-support.md)
+See the [TTL guide](../guides/features/ttl.md) for configuration and adapter behavior.

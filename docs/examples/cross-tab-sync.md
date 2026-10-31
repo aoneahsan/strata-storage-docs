@@ -1,215 +1,60 @@
-# Cross-Tab Sync Examples
+# Cross-tab change examples
 
-Examples of synchronizing storage across browser tabs and windows.
+Strata can notify another browser tab about a change to a supported shared adapter. A notification helps a view refresh; it does not make two concurrent writes atomic or synchronize an authenticated session.
 
-## Basic Sync Setup
+## Keep a theme view current
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata({
-  sync: {
-    enabled: true
-  }
+const storage = defineStorage({
+  sync: { enabled: true, storages: ['localStorage'] },
 });
 
-// Changes are automatically synced to all tabs
-await storage.set('shared-data', { count: 1 });
-```
-
-## Listening for Changes
-
-```typescript
-// Subscribe to all changes
-storage.subscribe((change) => {
-  console.log('Storage changed:', {
-    key: change.key,
-    newValue: change.newValue,
-    oldValue: change.oldValue,
-    source: change.source // 'local' or 'remote'
+async function applySavedTheme(): Promise<void> {
+  const theme = await storage.get<'light' | 'dark'>('theme', {
+    storage: 'localStorage',
   });
-  
-  if (change.source === 'remote') {
-    console.log('Another tab made this change');
-    updateUI(change);
+  document.documentElement.dataset.theme = theme ?? 'light';
+}
+
+const unsubscribe = storage.subscribe(change => {
+  if (change.key === 'theme' && change.source === 'remote') {
+    void applySavedTheme();
   }
 });
 
-// Subscribe to specific key
-storage.subscribe((change) => {
-  if (change.key === 'user-status') {
-    updateUserStatus(change.newValue);
-  }
-});
+await applySavedTheme();
+await storage.set('theme', 'dark', { storage: 'localStorage' });
+// Call unsubscribe() when this view is removed.
 ```
 
-## Auth Sync Example
+A tab receiving a remote event rereads the value; the event itself is not a durable record. Test two real tabs and a reload in your target browser.
+
+## Authentication boundary
+
+Keep credentials and session validity under your server or identity provider. Do not place an auth token in `localStorage` or broadcast it through Strata. For an existing server-owned session, you may publish a non-secret hint and recheck the server in other tabs:
 
 ```typescript
-class AuthSync {
-  constructor() {
-    this.storage = new Strata({ sync: { enabled: true } });
-    this.setupSync();
-  }
-  
-  setupSync() {
-    this.storage.subscribe((change) => {
-      if (change.source === 'remote') {
-        switch (change.key) {
-          case 'auth-token':
-            if (change.newValue) {
-              this.handleLogin(change.newValue);
-            } else {
-              this.handleLogout();
-            }
-            break;
-          
-          case 'user-profile':
-            this.updateUserProfile(change.newValue);
-            break;
-        }
-      }
-    });
-  }
-  
-  async login(token: string, profile: any) {
-    await this.storage.set('auth-token', token);
-    await this.storage.set('user-profile', profile);
-    // All tabs are now logged in
-  }
-  
-  async logout() {
-    await this.storage.remove('auth-token');
-    await this.storage.remove('user-profile');
-    // All tabs are now logged out
-  }
-}
-```
-
-## Shopping Cart Sync
-
-```typescript
-class CartSync {
-  private storage: Strata;
-  private listeners: Set<(cart: Cart) => void> = new Set();
-  
-  constructor() {
-    this.storage = new Strata({ sync: { enabled: true } });
-    this.initSync();
-  }
-  
-  private initSync() {
-    this.storage.subscribe((change) => {
-      if (change.key === 'shopping-cart' && change.source === 'remote') {
-        this.notifyListeners(change.newValue);
-      }
-    });
-  }
-  
-  async addItem(item: CartItem) {
-    const cart = await this.getCart();
-    cart.items.push(item);
-    cart.total += item.price * item.quantity;
-    cart.updatedAt = Date.now();
-    
-    await this.storage.set('shopping-cart', cart);
-    // All tabs see the new item
-  }
-  
-  onCartChange(callback: (cart: Cart) => void) {
-    this.listeners.add(callback);
-    return () => this.listeners.delete(callback);
-  }
-  
-  private notifyListeners(cart: Cart) {
-    this.listeners.forEach(callback => callback(cart));
-  }
-}
-```
-
-## Live Collaboration
-
-```typescript
-class CollaborativeEditor {
-  private storage: Strata;
-  private documentId: string;
-  
-  constructor(documentId: string) {
-    this.documentId = documentId;
-    this.storage = new Strata({
-      sync: {
-        enabled: true
-      }
-    });
-  }
-  
-  async updateContent(content: string, cursorPosition: number) {
-    await this.storage.set(`doc:${this.documentId}`, {
-      content,
-      lastEditBy: this.userId,
-      lastEditAt: Date.now(),
-      cursors: {
-        [this.userId]: cursorPosition
-      }
-    });
-  }
-  
-  onDocumentChange(callback: (doc: Document) => void) {
-    return this.storage.subscribe((change) => {
-      if (change.key === `doc:${this.documentId}` && 
-          change.source === 'remote') {
-        callback(change.newValue);
-      }
-    });
-  }
-}
-```
-
-## Notification Broadcasting
-
-```typescript
-class NotificationBroadcast {
-  async showNotification(notification: Notification) {
-    // Store notification with short TTL
-    await storage.set('notification', notification, {
-      ttl: 5000 // Auto-cleanup after 5 seconds
-    });
-  }
-  
-  listenForNotifications() {
-    storage.subscribe((change) => {
-      if (change.key === 'notification' && 
-          change.source === 'remote' && 
-          change.newValue) {
-        this.displayNotification(change.newValue);
-      }
-    });
-  }
-}
-```
-
-## Selective Sync
-
-```typescript
-const storage = new Strata({
-  sync: {
-    enabled: true,
-    storages: ['localStorage'] // Only sync localStorage
+const stopSessionHints = storage.subscribe(change => {
+  if (change.key === 'session-check' && change.source === 'remote') {
+    void refreshSessionFromServer();
   }
 });
 
-// This will sync across tabs
-await storage.set('shared', 'data', { storage: 'localStorage' });
-
-// This won't sync (memory storage)
-await storage.set('local', 'data', { storage: 'memory' });
-
-// Disable sync for specific operation
-await storage.set('private', 'data', { syncEnabled: false });
+await storage.set('session-check', Date.now(), {
+  storage: 'localStorage',
+});
+// Call stopSessionHints() when this view is removed.
 ```
 
-## See Also
+The hint does not log a tab in or out. Only the server's response determines session state.
 
-- [Sync Guide](../guides/features/sync.md)
-- [Data Sync](./data-sync.md)
-- [Offline Support](./offline-support.md)
+## Limits
+
+- Memory is local to one page or process, so it is not a cross-tab transport.
+- A subscription must be cleaned up when its owner is removed.
+- Multiple tabs changing one value can still race. Use a server-side operation or another coordinated protocol when order and uniqueness matter.
+- `StorageOptions` has no per-call `syncEnabled` switch. Configure sync on the instance and choose adapters deliberately.
+
+See the [sync reference](../api/features/sync.md) for the configuration surface.

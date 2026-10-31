@@ -8,10 +8,9 @@ Complete API documentation for Strata Storage.
 The main class for interacting with storage. Provides methods for all storage operations.
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 
-const storage = new Strata(config);
-await storage.initialize();
+const storage = defineStorage(config);
 ```
 
 ### [Type Definitions](./core/types.md)
@@ -107,9 +106,8 @@ await migrator.migrate(adapter, 1);
 ### Basic Operations
 
 ```typescript
-// Initialize
-const storage = new Strata();
-await storage.initialize();
+// Register standard web adapters; operations initialize lazily.
+const storage = defineStorage();
 
 // Set data
 await storage.set(key, value, options?);

@@ -10,10 +10,10 @@ zero-runtime-dependency guarantee.
 
 ```bash
 # the package itself
-npm install strata-storage
+yarn add strata-storage
 
 # Firebase is an OPTIONAL peer dependency — install it only if you use this feature
-npm install firebase
+yarn add firebase
 ```
 
 Import the Firebase helpers from the dedicated entry point:
@@ -25,11 +25,10 @@ import { enableFirebaseSync, isFirebaseAvailable } from 'strata-storage/firebase
 ## Quick start (Firestore)
 
 ```typescript
-import { Strata } from 'strata-storage';
+import { defineStorage } from 'strata-storage';
 import { enableFirebaseSync } from 'strata-storage/firebase';
 
-const storage = new Strata();
-await storage.initialize();
+const storage = defineStorage();
 
 await enableFirebaseSync(storage, {
   apiKey: 'YOUR_API_KEY',

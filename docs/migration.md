@@ -1,171 +1,54 @@
 ---
+title: Strata Storage migration guide
 sidebar_position: 9
-description: Migrate to Strata Storage's provider-less architecture and between major versions.
+description: Move to the current web factory and opt-in Capacitor adapter registration.
+tags: [migration, capacitor, web]
 ---
 
 # Strata Storage Migration Guide
 
-## Migrating to Provider-less Architecture (v2.0+)
+The main package exports the `Strata` class, but `new Strata()` starts with **no registered adapters**. Use `defineStorage()` for the standard web set, or register adapters explicitly before calling storage methods. Native adapters live in the `strata-storage/capacitor` entry point.
 
-Strata Storage now follows a provider-less architecture similar to Zustand, where the core library works everywhere by default, and platform-specific features (like Capacitor) are opt-in.
+## Web Setup
 
-### Breaking Changes
-
-1. **Capacitor adapters are no longer automatically registered**
-   - Previously: Capacitor adapters were automatically loaded when Capacitor was detected
-   - Now: You must explicitly import and register Capacitor adapters
-
-2. **Import paths have changed for Capacitor features**
-   - Previously: All exports were available from the main entry point
-   - Now: Capacitor-specific exports are in `strata-storage/capacitor`
-
-### Migration Steps
-
-#### 1. Update imports for Capacitor adapters
-
-**Before:**
 ```typescript
-import { 
-  Strata, 
-  PreferencesAdapter, 
-  SqliteAdapter,
-  SecureAdapter,
-  FilesystemAdapter 
-} from 'strata-storage';
+import { defineStorage } from 'strata-storage';
+
+const storage = defineStorage({
+  defaultStorages: ['indexedDB', 'localStorage', 'memory'],
+});
+
+await storage.set('draft', { title: 'First draft' });
+const draft = await storage.get<{ title: string }>('draft');
 ```
 
-**After:**
+The factory registers the web adapters and initializes lazily on the first operation. Calling `initialize()` yourself is optional. A manual `new Strata()` setup must call `registerWebAdapters(storage)` or `storage.registerAdapter(...)` before use.
+
+## Capacitor Setup
+
 ```typescript
-// Core imports from main entry
-import { Strata } from 'strata-storage';
-
-// Capacitor imports from subpath
-import { 
-  PreferencesAdapter, 
-  SqliteAdapter,
-  SecureAdapter,
-  FilesystemAdapter,
-  registerCapacitorAdapters
-} from 'strata-storage/capacitor';
-```
-
-#### 2. Explicitly register Capacitor adapters
-
-**Before:**
-```typescript
-// Capacitor adapters were automatically registered
-const storage = new Strata();
-await storage.initialize();
-
-// Could immediately use Capacitor storages
-await storage.set('key', 'value', { storage: 'preferences' });
-```
-
-**After:**
-```typescript
-import { Strata } from 'strata-storage';
+import { Capacitor } from '@capacitor/core';
+import { defineStorage } from 'strata-storage';
 import { registerCapacitorAdapters } from 'strata-storage/capacitor';
 
-const storage = new Strata();
-
-// Explicitly register Capacitor adapters if needed
-if (window.Capacitor) {
-  await registerCapacitorAdapters(storage);
-}
-
-await storage.initialize();
-
-// Now you can use Capacitor storages
-await storage.set('key', 'value', { storage: 'preferences' });
-```
-
-#### 3. Update default storage configuration
-
-**Before:**
-```typescript
-// On Capacitor, defaults included native storages automatically
-const storage = new Strata(); // defaulted to ['preferences', 'sqlite', 'indexedDB', 'localStorage', 'memory']
-```
-
-**After:**
-```typescript
-// Defaults are now web-only
-const storage = new Strata(); // defaults to ['indexedDB', 'localStorage', 'memory']
-
-// To include Capacitor storages in defaults:
-const storage = new Strata({
-  defaultStorages: ['preferences', 'sqlite', 'indexedDB', 'localStorage', 'memory']
+const storage = defineStorage({
+  defaultStorages: Capacitor.isNativePlatform()
+    ? ['sqlite', 'preferences', 'memory']
+    : ['indexedDB', 'localStorage', 'memory'],
 });
 await registerCapacitorAdapters(storage);
-await storage.initialize();
+
+await storage.set('draft', { title: 'First draft' });
 ```
 
-### Usage Examples
+`registerCapacitorAdapters()` registers Preferences, SQLite, Secure and Filesystem on a native Capacitor platform, then refreshes the instance. It does nothing to native registration in a browser. Import it from the Capacitor subpath, not the package root.
 
-#### Web-only project (no Capacitor)
-```typescript
-import { Strata } from 'strata-storage';
+## Existing Keys
 
-const storage = new Strata();
-await storage.initialize();
+The web `localStorage` and `sessionStorage` adapters now write with the `strata:` physical key prefix. The library can adopt its own older unprefixed storage envelopes on read. If an external script reads a physical key directly before Strata loads, configure `keyPrefix: false` and test that reader before upgrading; [configuration](./configuration.md#key-ownership) explains the ownership check.
 
-// Works with web storages out of the box
-await storage.set('key', 'value'); // Uses indexedDB by default
-```
+## Verify the Migration
 
-#### Capacitor project (opt-in native features)
-```typescript
-import { Strata } from 'strata-storage';
-import { registerCapacitorAdapters } from 'strata-storage/capacitor';
-
-const storage = new Strata({
-  defaultStorages: ['preferences', 'indexedDB', 'localStorage', 'memory']
-});
-
-// Register Capacitor adapters
-await registerCapacitorAdapters(storage);
-await storage.initialize();
-
-// Now you can use native storages
-await storage.set('secure-key', 'secret', { storage: 'secure' });
-await storage.set('pref-key', 'value', { storage: 'preferences' });
-```
-
-#### Using the convenience function
-```typescript
-import { createCapacitorStrata } from 'strata-storage/capacitor';
-
-// This automatically registers Capacitor adapters
-const storage = await createCapacitorStrata({
-  defaultStorages: ['preferences', 'sqlite', 'localStorage']
-});
-
-// Ready to use with Capacitor adapters
-await storage.set('key', 'value', { storage: 'sqlite' });
-```
-
-### Benefits of the New Architecture
-
-1. **Smaller bundle size**: Web-only projects don't include Capacitor-specific code
-2. **Better tree-shaking**: Unused adapters can be eliminated by bundlers
-3. **Clearer dependencies**: Explicit imports make it clear what features are being used
-4. **Platform flexibility**: Easy to add support for other platforms without affecting core
-5. **Progressive enhancement**: Start with web, add native features as needed
-
-### Troubleshooting
-
-**Issue: "Adapter not available" errors after upgrading**
-- Make sure you've called `registerCapacitorAdapters()` before using Capacitor storages
-
-**Issue: TypeScript errors on Capacitor imports**
-- Update your imports to use `strata-storage/capacitor` for Capacitor-specific features
-
-**Issue: Build errors with new import paths**
-- Ensure your bundler supports package.json `exports` field (most modern bundlers do)
-- Update your TypeScript to version 4.7+ for full exports support
-
-### Need Help?
-
-- Check the [examples](./examples/README.md) section for updated usage patterns
-- [Contact us](https://stratastorage.aoneahsan.com/contact) to report an issue
-- Review the [Introduction](./intro.md) for comprehensive documentation
+1. Build with the current package exports and inspect every custom `new Strata()` instance for registration.
+2. Read a known pre-upgrade key, write a new value, reload and read it back.
+3. On iOS and Android, sync the native project and run the [device verification guide](./guides/platforms/device-verification.md). Browser tests cannot prove native persistence.
