@@ -1,6 +1,6 @@
 {
   "name": "strata-storage-docs",
-  "version": "2.8.2",
+  "version": "2.8.3",
   "private": true,
   "description": "Documentation site for Strata Storage (Docusaurus 3).",
   "scripts": {
@@ -25,7 +25,8 @@
     "clsx": "^2.1.1",
     "prism-react-renderer": "^2.4.1",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "strata-storage": "3.1.4"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.10.2",

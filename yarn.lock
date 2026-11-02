@@ -12516,9 +12516,39 @@ __metadata:
     prism-react-renderer: "npm:^2.4.1"
     react: "npm:^19.3.1"
     react-dom: "npm:^19.3.1"
+    strata-storage: "npm:3.1.4"
     typescript: "npm:~6.0.3"
   languageName: unknown
   linkType: soft
+
+"strata-storage@npm:3.1.4":
+  version: 3.1.4
+  resolution: "strata-storage@npm:3.1.4"
+  peerDependencies:
+    "@angular/core": ">=21.0.6"
+    "@angular/forms": ">=21.0.6"
+    "@capacitor/core": ">=8.0.0"
+    firebase: ">=10.0.0"
+    react: ">=19.2.3"
+    vue: ">=3.5.26"
+  peerDependenciesMeta:
+    "@angular/core":
+      optional: true
+    "@angular/forms":
+      optional: true
+    "@capacitor/core":
+      optional: true
+    firebase:
+      optional: true
+    react:
+      optional: true
+    vue:
+      optional: true
+  bin:
+    strata-storage: bin/cli.js
+  checksum: 10c0/22b18c77a57c26e1fe4afd5141a27e47a1ddcab98f7c51985e69967416b50392a32eeb04d2cf93bdbad19db4620c874072a183365b444fd9d84a3edfae66728e
+  languageName: node
+  linkType: hard
 
 "string-width@npm:^4.1.0, string-width@npm:^4.2.0":
   version: 4.2.3

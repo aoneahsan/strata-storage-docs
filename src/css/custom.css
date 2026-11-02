@@ -39,3 +39,9 @@
 article a {
   text-underline-offset: 0.2em;
 }
+.docs-release-notice { position: fixed; z-index: 80; inset-inline: 1rem; bottom: 1rem; max-width: 42rem; }
+.docs-release-gate { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 1rem; background: rgb(16 24 37 / 78%); }
+.docs-release-panel { width: 100%; max-width: 42rem; max-height: calc(100dvh - 2rem); overflow-y: auto; padding: clamp(1rem, 4vw, 2rem); border: 2px solid var(--ifm-color-primary); background: var(--ifm-background-color); color: var(--ifm-font-color-base); box-shadow: 0 1rem 3rem rgb(0 0 0 / 25%); }
+.docs-release-panel h2 { margin: .5rem 0; font-size: clamp(1.5rem, 5vw, 2.5rem); }
+.docs-release-panel p { overflow-wrap: anywhere; }
+.docs-release-panel button { min-height: 2.75rem; margin-top: .5rem; padding: .6rem 1rem; border: 0; border-radius: var(--ifm-button-border-radius); background: var(--ifm-color-primary); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }

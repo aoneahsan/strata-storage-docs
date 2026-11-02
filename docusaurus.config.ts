@@ -1,8 +1,10 @@
 import { themes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import { readFileSync } from 'node:fs';
 import llmsFull from './plugins/llms-full';
 import sitePages, { withLastmod } from './plugins/site-pages';
+import releaseWorker from './plugins/release-worker';
 
 /** The docs site's own address. `static/CNAME` holds the same host for GitHub Pages. */
 const SITE_URL = 'https://stratastorage-docs.aoneahsan.com';
@@ -12,6 +14,9 @@ const NPM_URL = 'https://www.npmjs.com/package/strata-storage';
 
 /** The release notes' route: the blog plugin's `routeBasePath` below, with its leading slash. */
 const BLOG_PATH = '/blog';
+const DOCS_VERSION = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version as string;
+const RELEASE_CHANNEL = process.env.DOCS_RELEASE_CHANNEL === 'test' ? 'docs_test' : 'docs';
+const RELEASE_ENDPOINT = 'https://ttehmrpntwcligdzehue.supabase.co/functions/v1/release-check';
 
 /** Internal docs files that must never ship: excluded from the docs plugin and from `/llms-full.txt` alike. */
 const INTERNAL_FILES = ['MANUAL-TASKS.md', 'PACKAGES.md', 'REPORTED-ISSUES.md', 'RESOLVED-ISSUES.md'];
@@ -31,6 +36,7 @@ const config: Config = {
 
   url: SITE_URL,
   baseUrl: '/',
+  customFields: { docsVersion: DOCS_VERSION, releaseChannel: RELEASE_CHANNEL, releaseEndpoint: RELEASE_ENDPOINT },
 
   organizationName: 'aoneahsan',
   projectName: 'strata-storage-docs',
@@ -123,7 +129,7 @@ const config: Config = {
   ],
 
   // `/sitemap` and `/feed` for people, `/feed.xml` beside `/sitemap.xml` for machines, `/llms-full.txt` for LLMs.
-  plugins: [sitePages({ blogPath: BLOG_PATH }), llmsFull({ skipFiles: INTERNAL_FILES })],
+  plugins: [sitePages({ blogPath: BLOG_PATH }), llmsFull({ skipFiles: INTERNAL_FILES }), releaseWorker({ version: DOCS_VERSION })],
 
   themes: [
     [
