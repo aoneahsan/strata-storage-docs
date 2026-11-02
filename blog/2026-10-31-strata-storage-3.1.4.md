@@ -2,7 +2,7 @@
 slug: strata-storage-3-1-4
 title: Strata Storage 3.1.4
 description: "The optional Firebase adapter names are now in StorageType; runtime behaviour is unchanged."
-date: 2026-10-31
+date: 2026-10-31T23:42:51+05:00
 tags: [release]
 ---
 
