@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import llmsFull from './plugins/llms-full';
 import sitePages, { withLastmod } from './plugins/site-pages';
 import releaseWorker from './plugins/release-worker';
+import compareLinkPolicy from './plugins/compare-link-policy';
 
 /** The docs site's own address. `static/CNAME` holds the same host for GitHub Pages. */
 const SITE_URL = 'https://stratastorage-docs.aoneahsan.com';
@@ -78,6 +79,7 @@ const config: Config = {
           showLastUpdateTime: true,
           // The site speaks as the Strata Storage team, so no person's name is shown on a page.
           showLastUpdateAuthor: false,
+          rehypePlugins: [compareLinkPolicy],
           // `exclude` REPLACES the plugin defaults, so the defaults are restated here.
           exclude: [
             '**/_*.{js,jsx,ts,tsx,md,mdx}',
