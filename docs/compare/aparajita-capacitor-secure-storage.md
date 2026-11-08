@@ -9,9 +9,9 @@ last_update:
 
 # Moving from @aparajita/capacitor-secure-storage
 
-Stay if you use iCloud Keychain sync or per-item keychain access. Strata's `secure` adapter offers neither, and copying wouldn't bring them along. Move when you don't need those, and the secure store is one of several your app writes to.
+Stay if you use iCloud Keychain sync or per-item keychain access. Strata's `secure` adapter offers neither, and copying wouldn't bring them along. Without those needs, moving makes sense when the secure store is one of several your app writes to.
 
-## The calls
+## Secure calls, with the store named
 
 | @aparajita/capacitor-secure-storage | Strata Storage |
 |---|---|
@@ -52,9 +52,9 @@ The plugin's README says not to use it on the web in production. On Strata the `
 
 Check the moved values on [each device](../guides/platforms/device-verification.md) before you clear the old entries in a later release.
 
-## @aparajita/capacitor-secure-storage as we checked it
+## What the README and npm entry say
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check @aparajita/capacitor-secure-storage yourself](https://github.com/aparajita/capacitor-secure-storage), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/aparajita-capacitor-secure-storage).
+Checked 7 Nov 2026 against the plugin's README and its npm entry. Where a row says "Not stated on the pages we checked", those pages didn't mention it either way. [Check @aparajita/capacitor-secure-storage yourself](https://github.com/aparajita/capacitor-secure-storage), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/aparajita-capacitor-secure-storage).
 
 | Store or capability | @aparajita/capacitor-secure-storage | Strata Storage |
 |---|---|---|

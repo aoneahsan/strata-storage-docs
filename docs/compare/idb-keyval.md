@@ -9,9 +9,9 @@ last_update:
 
 # Moving from idb-keyval
 
-idb-keyval is a fraction of Strata Storage's size (the figures are below). If IndexedDB key-value is all you need, keep it. Move when expiry, encryption or cross-tab sync would otherwise be code you write around it, or when the same values have to reach a native store.
+idb-keyval is a fraction of Strata Storage's size (the figures are below). If IndexedDB key-value is all you need, keep it. The case for moving is expiry, encryption or cross-tab sync you'd otherwise write around it yourself, or values that also have to reach a native store.
 
-## The calls
+## Same verbs, one extra option
 
 | idb-keyval | Strata Storage |
 |---|---|
@@ -51,21 +51,13 @@ You're trading 805 bytes for a larger package; the table below has both measurem
 
 Delete the old database with idb-keyval's `clear()` in a later release, after you've read real keys back.
 
-## idb-keyval as we checked it
+## idb-keyval, as its README puts it
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check idb-keyval yourself](https://github.com/jakearchibald/idb-keyval), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/idb-keyval).
+Checked 7 Nov 2026. idb-keyval's README covers IndexedDB and its npm entry lists no dependencies. Nothing there mentions localStorage, sessionStorage, cookies, the URL, any native store, or one API across web and native, so those eight rows are left out. [Check idb-keyval yourself](https://github.com/jakearchibald/idb-keyval) to confirm; the [side-by-side page](https://stratastorage.aoneahsan.com/compare/idb-keyval) has both libraries in full.
 
 | Store or capability | idb-keyval | Strata Storage |
 |---|---|---|
-| localStorage | Not stated on the pages we checked | Yes |
 | IndexedDB | Yes ([source](https://github.com/jakearchibald/idb-keyval/blob/main/README.md), 7 Nov 2026) | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked | Yes |
 | No runtime dependencies | Yes ([source](https://registry.npmjs.org/idb-keyval/latest), 7 Nov 2026) | Yes |
 
 | Package fact | idb-keyval | Strata Storage |

@@ -11,7 +11,7 @@ last_update:
 
 Most apps using this plugin should keep it. It gives you SQL, joins, SQLCipher and an Electron target, and Strata's `sqlite` adapter gives you none of those: you can't write SQL against it. This guide is for the case where your database turned out to be one key-value table.
 
-## The calls
+## SQL statements and their key-value stand-ins
 
 | @capacitor-community/sqlite | Strata Storage |
 |---|---|
@@ -51,21 +51,12 @@ Strata writes to its own database, `strata_storage` unless you configure another
 
 Read a moved key on [each device](../guides/platforms/device-verification.md) before you remove the plugin.
 
-## @capacitor-community/sqlite as we checked it
+## The plugin's pages, briefly
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check @capacitor-community/sqlite yourself](https://github.com/capacitor-community/sqlite), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-community-sqlite).
+We checked the plugin's pages and npm entry on 7 Nov 2026. For the capabilities we compare, they state one thing: it depends on jeep-sqlite. The web stores, the URL, the Keychain, Android secure storage, native preferences and a shared web-and-native API aren't discussed, so the table shows only that row. Read them as unanswered, not as "no". [Check @capacitor-community/sqlite yourself](https://github.com/capacitor-community/sqlite), or open the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-community-sqlite).
 
 | Store or capability | @capacitor-community/sqlite | Strata Storage |
 |---|---|---|
-| localStorage | Not stated on the pages we checked | Yes |
-| IndexedDB | Not stated on the pages we checked | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked. The README configures an iosKeychainPrefix for the database passphrase, not a key-value Keychain store | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked | Yes |
 | No runtime dependencies | No. Depends on jeep-sqlite ([source](https://registry.npmjs.org/@capacitor-community/sqlite/latest), 7 Nov 2026) | Yes |
 
 | Package fact | @capacitor-community/sqlite | Strata Storage |

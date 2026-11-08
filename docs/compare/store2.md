@@ -9,9 +9,9 @@ last_update:
 
 # Moving from store2
 
-store2 is synchronous and so are Strata's `localStorage` and `sessionStorage` calls, so most of this is a rename. For a site that only touches those two areas, store2 is the smaller package and a move buys you nothing. Move when values also need IndexedDB, a cookie, the URL or a native store.
+store2 is synchronous and so are Strata's `localStorage` and `sessionStorage` calls, so most of this is a rename. For a site that only touches those two areas, store2 is the smaller package and a move buys you nothing. The move earns its keep only when values also need IndexedDB, a cookie, the URL or a native store.
 
-## The calls
+## The rename, call by call
 
 | store2 | Strata Storage |
 |---|---|
@@ -48,21 +48,14 @@ Your old keys stay in place until you remove them, and other code may own some o
 
 If you'd rather move one raw value and drop the original in the same step, `storage.importRawSync('theme', 'theme', { storage: 'localStorage' })` does that, but it keeps the raw string, so you'd call `JSON.parse` on what comes back.
 
-## store2 as we checked it
+## store2's own description
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check store2 yourself](https://github.com/nbubna/store), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/store2).
+From store2's README and npm entry, read 7 Nov 2026: localStorage, sessionStorage, and no runtime dependencies. They don't mention IndexedDB, cookies, the URL, native stores or one API across web and native, so those rows are hidden here. Not mentioned isn't the same as missing. [Check store2 yourself](https://github.com/nbubna/store), or open the [side-by-side page](https://stratastorage.aoneahsan.com/compare/store2).
 
 | Store or capability | store2 | Strata Storage |
 |---|---|---|
 | localStorage | Yes ([source](https://github.com/nbubna/store/blob/master/README.md), 7 Nov 2026) | Yes |
-| IndexedDB | Not stated on the pages we checked | Yes |
 | sessionStorage | Yes ([source](https://github.com/nbubna/store/blob/master/README.md), 7 Nov 2026) | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked | Yes |
 | No runtime dependencies | Yes ([source](https://registry.npmjs.org/store2/latest), 7 Nov 2026) | Yes |
 
 | Package fact | store2 | Strata Storage |

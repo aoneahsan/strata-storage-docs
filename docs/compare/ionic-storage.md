@@ -9,9 +9,9 @@ last_update:
 
 # Moving from @ionic/storage
 
-`@ionic/storage` sits on localForage and has the same key-value shape, so the calls map one to one. If you're on Ionic with its Angular module and plan to use Ionic Secure Storage, staying is reasonable. Move when you'd rather get encryption and native stores from one package without adding drivers.
+`@ionic/storage` sits on localForage and has the same key-value shape, so the calls map one to one. If you're on Ionic with its Angular module and plan to use Ionic Secure Storage, staying is reasonable. Strata makes more sense if you'd rather get encryption and native stores from one package, with no drivers to add.
 
-## The calls
+## One-to-one, apart from `create()`
 
 | @ionic/storage | Strata Storage |
 |---|---|
@@ -25,7 +25,7 @@ last_update:
 | `store.length()` | `(await storage.keys()).length` |
 | `defineDriver(CordovaSQLiteDriver)` | `registerCapacitorAdapters(storage)` |
 
-## Copy what's there
+## Copy the existing keys
 
 ```ts
 import { Storage } from '@ionic/storage';
@@ -50,20 +50,14 @@ If you configured a custom `name`, `storeName` or `driverOrder`, pass the same o
 
 On a native build, register the adapters and pick `sqlite`, `preferences` or `secure` per call ([Capacitor setup](../migration.md#capacitor-setup)). Encryption is part of the package and off by default: `{ encrypt: true }` on a `set()`, with a password in the instance's `encryption` config ([encryption guide](../guides/features/encryption.md)). It's a different format from Ionic Secure Storage, so anything encrypted there has to be read through that product first.
 
-## @ionic/storage as we checked it
+## Read from @ionic/storage's README
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check @ionic/storage yourself](https://github.com/ionic-team/ionic-storage), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/ionic-storage).
+As read on 7 Nov 2026. The README and npm entry cover localStorage, IndexedDB, the driver-based API and the localforage dependency. They don't mention sessionStorage, cookies, the URL, the Keychain, Android secure storage or native preferences, so those rows are left out. [Check @ionic/storage yourself](https://github.com/ionic-team/ionic-storage), or compare them on the [side-by-side page](https://stratastorage.aoneahsan.com/compare/ionic-storage).
 
 | Store or capability | @ionic/storage | Strata Storage |
 |---|---|---|
 | localStorage | Yes ([source](https://github.com/ionic-team/ionic-storage/blob/main/README.md), 7 Nov 2026) | Yes |
 | IndexedDB | Yes ([source](https://github.com/ionic-team/ionic-storage/blob/main/README.md), 7 Nov 2026) | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
 | Web and native stores behind one API | Partly. One API with a driver order; native SQLite needs a separately installed Cordova driver or Ionic Secure Storage ([source](https://github.com/ionic-team/ionic-storage/blob/main/README.md), 7 Nov 2026) | Yes |
 | No runtime dependencies | No. Depends on localforage ([source](https://registry.npmjs.org/@ionic/storage/latest), 7 Nov 2026) | Yes |
 

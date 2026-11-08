@@ -11,7 +11,7 @@ last_update:
 
 idb is IndexedDB with promises: object stores, indexes, cursors and transactions stay in your hands. Strata hides all of those, so if you use them on purpose, this is the wrong move. It fits when you only ever call `get` and `put`, and you don't want to think in IndexedDB terms or you need the value elsewhere too.
 
-## The calls
+## Store and key become one string
 
 | idb | Strata Storage |
 |---|---|
@@ -46,21 +46,13 @@ export async function moveDrafts(): Promise<void> {
 
 Calling `openDB` with no version opens the database as it stands and runs no upgrade. Strata's own database has a different name, so yours is left alone until you call `deleteDB` from idb, in a later release, after real keys have read back correctly.
 
-## idb as we checked it
+## What idb documents
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check idb yourself](https://github.com/jakearchibald/idb), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/idb).
+We read idb's README and npm entry on 7 Nov 2026. They describe IndexedDB, with no runtime dependencies, and stop there. Other web stores, the URL, the native stores and a shared web-and-native API don't come up, so those rows are gone from this table. [Check idb yourself](https://github.com/jakearchibald/idb), or compare on the [side-by-side page](https://stratastorage.aoneahsan.com/compare/idb).
 
 | Store or capability | idb | Strata Storage |
 |---|---|---|
-| localStorage | Not stated on the pages we checked | Yes |
 | IndexedDB | Yes ([source](https://github.com/jakearchibald/idb/blob/main/README.md), 7 Nov 2026) | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked | Yes |
 | No runtime dependencies | Yes ([source](https://registry.npmjs.org/idb/latest), 7 Nov 2026) | Yes |
 
 | Package fact | idb | Strata Storage |

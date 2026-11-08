@@ -11,7 +11,7 @@ last_update:
 
 Dexie.js is a database: versioned schemas, indexes, bulk writes, live queries. Strata Storage is a key-value layer. If your queries lean on indexes or your tables hold many thousands of rows, stay on Dexie: `storage.query()` reads and decodes every key in the store rather than using an index. This guide fits a smaller case, where Dexie ended up holding settings, drafts and caches and you also need native stores.
 
-## The calls
+## From table calls to keys
 
 | Dexie.js | Strata Storage |
 |---|---|
@@ -67,21 +67,13 @@ await storage.clear({ tags: ['drafts'] });
 
 Results aren't sorted by an index, so sort them yourself. Time a query against a realistic amount of your data before you delete the Dexie code.
 
-## Dexie.js as we checked it
+## Dexie.js, from its own pages
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check Dexie.js yourself](https://dexie.org), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/dexie).
+As of 7 Nov 2026, Dexie's README and npm entry confirm IndexedDB and no runtime dependencies. They don't mention localStorage, sessionStorage, cookies, the URL, the Keychain, Android secure storage, native preferences or a single API over web and native stores, so those rows aren't shown. A page staying quiet on something isn't the same as the library lacking it: [Check Dexie.js yourself](https://dexie.org), or open the [side-by-side page](https://stratastorage.aoneahsan.com/compare/dexie).
 
 | Store or capability | Dexie.js | Strata Storage |
 |---|---|---|
-| localStorage | Not stated on the pages we checked | Yes |
 | IndexedDB | Yes ([source](https://github.com/dexie/Dexie.js/blob/master/README.md), 7 Nov 2026) | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked. The README says it supports Capacitor for iOS and Android apps, meaning IndexedDB inside the webview; no native store is described | Yes |
 | No runtime dependencies | Yes ([source](https://registry.npmjs.org/dexie/latest), 7 Nov 2026) | Yes |
 
 | Package fact | Dexie.js | Strata Storage |

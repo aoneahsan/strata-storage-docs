@@ -11,7 +11,7 @@ last_update:
 
 Read this before you change anything: Strata's cookie adapter stores a JSON envelope under a `strata_` prefix, not your bare value. A server, or any other script reading `theme=dark`, won't find it. Cookies that anything else reads should stay on js-cookie. Move only the ones your client code alone reads.
 
-## The calls
+## Each js-cookie call, and its Strata form
 
 | js-cookie | Strata Storage |
 |---|---|
@@ -50,21 +50,13 @@ js-cookie doesn't report a cookie's expiry, so the copy has to choose one. Remov
 
 The adapter reports a 4 KB per-cookie limit, and the envelope takes some of it, so try your longest value. JavaScript can't write `HttpOnly` cookies with either library, and session secrets don't belong in these.
 
-## js-cookie as we checked it
+## js-cookie on paper
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check js-cookie yourself](https://github.com/js-cookie/js-cookie), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/js-cookie).
+Checked 7 Nov 2026. js-cookie's README is about cookies and nothing else, so it says nothing on localStorage, IndexedDB, sessionStorage, the URL, native stores or one API across web and native. We've dropped those rows rather than fill them with "not stated". [Check js-cookie yourself](https://github.com/js-cookie/js-cookie), or see the two side by side on the [side-by-side page](https://stratastorage.aoneahsan.com/compare/js-cookie).
 
 | Store or capability | js-cookie | Strata Storage |
 |---|---|---|
-| localStorage | Not stated on the pages we checked | Yes |
-| IndexedDB | Not stated on the pages we checked | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
 | Cookies | Yes ([source](https://github.com/js-cookie/js-cookie/blob/main/README.md), 7 Nov 2026) | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked | Yes |
 | No runtime dependencies | Yes ([source](https://registry.npmjs.org/js-cookie/latest), 7 Nov 2026) | Yes |
 
 | Package fact | js-cookie | Strata Storage |

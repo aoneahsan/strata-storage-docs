@@ -9,9 +9,9 @@ last_update:
 
 # Moving from localForage
 
-localForage and Strata Storage both give you async key-value calls over IndexedDB. If your app only ever runs in a browser and you're happy with localForage, there's no reason to move. Move when the same code also ships under Capacitor, or you want `sessionStorage`, cookies or the URL behind the same call.
+localForage and Strata Storage both give you async key-value calls over IndexedDB. If your app only ever runs in a browser and you're happy with localForage, there's no reason to move. It starts to pay off once the same code also ships under Capacitor, or you want `sessionStorage`, cookies or the URL behind the same call.
 
-## The calls
+## localForage calls, renamed
 
 | localForage | Strata Storage |
 |---|---|
@@ -51,20 +51,14 @@ Read a few real keys back through `storage.get()`. If you keep `Blob` values, re
 
 Adding native stores is a separate step: see [Capacitor setup](../migration.md#capacitor-setup) and check the read on a [device](../guides/platforms/device-verification.md).
 
-## localForage as we checked it
+## What localForage's pages say
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check localForage yourself](https://github.com/localForage/localForage), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/localforage).
+Read on 7 Nov 2026, from localForage's README and its npm entry. Neither says anything about sessionStorage, cookies, the URL, the iOS Keychain, Android secure storage or native preferences, so those rows are left out; Strata has an adapter for each. That silence isn't proof the library can't do them. [Check localForage yourself](https://github.com/localForage/localForage) to confirm, or compare on the [side-by-side page](https://stratastorage.aoneahsan.com/compare/localforage).
 
 | Store or capability | localForage | Strata Storage |
 |---|---|---|
 | localStorage | Yes ([source](https://github.com/localForage/localForage/blob/master/README.md), 7 Nov 2026) | Yes |
 | IndexedDB | Yes ([source](https://github.com/localForage/localForage/blob/master/README.md), 7 Nov 2026) | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
 | Web and native stores behind one API | No. The README says it is designed to run in the browser; no native store is described ([source](https://github.com/localForage/localForage/blob/master/README.md), 7 Nov 2026) | Yes |
 | No runtime dependencies | No. Depends on lie ([source](https://registry.npmjs.org/localforage/latest), 7 Nov 2026) | Yes |
 

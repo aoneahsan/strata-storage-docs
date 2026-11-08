@@ -9,9 +9,9 @@ last_update:
 
 # Moving from capacitor-secure-storage-plugin
 
-This plugin does one job: string secrets in the Keychain and in Keystore-backed preferences. If that's all your app stores, keep it. Move when the secure store sits beside others and you want one call shape for all of them.
+This plugin does one job: string secrets in the Keychain and in Keystore-backed preferences. If that's all your app stores, keep it. Switch when the secure store sits beside others and you want one call shape for all of them.
 
-## The calls
+## Unwrapping `{ value }`
 
 | capacitor-secure-storage-plugin | Strata Storage |
 |---|---|
@@ -50,9 +50,9 @@ Don't log these values while you test the copy. Run `npx cap sync` after install
 
 The `secure` adapter doesn't expose Keychain accessibility, a biometric requirement or an authentication prompt ([secure adapter](../api/adapters/capacitor/secure.md)). It's native only, too. A browser run won't exercise it, so check the read on [each device](../guides/platforms/device-verification.md), and only then remove the plugin's entries with `SecureStoragePlugin.clear()`, in a later release.
 
-## capacitor-secure-storage-plugin as we checked it
+## The plugin, per its README
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check capacitor-secure-storage-plugin yourself](https://github.com/martinkasa/capacitor-secure-storage-plugin), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-secure-storage-plugin).
+From the README and npm entry, 7 Nov 2026. Five rows read "Not stated on the pages we checked": the plugin's pages don't raise them, which tells you nothing about whether it could. [Check capacitor-secure-storage-plugin yourself](https://github.com/martinkasa/capacitor-secure-storage-plugin), or open the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-secure-storage-plugin).
 
 | Store or capability | capacitor-secure-storage-plugin | Strata Storage |
 |---|---|---|

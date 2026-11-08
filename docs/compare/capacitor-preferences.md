@@ -9,9 +9,9 @@ last_update:
 
 # Moving from @capacitor/preferences
 
-`@capacitor/preferences` holds string values in UserDefaults, SharedPreferences and, on the web, `localStorage`. For a handful of string settings it's the simplest choice, and the Capacitor team maintains it. Move when preferences are one store among several, or you're tired of `JSON.stringify` around every call.
+`@capacitor/preferences` holds string values in UserDefaults, SharedPreferences and, on the web, `localStorage`. For a handful of string settings it's the simplest choice, and the Capacitor team maintains it. It's worth switching once preferences become one store among several, or after one `JSON.stringify` too many.
 
-## The calls
+## Preferences calls without the `{ key }` wrapper
 
 | @capacitor/preferences | Strata Storage |
 |---|---|
@@ -57,19 +57,13 @@ Don't assume the old and new keys are the same entries, even though both end up 
 
 A browser run exercises `localStorage`, not the native path. Install a build holding old data, update to the new one, and read a moved key on both iOS and Android ([device verification](../guides/platforms/device-verification.md)). Remove the plugin in a later release.
 
-## @capacitor/preferences as we checked it
+## What the Capacitor docs say
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check @capacitor/preferences yourself](https://capacitorjs.com/docs/apis/preferences), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-preferences).
+Read on the Capacitor docs page and the npm registry, 7 Nov 2026. They don't cover IndexedDB, sessionStorage, cookies, the URL, the iOS Keychain or Android secure storage, so those rows are left out. [Check @capacitor/preferences yourself](https://capacitorjs.com/docs/apis/preferences) for yourself, or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-preferences).
 
 | Store or capability | @capacitor/preferences | Strata Storage |
 |---|---|---|
 | localStorage | Partly. Used as the fallback when running as a PWA, not chosen directly ([source](https://capacitorjs.com/docs/apis/preferences), 7 Nov 2026) | Yes |
-| IndexedDB | Not stated on the pages we checked | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
 | Native preferences (UserDefaults / SharedPreferences) | Yes ([source](https://capacitorjs.com/docs/apis/preferences), 7 Nov 2026) | Yes |
 | Web and native stores behind one API | Partly. One API over one store per platform, string values only; the page says it is not meant to be used as a local database ([source](https://capacitorjs.com/docs/apis/preferences), 7 Nov 2026) | Yes |
 | No runtime dependencies | Yes. @capacitor/core is a peer dependency ([source](https://registry.npmjs.org/@capacitor/preferences/latest), 7 Nov 2026) | Yes |

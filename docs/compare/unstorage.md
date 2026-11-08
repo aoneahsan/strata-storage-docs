@@ -9,9 +9,9 @@ last_update:
 
 # Moving from unstorage
 
-Stay on unstorage if the same code runs on servers or edge runtimes, or you mount Redis, S3 or Cloudflare KV. Strata has no server drivers and doesn't try to. Move when your storage is all on the device and you want the Keychain, Android encrypted preferences, SQLite, cookies or the URL.
+Stay on unstorage if the same code runs on servers or edge runtimes, or you mount Redis, S3 or Cloudflare KV. Strata has no server drivers and doesn't try to. Strata is for storage that lives entirely on the device, where you want the Keychain, Android encrypted preferences, SQLite, cookies or the URL.
 
-## The calls
+## Mostly the same names
 
 | unstorage | Strata Storage |
 |---|---|
@@ -28,7 +28,7 @@ Stay on unstorage if the same code runs on servers or edge runtimes, or you moun
 
 Instead of mounting a driver at a path, you name the adapter on the call, or set the order once with `defaultStorages`.
 
-## Copy what's there
+## Copying across drivers
 
 ```ts
 import { createStorage } from 'unstorage';
@@ -51,9 +51,9 @@ The prefix check stops the copy picking up Strata's own entries when both librar
 
 Set a `base` on the old driver if you used one, or you'll list keys outside your own area. Read real keys back before you remove them.
 
-## unstorage as we checked it
+## unstorage's drivers, as documented
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check unstorage yourself](https://unstorage.unjs.io), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/unstorage).
+We read the drivers list, the guide and the npm entry on 7 Nov 2026. Four rows aren't covered by those pages and say so; that's a gap in what's written, not a verdict. [Check unstorage yourself](https://unstorage.unjs.io), or see both on the [side-by-side page](https://stratastorage.aoneahsan.com/compare/unstorage).
 
 | Store or capability | unstorage | Strata Storage |
 |---|---|---|
