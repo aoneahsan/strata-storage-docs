@@ -5688,9 +5688,9 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/aparajita-capacitor-secure
 
 # Moving from @aparajita/capacitor-secure-storage
 
-Stay if you use iCloud Keychain sync or per-item keychain access. Strata's `secure` adapter offers neither, and copying wouldn't bring them along. Move when you don't need those, and the secure store is one of several your app writes to.
+Stay if you use iCloud Keychain sync or per-item keychain access. Strata's `secure` adapter offers neither, and copying wouldn't bring them along. Without those needs, moving makes sense when the secure store is one of several your app writes to.
 
-## The calls
+## Secure calls, with the store named
 
 | @aparajita/capacitor-secure-storage | Strata Storage |
 |---|---|
@@ -5731,9 +5731,9 @@ The plugin's README says not to use it on the web in production. On Strata the `
 
 Check the moved values on [each device](../guides/platforms/device-verification.md) before you clear the old entries in a later release.
 
-## @aparajita/capacitor-secure-storage as we checked it
+## What the README and npm entry say
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check @aparajita/capacitor-secure-storage yourself](https://github.com/aparajita/capacitor-secure-storage), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/aparajita-capacitor-secure-storage).
+Checked 7 Nov 2026 against the plugin's README and its npm entry. Where a row says "Not stated on the pages we checked", those pages didn't mention it either way. [Check @aparajita/capacitor-secure-storage yourself](https://github.com/aparajita/capacitor-secure-storage), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/aparajita-capacitor-secure-storage).
 
 | Store or capability | @aparajita/capacitor-secure-storage | Strata Storage |
 |---|---|---|
@@ -5765,7 +5765,7 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/capacitor-community-sqlite
 
 Most apps using this plugin should keep it. It gives you SQL, joins, SQLCipher and an Electron target, and Strata's `sqlite` adapter gives you none of those: you can't write SQL against it. This guide is for the case where your database turned out to be one key-value table.
 
-## The calls
+## SQL statements and their key-value stand-ins
 
 | @capacitor-community/sqlite | Strata Storage |
 |---|---|
@@ -5805,21 +5805,12 @@ Strata writes to its own database, `strata_storage` unless you configure another
 
 Read a moved key on [each device](../guides/platforms/device-verification.md) before you remove the plugin.
 
-## @capacitor-community/sqlite as we checked it
+## The plugin's pages, briefly
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check @capacitor-community/sqlite yourself](https://github.com/capacitor-community/sqlite), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-community-sqlite).
+We checked the plugin's pages and npm entry on 7 Nov 2026. For the capabilities we compare, they state one thing: it depends on jeep-sqlite. The web stores, the URL, the Keychain, Android secure storage, native preferences and a shared web-and-native API aren't discussed, so the table shows only that row. Read them as unanswered, not as "no". [Check @capacitor-community/sqlite yourself](https://github.com/capacitor-community/sqlite), or open the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-community-sqlite).
 
 | Store or capability | @capacitor-community/sqlite | Strata Storage |
 |---|---|---|
-| localStorage | Not stated on the pages we checked | Yes |
-| IndexedDB | Not stated on the pages we checked | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked. The README configures an iosKeychainPrefix for the database passphrase, not a key-value Keychain store | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked | Yes |
 | No runtime dependencies | No. Depends on jeep-sqlite ([source](https://registry.npmjs.org/@capacitor-community/sqlite/latest), 7 Nov 2026) | Yes |
 
 | Package fact | @capacitor-community/sqlite | Strata Storage |
@@ -5837,9 +5828,9 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/capacitor-preferences
 
 # Moving from @capacitor/preferences
 
-`@capacitor/preferences` holds string values in UserDefaults, SharedPreferences and, on the web, `localStorage`. For a handful of string settings it's the simplest choice, and the Capacitor team maintains it. Move when preferences are one store among several, or you're tired of `JSON.stringify` around every call.
+`@capacitor/preferences` holds string values in UserDefaults, SharedPreferences and, on the web, `localStorage`. For a handful of string settings it's the simplest choice, and the Capacitor team maintains it. It's worth switching once preferences become one store among several, or after one `JSON.stringify` too many.
 
-## The calls
+## Preferences calls without the `{ key }` wrapper
 
 | @capacitor/preferences | Strata Storage |
 |---|---|
@@ -5885,19 +5876,13 @@ Don't assume the old and new keys are the same entries, even though both end up 
 
 A browser run exercises `localStorage`, not the native path. Install a build holding old data, update to the new one, and read a moved key on both iOS and Android ([device verification](../guides/platforms/device-verification.md)). Remove the plugin in a later release.
 
-## @capacitor/preferences as we checked it
+## What the Capacitor docs say
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check @capacitor/preferences yourself](https://capacitorjs.com/docs/apis/preferences), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-preferences).
+Read on the Capacitor docs page and the npm registry, 7 Nov 2026. They don't cover IndexedDB, sessionStorage, cookies, the URL, the iOS Keychain or Android secure storage, so those rows are left out. [Check @capacitor/preferences yourself](https://capacitorjs.com/docs/apis/preferences) for yourself, or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-preferences).
 
 | Store or capability | @capacitor/preferences | Strata Storage |
 |---|---|---|
 | localStorage | Partly. Used as the fallback when running as a PWA, not chosen directly ([source](https://capacitorjs.com/docs/apis/preferences), 7 Nov 2026) | Yes |
-| IndexedDB | Not stated on the pages we checked | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
 | Native preferences (UserDefaults / SharedPreferences) | Yes ([source](https://capacitorjs.com/docs/apis/preferences), 7 Nov 2026) | Yes |
 | Web and native stores behind one API | Partly. One API over one store per platform, string values only; the page says it is not meant to be used as a local database ([source](https://capacitorjs.com/docs/apis/preferences), 7 Nov 2026) | Yes |
 | No runtime dependencies | Yes. @capacitor/core is a peer dependency ([source](https://registry.npmjs.org/@capacitor/preferences/latest), 7 Nov 2026) | Yes |
@@ -5917,9 +5902,9 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/capacitor-secure-storage-p
 
 # Moving from capacitor-secure-storage-plugin
 
-This plugin does one job: string secrets in the Keychain and in Keystore-backed preferences. If that's all your app stores, keep it. Move when the secure store sits beside others and you want one call shape for all of them.
+This plugin does one job: string secrets in the Keychain and in Keystore-backed preferences. If that's all your app stores, keep it. Switch when the secure store sits beside others and you want one call shape for all of them.
 
-## The calls
+## Unwrapping `{ value }`
 
 | capacitor-secure-storage-plugin | Strata Storage |
 |---|---|
@@ -5958,9 +5943,9 @@ Don't log these values while you test the copy. Run `npx cap sync` after install
 
 The `secure` adapter doesn't expose Keychain accessibility, a biometric requirement or an authentication prompt ([secure adapter](../api/adapters/capacitor/secure.md)). It's native only, too. A browser run won't exercise it, so check the read on [each device](../guides/platforms/device-verification.md), and only then remove the plugin's entries with `SecureStoragePlugin.clear()`, in a later release.
 
-## capacitor-secure-storage-plugin as we checked it
+## The plugin, per its README
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check capacitor-secure-storage-plugin yourself](https://github.com/martinkasa/capacitor-secure-storage-plugin), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-secure-storage-plugin).
+From the README and npm entry, 7 Nov 2026. Five rows read "Not stated on the pages we checked": the plugin's pages don't raise them, which tells you nothing about whether it could. [Check capacitor-secure-storage-plugin yourself](https://github.com/martinkasa/capacitor-secure-storage-plugin), or open the [side-by-side page](https://stratastorage.aoneahsan.com/compare/capacitor-secure-storage-plugin).
 
 | Store or capability | capacitor-secure-storage-plugin | Strata Storage |
 |---|---|---|
@@ -5992,7 +5977,7 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/dexie
 
 Dexie.js is a database: versioned schemas, indexes, bulk writes, live queries. Strata Storage is a key-value layer. If your queries lean on indexes or your tables hold many thousands of rows, stay on Dexie: `storage.query()` reads and decodes every key in the store rather than using an index. This guide fits a smaller case, where Dexie ended up holding settings, drafts and caches and you also need native stores.
 
-## The calls
+## From table calls to keys
 
 | Dexie.js | Strata Storage |
 |---|---|
@@ -6048,21 +6033,13 @@ await storage.clear({ tags: ['drafts'] });
 
 Results aren't sorted by an index, so sort them yourself. Time a query against a realistic amount of your data before you delete the Dexie code.
 
-## Dexie.js as we checked it
+## Dexie.js, from its own pages
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check Dexie.js yourself](https://dexie.org), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/dexie).
+As of 7 Nov 2026, Dexie's README and npm entry confirm IndexedDB and no runtime dependencies. They don't mention localStorage, sessionStorage, cookies, the URL, the Keychain, Android secure storage, native preferences or a single API over web and native stores, so those rows aren't shown. A page staying quiet on something isn't the same as the library lacking it: [Check Dexie.js yourself](https://dexie.org), or open the [side-by-side page](https://stratastorage.aoneahsan.com/compare/dexie).
 
 | Store or capability | Dexie.js | Strata Storage |
 |---|---|---|
-| localStorage | Not stated on the pages we checked | Yes |
 | IndexedDB | Yes ([source](https://github.com/dexie/Dexie.js/blob/master/README.md), 7 Nov 2026) | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked. The README says it supports Capacitor for iOS and Android apps, meaning IndexedDB inside the webview; no native store is described | Yes |
 | No runtime dependencies | Yes ([source](https://registry.npmjs.org/dexie/latest), 7 Nov 2026) | Yes |
 
 | Package fact | Dexie.js | Strata Storage |
@@ -6080,9 +6057,9 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/idb-keyval
 
 # Moving from idb-keyval
 
-idb-keyval is a fraction of Strata Storage's size (the figures are below). If IndexedDB key-value is all you need, keep it. Move when expiry, encryption or cross-tab sync would otherwise be code you write around it, or when the same values have to reach a native store.
+idb-keyval is a fraction of Strata Storage's size (the figures are below). If IndexedDB key-value is all you need, keep it. The case for moving is expiry, encryption or cross-tab sync you'd otherwise write around it yourself, or values that also have to reach a native store.
 
-## The calls
+## Same verbs, one extra option
 
 | idb-keyval | Strata Storage |
 |---|---|
@@ -6122,21 +6099,13 @@ You're trading 805 bytes for a larger package; the table below has both measurem
 
 Delete the old database with idb-keyval's `clear()` in a later release, after you've read real keys back.
 
-## idb-keyval as we checked it
+## idb-keyval, as its README puts it
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check idb-keyval yourself](https://github.com/jakearchibald/idb-keyval), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/idb-keyval).
+Checked 7 Nov 2026. idb-keyval's README covers IndexedDB and its npm entry lists no dependencies. Nothing there mentions localStorage, sessionStorage, cookies, the URL, any native store, or one API across web and native, so those eight rows are left out. [Check idb-keyval yourself](https://github.com/jakearchibald/idb-keyval) to confirm; the [side-by-side page](https://stratastorage.aoneahsan.com/compare/idb-keyval) has both libraries in full.
 
 | Store or capability | idb-keyval | Strata Storage |
 |---|---|---|
-| localStorage | Not stated on the pages we checked | Yes |
 | IndexedDB | Yes ([source](https://github.com/jakearchibald/idb-keyval/blob/main/README.md), 7 Nov 2026) | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked | Yes |
 | No runtime dependencies | Yes ([source](https://registry.npmjs.org/idb-keyval/latest), 7 Nov 2026) | Yes |
 
 | Package fact | idb-keyval | Strata Storage |
@@ -6156,7 +6125,7 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/idb
 
 idb is IndexedDB with promises: object stores, indexes, cursors and transactions stay in your hands. Strata hides all of those, so if you use them on purpose, this is the wrong move. It fits when you only ever call `get` and `put`, and you don't want to think in IndexedDB terms or you need the value elsewhere too.
 
-## The calls
+## Store and key become one string
 
 | idb | Strata Storage |
 |---|---|
@@ -6191,21 +6160,13 @@ export async function moveDrafts(): Promise<void> {
 
 Calling `openDB` with no version opens the database as it stands and runs no upgrade. Strata's own database has a different name, so yours is left alone until you call `deleteDB` from idb, in a later release, after real keys have read back correctly.
 
-## idb as we checked it
+## What idb documents
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check idb yourself](https://github.com/jakearchibald/idb), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/idb).
+We read idb's README and npm entry on 7 Nov 2026. They describe IndexedDB, with no runtime dependencies, and stop there. Other web stores, the URL, the native stores and a shared web-and-native API don't come up, so those rows are gone from this table. [Check idb yourself](https://github.com/jakearchibald/idb), or compare on the [side-by-side page](https://stratastorage.aoneahsan.com/compare/idb).
 
 | Store or capability | idb | Strata Storage |
 |---|---|---|
-| localStorage | Not stated on the pages we checked | Yes |
 | IndexedDB | Yes ([source](https://github.com/jakearchibald/idb/blob/main/README.md), 7 Nov 2026) | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked | Yes |
 | No runtime dependencies | Yes ([source](https://registry.npmjs.org/idb/latest), 7 Nov 2026) | Yes |
 
 | Package fact | idb | Strata Storage |
@@ -6252,9 +6213,9 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/ionic-storage
 
 # Moving from @ionic/storage
 
-`@ionic/storage` sits on localForage and has the same key-value shape, so the calls map one to one. If you're on Ionic with its Angular module and plan to use Ionic Secure Storage, staying is reasonable. Move when you'd rather get encryption and native stores from one package without adding drivers.
+`@ionic/storage` sits on localForage and has the same key-value shape, so the calls map one to one. If you're on Ionic with its Angular module and plan to use Ionic Secure Storage, staying is reasonable. Strata makes more sense if you'd rather get encryption and native stores from one package, with no drivers to add.
 
-## The calls
+## One-to-one, apart from `create()`
 
 | @ionic/storage | Strata Storage |
 |---|---|
@@ -6268,7 +6229,7 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/ionic-storage
 | `store.length()` | `(await storage.keys()).length` |
 | `defineDriver(CordovaSQLiteDriver)` | `registerCapacitorAdapters(storage)` |
 
-## Copy what's there
+## Copy the existing keys
 
 ```ts
 import { Storage } from '@ionic/storage';
@@ -6293,20 +6254,14 @@ If you configured a custom `name`, `storeName` or `driverOrder`, pass the same o
 
 On a native build, register the adapters and pick `sqlite`, `preferences` or `secure` per call ([Capacitor setup](../migration.md#capacitor-setup)). Encryption is part of the package and off by default: `{ encrypt: true }` on a `set()`, with a password in the instance's `encryption` config ([encryption guide](../guides/features/encryption.md)). It's a different format from Ionic Secure Storage, so anything encrypted there has to be read through that product first.
 
-## @ionic/storage as we checked it
+## Read from @ionic/storage's README
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check @ionic/storage yourself](https://github.com/ionic-team/ionic-storage), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/ionic-storage).
+As read on 7 Nov 2026. The README and npm entry cover localStorage, IndexedDB, the driver-based API and the localforage dependency. They don't mention sessionStorage, cookies, the URL, the Keychain, Android secure storage or native preferences, so those rows are left out. [Check @ionic/storage yourself](https://github.com/ionic-team/ionic-storage), or compare them on the [side-by-side page](https://stratastorage.aoneahsan.com/compare/ionic-storage).
 
 | Store or capability | @ionic/storage | Strata Storage |
 |---|---|---|
 | localStorage | Yes ([source](https://github.com/ionic-team/ionic-storage/blob/main/README.md), 7 Nov 2026) | Yes |
 | IndexedDB | Yes ([source](https://github.com/ionic-team/ionic-storage/blob/main/README.md), 7 Nov 2026) | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
 | Web and native stores behind one API | Partly. One API with a driver order; native SQLite needs a separately installed Cordova driver or Ionic Secure Storage ([source](https://github.com/ionic-team/ionic-storage/blob/main/README.md), 7 Nov 2026) | Yes |
 | No runtime dependencies | No. Depends on localforage ([source](https://registry.npmjs.org/@ionic/storage/latest), 7 Nov 2026) | Yes |
 
@@ -6327,7 +6282,7 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/js-cookie
 
 Read this before you change anything: Strata's cookie adapter stores a JSON envelope under a `strata_` prefix, not your bare value. A server, or any other script reading `theme=dark`, won't find it. Cookies that anything else reads should stay on js-cookie. Move only the ones your client code alone reads.
 
-## The calls
+## Each js-cookie call, and its Strata form
 
 | js-cookie | Strata Storage |
 |---|---|
@@ -6366,21 +6321,13 @@ js-cookie doesn't report a cookie's expiry, so the copy has to choose one. Remov
 
 The adapter reports a 4 KB per-cookie limit, and the envelope takes some of it, so try your longest value. JavaScript can't write `HttpOnly` cookies with either library, and session secrets don't belong in these.
 
-## js-cookie as we checked it
+## js-cookie on paper
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check js-cookie yourself](https://github.com/js-cookie/js-cookie), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/js-cookie).
+Checked 7 Nov 2026. js-cookie's README is about cookies and nothing else, so it says nothing on localStorage, IndexedDB, sessionStorage, the URL, native stores or one API across web and native. We've dropped those rows rather than fill them with "not stated". [Check js-cookie yourself](https://github.com/js-cookie/js-cookie), or see the two side by side on the [side-by-side page](https://stratastorage.aoneahsan.com/compare/js-cookie).
 
 | Store or capability | js-cookie | Strata Storage |
 |---|---|---|
-| localStorage | Not stated on the pages we checked | Yes |
-| IndexedDB | Not stated on the pages we checked | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
 | Cookies | Yes ([source](https://github.com/js-cookie/js-cookie/blob/main/README.md), 7 Nov 2026) | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked | Yes |
 | No runtime dependencies | Yes ([source](https://registry.npmjs.org/js-cookie/latest), 7 Nov 2026) | Yes |
 
 | Package fact | js-cookie | Strata Storage |
@@ -6398,9 +6345,9 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/localforage
 
 # Moving from localForage
 
-localForage and Strata Storage both give you async key-value calls over IndexedDB. If your app only ever runs in a browser and you're happy with localForage, there's no reason to move. Move when the same code also ships under Capacitor, or you want `sessionStorage`, cookies or the URL behind the same call.
+localForage and Strata Storage both give you async key-value calls over IndexedDB. If your app only ever runs in a browser and you're happy with localForage, there's no reason to move. It starts to pay off once the same code also ships under Capacitor, or you want `sessionStorage`, cookies or the URL behind the same call.
 
-## The calls
+## localForage calls, renamed
 
 | localForage | Strata Storage |
 |---|---|
@@ -6440,20 +6387,14 @@ Read a few real keys back through `storage.get()`. If you keep `Blob` values, re
 
 Adding native stores is a separate step: see [Capacitor setup](../migration.md#capacitor-setup) and check the read on a [device](../guides/platforms/device-verification.md).
 
-## localForage as we checked it
+## What localForage's pages say
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check localForage yourself](https://github.com/localForage/localForage), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/localforage).
+Read on 7 Nov 2026, from localForage's README and its npm entry. Neither says anything about sessionStorage, cookies, the URL, the iOS Keychain, Android secure storage or native preferences, so those rows are left out; Strata has an adapter for each. That silence isn't proof the library can't do them. [Check localForage yourself](https://github.com/localForage/localForage) to confirm, or compare on the [side-by-side page](https://stratastorage.aoneahsan.com/compare/localforage).
 
 | Store or capability | localForage | Strata Storage |
 |---|---|---|
 | localStorage | Yes ([source](https://github.com/localForage/localForage/blob/master/README.md), 7 Nov 2026) | Yes |
 | IndexedDB | Yes ([source](https://github.com/localForage/localForage/blob/master/README.md), 7 Nov 2026) | Yes |
-| sessionStorage | Not stated on the pages we checked | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
 | Web and native stores behind one API | No. The README says it is designed to run in the browser; no native store is described ([source](https://github.com/localForage/localForage/blob/master/README.md), 7 Nov 2026) | Yes |
 | No runtime dependencies | No. Depends on lie ([source](https://registry.npmjs.org/localforage/latest), 7 Nov 2026) | Yes |
 
@@ -6472,9 +6413,9 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/store2
 
 # Moving from store2
 
-store2 is synchronous and so are Strata's `localStorage` and `sessionStorage` calls, so most of this is a rename. For a site that only touches those two areas, store2 is the smaller package and a move buys you nothing. Move when values also need IndexedDB, a cookie, the URL or a native store.
+store2 is synchronous and so are Strata's `localStorage` and `sessionStorage` calls, so most of this is a rename. For a site that only touches those two areas, store2 is the smaller package and a move buys you nothing. The move earns its keep only when values also need IndexedDB, a cookie, the URL or a native store.
 
-## The calls
+## The rename, call by call
 
 | store2 | Strata Storage |
 |---|---|
@@ -6511,21 +6452,14 @@ Your old keys stay in place until you remove them, and other code may own some o
 
 If you'd rather move one raw value and drop the original in the same step, `storage.importRawSync('theme', 'theme', { storage: 'localStorage' })` does that, but it keeps the raw string, so you'd call `JSON.parse` on what comes back.
 
-## store2 as we checked it
+## store2's own description
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check store2 yourself](https://github.com/nbubna/store), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/store2).
+From store2's README and npm entry, read 7 Nov 2026: localStorage, sessionStorage, and no runtime dependencies. They don't mention IndexedDB, cookies, the URL, native stores or one API across web and native, so those rows are hidden here. Not mentioned isn't the same as missing. [Check store2 yourself](https://github.com/nbubna/store), or open the [side-by-side page](https://stratastorage.aoneahsan.com/compare/store2).
 
 | Store or capability | store2 | Strata Storage |
 |---|---|---|
 | localStorage | Yes ([source](https://github.com/nbubna/store/blob/master/README.md), 7 Nov 2026) | Yes |
-| IndexedDB | Not stated on the pages we checked | Yes |
 | sessionStorage | Yes ([source](https://github.com/nbubna/store/blob/master/README.md), 7 Nov 2026) | Yes |
-| Cookies | Not stated on the pages we checked | Yes |
-| URL parameters as a store | Not stated on the pages we checked | Yes |
-| iOS Keychain | Not stated on the pages we checked | Yes |
-| Android secure storage (Keystore-backed) | Not stated on the pages we checked | Yes |
-| Native preferences (UserDefaults / SharedPreferences) | Not stated on the pages we checked | Yes |
-| Web and native stores behind one API | Not stated on the pages we checked | Yes |
 | No runtime dependencies | Yes ([source](https://registry.npmjs.org/store2/latest), 7 Nov 2026) | Yes |
 
 | Package fact | store2 | Strata Storage |
@@ -6543,9 +6477,9 @@ URL: https://stratastorage-docs.aoneahsan.com/compare/unstorage
 
 # Moving from unstorage
 
-Stay on unstorage if the same code runs on servers or edge runtimes, or you mount Redis, S3 or Cloudflare KV. Strata has no server drivers and doesn't try to. Move when your storage is all on the device and you want the Keychain, Android encrypted preferences, SQLite, cookies or the URL.
+Stay on unstorage if the same code runs on servers or edge runtimes, or you mount Redis, S3 or Cloudflare KV. Strata has no server drivers and doesn't try to. Strata is for storage that lives entirely on the device, where you want the Keychain, Android encrypted preferences, SQLite, cookies or the URL.
 
-## The calls
+## Mostly the same names
 
 | unstorage | Strata Storage |
 |---|---|
@@ -6562,7 +6496,7 @@ Stay on unstorage if the same code runs on servers or edge runtimes, or you moun
 
 Instead of mounting a driver at a path, you name the adapter on the call, or set the order once with `defaultStorages`.
 
-## Copy what's there
+## Copying across drivers
 
 ```ts
 import { createStorage } from 'unstorage';
@@ -6585,9 +6519,9 @@ The prefix check stops the copy picking up Strata's own entries when both librar
 
 Set a `base` on the old driver if you used one, or you'll list keys outside your own area. Read real keys back before you remove them.
 
-## unstorage as we checked it
+## unstorage's drivers, as documented
 
-Last checked 7 Nov 2026. "Not stated" means the pages we checked don't mention it, not that the library can't do it. [Check unstorage yourself](https://unstorage.unjs.io), or see the [side-by-side page](https://stratastorage.aoneahsan.com/compare/unstorage).
+We read the drivers list, the guide and the npm entry on 7 Nov 2026. Four rows aren't covered by those pages and say so; that's a gap in what's written, not a verdict. [Check unstorage yourself](https://unstorage.unjs.io), or see both on the [side-by-side page](https://stratastorage.aoneahsan.com/compare/unstorage).
 
 | Store or capability | unstorage | Strata Storage |
 |---|---|---|
