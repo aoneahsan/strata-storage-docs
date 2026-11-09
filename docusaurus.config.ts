@@ -154,6 +154,7 @@ const config: Config = {
 
   // 🔴 Never a canonical here: the theme emits one per route, and a global one doubles every page's (SA-P01).
   headTags: [
+    { tagName: 'meta', attributes: { name: 'yandex-verification', content: 'bfb02722189028cf' } },
     {
       tagName: 'script',
       attributes: { type: 'application/ld+json' },
