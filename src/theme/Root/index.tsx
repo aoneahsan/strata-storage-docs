@@ -3,6 +3,7 @@ import Translate from '@docusaurus/Translate';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import { useLocation } from '@docusaurus/router';
 import { defineStorage } from 'strata-storage';
+import LicenceCheck from '@site/src/components/LicenceCheck';
 
 type Release = { version: string; severity: 'normal' | 'urgent'; reason: string; updateUrl: string };
 type Notice = { version: string; reason: string; startId: string };
@@ -203,5 +204,5 @@ function DocsReleaseGate() {
 }
 
 export default function Root({ children }: { children: React.ReactNode }): React.ReactNode {
-  return <>{children}<DocsReleaseGate /></>;
+  return <>{children}<DocsReleaseGate /><LicenceCheck /></>;
 }

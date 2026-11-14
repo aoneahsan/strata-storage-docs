@@ -37,7 +37,8 @@ const config: Config = {
 
   url: SITE_URL,
   baseUrl: '/',
-  customFields: { docsVersion: DOCS_VERSION, releaseChannel: RELEASE_CHANNEL, releaseEndpoint: RELEASE_ENDPOINT },
+  // A white-label docs build sets WHITE_LABEL_KEY; ours leaves it empty, so the licence check never runs here.
+  customFields: { docsVersion: DOCS_VERSION, releaseChannel: RELEASE_CHANNEL, releaseEndpoint: RELEASE_ENDPOINT, whiteLabelKey: process.env.WHITE_LABEL_KEY?.trim() ?? '' },
 
   organizationName: 'aoneahsan',
   projectName: 'strata-storage-docs',
@@ -253,6 +254,7 @@ const config: Config = {
             { label: 'Quick Start', to: '/quick-start' },
             { label: 'API Reference', to: '/api' },
             { label: 'For AI Agents', to: '/ai' },
+            { label: 'White-label & licensing', to: '/white-label/overview' },
           ],
         },
         {

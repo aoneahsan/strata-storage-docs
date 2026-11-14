@@ -45,3 +45,4 @@ article a {
 .docs-release-panel h2 { margin: .5rem 0; font-size: clamp(1.5rem, 5vw, 2.5rem); }
 .docs-release-panel p { overflow-wrap: anywhere; }
 .docs-release-panel button { min-height: 2.75rem; margin-top: .5rem; padding: .6rem 1rem; border: 0; border-radius: var(--ifm-button-border-radius); background: var(--ifm-color-primary); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.docs-licence-panel { background: var(--ifm-background-surface-color); }

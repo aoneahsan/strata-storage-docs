@@ -53,3 +53,13 @@ Developer: https://aoneahsan.com · Contact: aoneahsan@gmail.com
 - [FAQ](https://stratastorage-docs.aoneahsan.com/reference/faq)
 - [Troubleshooting](https://stratastorage-docs.aoneahsan.com/reference/troubleshooting)
 - [Changelog](https://stratastorage-docs.aoneahsan.com/reference/changelog)
+
+## White-label & licensing
+
+- [Overview](https://stratastorage-docs.aoneahsan.com/white-label/overview)
+- [What is delivered](https://stratastorage-docs.aoneahsan.com/white-label/what-is-delivered)
+- [Setup timeline](https://stratastorage-docs.aoneahsan.com/white-label/setup-timeline)
+- [Updates and renewals](https://stratastorage-docs.aoneahsan.com/white-label/updates-and-renewals)
+- [Verify a licence](https://stratastorage-docs.aoneahsan.com/white-label/verify-a-licence)
+- [FAQ](https://stratastorage-docs.aoneahsan.com/white-label/faq)
+- [Pricing (marketing site)](https://stratastorage.aoneahsan.com/white-label/pricing)
