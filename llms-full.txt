@@ -15517,3 +15517,155 @@ When creating an issue, please include:
 - **Contact / report an issue**: [stratastorage.aoneahsan.com/contact](https://stratastorage.aoneahsan.com/contact)
 - **Documentation**: [stratastorage-docs.aoneahsan.com](https://stratastorage-docs.aoneahsan.com)
 - **Email**: aoneahsan@gmail.com
+
+
+================================================================================
+# White-label licence questions
+URL: https://stratastorage-docs.aoneahsan.com/white-label/faq
+================================================================================
+
+# White-label questions
+
+## Do I get the source code?
+
+You already have it. The repository is public under MIT. The licence adds the rebrand, publishing, docs and releases, and the right to use our name and mark.
+
+## Who owns the npm package name?
+
+You do. The scope sits in your npm account; our release account only holds publish rights, and you can remove them.
+
+## Does it include the Capacitor plugin?
+
+Yes. The rebranded build carries the web adapters, the Capacitor plugin for iOS and Android, and the React, Vue, Angular and Firebase entry points the package ships today.
+
+## Can someone else license the same package?
+
+Yes. A licence isn't exclusive, and there's no buyout because the code is already public.
+
+## Can you add something only we need?
+
+Yes, as [custom work](https://stratastorage.aoneahsan.com/white-label/custom-work), quoted on its own.
+
+
+================================================================================
+# White-label Strata Storage under your npm scope
+URL: https://stratastorage-docs.aoneahsan.com/white-label/overview
+================================================================================
+
+# White-label licence
+
+A white-label licence pays us to publish Strata Storage under your npm scope, put your name on these docs, and carry each release over to your package. Your developers still call `set`, `get` and `remove`; the import line changes from `strata-storage` to yours.
+
+## What stays the same
+
+The source is public under the [MIT licence](https://github.com/aoneahsan/strata-storage/blob/main/LICENSE). Anyone can install `strata-storage`, read it and fork it, with or without a licence. Because the code is already open, there's no buyout, and a licence is never exclusive: we can license the same package to other teams.
+
+## What the licence adds
+
+- The managed work: rebrand, publish, docs and releases. [What is delivered](./what-is-delivered.md) lists it.
+- The right to say your package is built on Strata Storage and to show our mark beside yours. MIT covers the code, not the name.
+
+## Not the right fit when
+
+- You only need the package. Install `strata-storage`; it's MIT and needs no account.
+- You need a hosted backend. Strata Storage keeps values on the device and in the browser, so there's no server for us to run.
+
+## Price and terms
+
+The [pricing page](https://stratastorage.aoneahsan.com/white-label/pricing) shows the current price and total, read from our licensing service. The [licence terms](https://stratastorage.aoneahsan.com/white-label/license-terms) are the agreement in plain words.
+
+
+================================================================================
+# Setting up a white-label Strata Storage package
+URL: https://stratastorage-docs.aoneahsan.com/white-label/setup-timeline
+================================================================================
+
+# Setup timeline
+
+Each step waits on the one before it. Nothing starts until the payment provider confirms the payment; a return page alone doesn't.
+
+1. **Licence email.** Your licence key and certificate arrive by email.
+2. **Your npm scope.** You send the scope or package name, and add our release account as a publisher on it.
+3. **Your docs domain.** You point the domain you gave at checkout to the docs host we tell you, with one DNS record.
+4. **Your brand.** You send the name, mark and colours for the docs site.
+5. **First build.** We publish the rebranded package and deploy the docs, with the licence file at its fixed path.
+6. **Install line.** We send the install command for your developers, for example `yarn add @your-scope/storage`.
+
+After that, each `strata-storage` release during your update period follows the same path. See [updates and renewals](./updates-and-renewals.md).
+
+
+================================================================================
+# White-label updates and renewals
+URL: https://stratastorage-docs.aoneahsan.com/white-label/updates-and-renewals
+================================================================================
+
+# Updates and renewals
+
+Every licence includes a period of releases from the purchase date. The [updates page](https://stratastorage.aoneahsan.com/white-label/updates) shows its length and the renewal prices.
+
+## What an update is
+
+- Bug fixes, adapter changes and new storage options in `strata-storage`, rebuilt into your package.
+- Capacitor and framework support as the package adopts it, with the native plugin rebuilt.
+- Your docs updated for each published release, migration notes included.
+
+A change only your team needs isn't an update; it's custom work.
+
+## When the period ends
+
+Your package stays published at its last version and keeps working in your developers' apps. Renew for 3, 6 or 12 months with your licence key and licence email on the updates page to keep releases coming.
+
+
+================================================================================
+# Verify a white-label Strata Storage licence
+URL: https://stratastorage-docs.aoneahsan.com/white-label/verify-a-licence
+================================================================================
+
+# Verify a licence
+
+Anyone can check a licence on the [verify page](https://stratastorage.aoneahsan.com/verify-license). Verification is run by our licensing service.
+
+## By key
+
+Paste the key. It starts with `STRATASTORAGE-WL-` and is in the buyer's licence email and on their certificate. The answer shows the client, the domains, the status and the date releases run until.
+
+## By domain
+
+Enter the domain of the package's docs site. A licensed docs site serves this file:
+
+```text
+/.well-known/stratastorage-white-label-license.json
+```
+
+The check reads that file and confirms the key it names belongs to that domain.
+
+## On a licensed docs site
+
+A docs build made for a licence carries its key. When it opens on a domain the licence doesn't cover, or the licence is revoked, the page shows a notice that the licence is not active, with a link to the verify page. If the check can't reach our service, the docs open as normal.
+
+
+================================================================================
+# What a white-label Strata Storage licence delivers
+URL: https://stratastorage-docs.aoneahsan.com/white-label/what-is-delivered
+================================================================================
+
+# What is delivered
+
+Strata Storage ships one group, the npm package, so a licence covers all of it.
+
+| Part | What you get under your name |
+|---|---|
+| Package | Your package name and scope, README and changelog. The core keeps zero runtime dependencies. |
+| Entry points | The `react`, `vue`, `angular`, `capacitor` and `firebase` sub-paths the package ships today, renamed under your package. |
+| Native plugin | The Capacitor plugin for iOS and Android, with the pod and Android module renamed to match. |
+| CLI | The `configure` command under your command name. |
+| Docs | These guides and the API reference, rebuilt with your name, package name and colours, on the domain you give us. |
+| Licence file | A file on your docs domain naming your licence key, so anyone can [verify it](./verify-a-licence.md). |
+
+## Who owns what
+
+You keep the npm organisation and the package name. You give our release account publish rights, and you can take them away. Your domain and npm organisation are your own costs.
+
+## What isn't included
+
+Changes only your team needs, such as a new adapter or an extra framework binding, are [custom work](https://stratastorage.aoneahsan.com/white-label/custom-work), quoted separately.
