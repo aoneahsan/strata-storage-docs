@@ -1,4 +1,4 @@
-/* Strata Storage docs 2.8.4; build 1fd5cb5551507bbd679124a4de28bf997b24457612c7820dfbb9d9eec03466ea */
+/* Strata Storage docs 2.8.4; build 819109bf767bf192dc37577e745768d1bc01571e2631503faf874f490b2bdb37 */
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
 self.addEventListener('message', (event) => { if (event.data?.type === 'SKIP_WAITING') self.skipWaiting(); });
