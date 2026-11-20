@@ -17,6 +17,13 @@ For AI agents: https://stratastorage-docs.aoneahsan.com/ai
 Full text (one file for ingestion): https://stratastorage-docs.aoneahsan.com/llms-full.txt
 Developer: https://aoneahsan.com · Contact: aoneahsan@gmail.com
 
+
+## Get Strata Storage
+
+- [All apps](https://stratastorage-docs.aoneahsan.com/apps): every released surface of Strata Storage.
+- [npm](https://www.npmjs.com/package/strata-storage)
+- [Website](https://stratastorage.aoneahsan.com)
+
 ## Getting started
 
 - [Introduction](https://stratastorage-docs.aoneahsan.com/): what Strata Storage is and why it exists.

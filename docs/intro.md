@@ -7,6 +7,8 @@ keywords: [strata storage, capacitor storage, indexeddb, sqlite, encryption, cro
 
 # Introduction
 
+**Get Strata Storage:** `npm install strata-storage` · [npm](https://www.npmjs.com/package/strata-storage) · [website](https://stratastorage.aoneahsan.com) · [all apps](/apps)
+
 Strata Storage gives browser and Capacitor apps one `set()` and `get()` shape across several storage adapters. The adapter still matters: browser, iOS and Android values live in different places, and a browser read cannot prove a native read.
 
 ## First browser round-trip

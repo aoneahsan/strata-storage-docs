@@ -6,12 +6,13 @@ import llmsFull from './plugins/llms-full';
 import sitePages, { withLastmod } from './plugins/site-pages';
 import releaseWorker from './plugins/release-worker';
 import compareLinkPolicy from './plugins/compare-link-policy';
+import { OTHER_PLATFORMS, platformHref } from './src/data/platforms';
 
 /** The docs site's own address. `static/CNAME` holds the same host for GitHub Pages. */
 const SITE_URL = 'https://stratastorage-docs.aoneahsan.com';
-const MARKETING_URL = 'https://stratastorage.aoneahsan.com';
+const MARKETING_URL = platformHref('web');
 const GITHUB_URL = 'https://github.com/aoneahsan/strata-storage';
-const NPM_URL = 'https://www.npmjs.com/package/strata-storage';
+const NPM_URL = platformHref('npm');
 
 /** The release notes' route: the blog plugin's `routeBasePath` below, with its leading slash. */
 const BLOG_PATH = '/blog';
@@ -239,13 +240,27 @@ const config: Config = {
         { to: '/api', label: 'API', position: 'left' },
         { to: BLOG_PATH, label: 'Releases', position: 'left' },
         { to: '/ai', label: 'For AI', position: 'left' },
-        { href: MARKETING_URL, label: 'Website', position: 'right' },
-        { href: NPM_URL, label: 'npm', position: 'right' },
+        {
+          type: 'dropdown',
+          label: 'Get Strata Storage',
+          position: 'right',
+          items: [
+            ...OTHER_PLATFORMS.map((platform) => ({ label: platform.name, href: platform.href })),
+            { label: 'All apps', to: '/apps' },
+          ],
+        },
       ],
     },
     footer: {
       style: 'dark',
       links: [
+        {
+          title: 'Get Strata Storage',
+          items: [
+            ...OTHER_PLATFORMS.map((platform) => ({ label: platform.name, href: platform.href })),
+            { label: 'All apps', to: '/apps' },
+          ],
+        },
         {
           title: 'Docs',
           items: [
