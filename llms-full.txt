@@ -5682,6 +5682,18 @@ const capabilities = storage.getCapabilities(storage?);
 
 
 ================================================================================
+# Get Strata Storage
+URL: https://stratastorage-docs.aoneahsan.com/apps
+================================================================================
+
+import AppsList from '@site/src/components/AppsList';
+
+Install it from npm, read about it on the website, and keep these docs a tab away.
+
+<AppsList />
+
+
+================================================================================
 # Moving from @aparajita/capacitor-secure-storage to Strata Storage
 URL: https://stratastorage-docs.aoneahsan.com/compare/aparajita-capacitor-secure-storage
 ================================================================================
@@ -14228,6 +14240,8 @@ URL: https://stratastorage-docs.aoneahsan.com/
 ================================================================================
 
 # Introduction
+
+**Get Strata Storage:** `npm install strata-storage` · [npm](https://www.npmjs.com/package/strata-storage) · [website](https://stratastorage.aoneahsan.com) · [all apps](/apps)
 
 Strata Storage gives browser and Capacitor apps one `set()` and `get()` shape across several storage adapters. The adapter still matters: browser, iOS and Android values live in different places, and a browser read cannot prove a native read.
 
